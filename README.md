@@ -1,2 +1,2 @@
 # goo.io
-go lib pkg
+golang development framework
