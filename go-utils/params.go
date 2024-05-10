@@ -2,7 +2,7 @@ package goutils
 
 import (
 	"encoding/json"
-	goo_log "github.com/liqiongtao/googo.io/goo-log"
+	golog "github.com/jiriyao/go.io/go-log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -14,7 +14,7 @@ type Byte []byte
 func (b Byte) Params() (p *Params, err error) {
 	p = NewParams()
 	if err = json.Unmarshal(b, &p.data); err != nil {
-		goo_log.WithField("params", string(b)).Error(err)
+		golog.WithField("params", string(b)).Error(err)
 		return
 	}
 	return

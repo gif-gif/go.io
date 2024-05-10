@@ -1,14 +1,14 @@
 package goutils
 
 import (
-	goo_log "github.com/liqiongtao/googo.io/goo-log"
+	golog "github.com/jiriyao/go.io/go-log"
 	"sync"
 )
 
 // 捕获panic
 func Recovery() {
 	if r := recover(); r != nil {
-		goo_log.Error(r)
+		golog.Error(r)
 	}
 }
 
