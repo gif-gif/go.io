@@ -1,2 +1,2 @@
-# goo.io
+# go.io
 golang development framework
