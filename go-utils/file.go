@@ -2,6 +2,9 @@ package goutils
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
+	"mime/multipart"
 	"os"
 	"path"
 	"runtime"
@@ -82,4 +85,57 @@ func prettyFile(file string) string {
 	}
 
 	return file[index2+1:]
+}
+
+func Exist(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil // 文件或目录存在
+	}
+	if os.IsNotExist(err) {
+		return false, nil // 文件或目录不存在
+	}
+	return false, err // 发生了其他错误，无法确定
+}
+
+func CreateSavePath(dst string, perm os.FileMode) error {
+	err := os.MkdirAll(dst, perm)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func SaveFile(file *multipart.FileHeader, dst string) error {
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, src)
+	return err
+}
+
+func GetFileHeaderMd5Name(fileHeader *multipart.FileHeader) (string, error) {
+	file, err := fileHeader.Open()
+	if err != nil {
+		return "", err
+	}
+
+	body, err := ioutil.ReadAll(file)
+	if err != nil {
+		return "", err
+	}
+
+	name := MD5(body)
+
+	return name, nil //+ filepath.Ext(fileHeader.Filename)
 }

@@ -1,2 +1,2 @@
 # go.io
-framework interfaces
+framework interfaces and configurations for libraries
