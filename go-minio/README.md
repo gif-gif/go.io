@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	AccessKeyId     = flag.String("access_key_id", "fPztco0yxWC1qrxz6iDN", "")
-	AccessKeySecret = flag.String("access_key_secret", "kWS6q1PIxjcEnLSkoBWrWqPnsHFHm1Q8cvG1CUPm", "")
+	AccessKeyId     = flag.String("access_key_id", "fPztco0yxWC1qrxz6iDN11", "")
+	AccessKeySecret = flag.String("access_key_secret", "kWS6q1PIxjcEnLSkoBW11rWqPnsHFHm1Q8cvG1CUPm", "")
 	Endpoint        = flag.String("endpoint", "minio.gif00.com", "")
 	Bucket          = flag.String("bucket", "test", "")
 	Domain          = flag.String("domain", "", "")
