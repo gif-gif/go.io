@@ -71,7 +71,7 @@ func uploadTest() {
 			filename = i[index+1:]
 		}
 
-		info, err := oss.FPutObject(context.Background(), strings.ToLower(filename), i)
+		info, err := oss.FPutObject(context.Background(), strings.ToLower(filename), i, nil)
 		if err != nil {
 			fmt.Println(err.Error())
 			continue
@@ -80,7 +80,29 @@ func uploadTest() {
 	}
 }
 
+func getTest() {
+
+	conf := gominio.Config{
+		AccessKeyId:     *AccessKeyId,
+		AccessKeySecret: *AccessKeySecret,
+		Endpoint:        *Endpoint,
+		Bucket:          *Bucket,
+		Domain:          *Domain,
+		UseSSL:          false,
+	}
+
+	oss := gominio.NewOssModel(conf)
+
+	err := oss.FGetObject(context.Background(), "/test/2024/05/422744271b108960a4818cc91a1822d9.log", "/Users/Jerry/Desktop/bak202405/422744271b108960a4818cc91a1822d9.log", nil)
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println("get object succeeded")
+	}
+}
+
 func main() {
 	//uploadTest()
-	createBucketTest()
+	//createBucketTest()
+	getTest()
 }
