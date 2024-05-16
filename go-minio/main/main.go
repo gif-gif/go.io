@@ -5,8 +5,11 @@ import (
 	"flag"
 	"fmt"
 	gominio "github.com/gif-gif/go.io/go-minio"
+	"github.com/minio/minio-go/v7"
+	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
 var (
@@ -71,7 +74,9 @@ func uploadTest() {
 			filename = i[index+1:]
 		}
 
-		info, err := oss.FPutObject(context.Background(), strings.ToLower(filename), i, nil)
+		info, err := oss.FPutObject(context.Background(), strings.ToLower(filename), i, &minio.PutObjectOptions{
+			Expires: time.Now().AddDate(0, 0, 1),
+		})
 		if err != nil {
 			fmt.Println(err.Error())
 			continue
@@ -99,6 +104,26 @@ func getTest() {
 	} else {
 		fmt.Println("get object succeeded")
 	}
+
+	for object := range oss.ListObjects("test", nil) {
+		if object.Err != nil {
+			fmt.Println(object.Err)
+			return
+		}
+		fmt.Println("found:", object)
+	}
+
+	// Set request parameters for content-disposition.
+	reqParams := make(url.Values)
+	reqParams.Set("response-content-disposition", "attachment; filename=\"your-filename.txt\"")
+
+	// Generates a presigned url which expires in a day.
+	presignedURL, err := oss.PresignedGetObject("test", "test.apk", time.Second*24*60*60, reqParams)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Successfully generated presigned URL", presignedURL)
 }
 
 func main() {

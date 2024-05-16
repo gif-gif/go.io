@@ -7,6 +7,8 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"log"
+	"net/url"
+	"time"
 )
 
 type GoMinio struct {
@@ -79,6 +81,25 @@ func (o *GoMinio) CreateBucket(ctx context.Context, bucketName string, location 
 		}
 	}
 	return nil
+}
+
+func (o *GoMinio) ListBuckets() ([]minio.BucketInfo, error) {
+	return o.client.ListBuckets(context.Background())
+}
+
+func (o *GoMinio) BucketExists(bucketName string) (bool, error) {
+	return o.client.BucketExists(context.Background(), bucketName)
+}
+
+func (o *GoMinio) ListObjects(bucketName string, opts *minio.ListObjectsOptions) <-chan minio.ObjectInfo {
+	if opts == nil {
+		opts = &minio.ListObjectsOptions{}
+	}
+	return o.client.ListObjects(context.Background(), bucketName, *opts)
+}
+
+func (o *GoMinio) PresignedGetObject(bucketName, objectName string, expiry time.Duration, reqParams url.Values) (u *url.URL, err error) {
+	return o.client.PresignedGetObject(context.Background(), bucketName, objectName, expiry, reqParams)
 }
 
 func (o *GoMinio) getClient() (*minio.Client, error) {
