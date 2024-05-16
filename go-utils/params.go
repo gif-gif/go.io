@@ -2,7 +2,7 @@ package goutils
 
 import (
 	"encoding/json"
-	golog "github.com/jiriyao/go.io/go-log"
+	golog "github.com/gif-gif/go.io/go-log"
 	"reflect"
 	"strconv"
 	"strings"

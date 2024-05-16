@@ -2,4 +2,4 @@
 golang development framework
 
 # 安装
-`go get -u github.com/jiriyao/go.io`
+`go get -u github.com/gif-gif/go.io`

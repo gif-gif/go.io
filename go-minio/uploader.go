@@ -3,7 +3,7 @@ package gominio
 import (
 	"context"
 	"errors"
-	golog "github.com/jiriyao/go.io/go-log"
+	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"log"

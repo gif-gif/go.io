@@ -1,4 +1,4 @@
-module github.com/jiriyao/go.io
+module github.com/gif-gif/go.io
 
 go 1.22
 

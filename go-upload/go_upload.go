@@ -1,7 +1,7 @@
 package goupload
 
 import (
-	goutils "github.com/jiriyao/go.io/go-utils"
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"mime/multipart"
 	"os"
 	"path/filepath"

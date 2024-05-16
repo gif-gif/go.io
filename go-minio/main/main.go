@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	gominio "github.com/jiriyao/go.io/go-minio"
+	gominio "github.com/gif-gif/go.io/go-minio"
 	"os"
 	"strings"
 )

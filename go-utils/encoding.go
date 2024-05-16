@@ -2,7 +2,7 @@ package goutils
 
 import (
 	"bytes"
-	golog "github.com/jiriyao/go.io/go-log"
+	golog "github.com/gif-gif/go.io/go-log"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 	"io/ioutil"

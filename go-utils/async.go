@@ -1,7 +1,7 @@
 package goutils
 
 import (
-	golog "github.com/jiriyao/go.io/go-log"
+	golog "github.com/gif-gif/go.io/go-log"
 	"sync"
 )
 
