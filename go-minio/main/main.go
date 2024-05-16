@@ -17,7 +17,30 @@ var (
 	Domain          = flag.String("domain", "", "")
 )
 
-func main() {
+func createBucketTest() {
+	conf := gominio.Config{
+		AccessKeyId:     *AccessKeyId,
+		AccessKeySecret: *AccessKeySecret,
+		Endpoint:        *Endpoint,
+		Bucket:          *Bucket,
+		Domain:          *Domain,
+		UseSSL:          false,
+	}
+
+	oss := gominio.NewOssModel(conf)
+	bucketName := "testbucket"
+	location := "us-east-1"
+
+	err := oss.CreateBucket(context.Background(), bucketName, location)
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println("Created bucket successfully")
+	}
+
+}
+
+func uploadTest() {
 	args := os.Args
 	if l := len(args); l < 2 {
 		fmt.Println("请选择上传文件!")
@@ -48,12 +71,16 @@ func main() {
 			filename = i[index+1:]
 		}
 
-		info, err := oss.Upload(context.Background(), strings.ToLower(filename), i)
+		info, err := oss.FPutObject(context.Background(), strings.ToLower(filename), i)
 		if err != nil {
 			fmt.Println(err.Error())
 			continue
 		}
 		fmt.Println(info)
 	}
+}
 
+func main() {
+	//uploadTest()
+	createBucketTest()
 }

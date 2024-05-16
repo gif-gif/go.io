@@ -7,16 +7,15 @@ import (
 
 type (
 	Oss interface {
-		Init(conf Config) *uploader
+		Init(conf Config) *GoMinio
 		Client() *minio.Client
-		ContentType(value string) *uploader
-		Options(opts minio.PutObjectOptions) *uploader
-		Upload(ctx context.Context, objectName string, filePath string) (*minio.UploadInfo, error)
+		FPutObject(ctx context.Context, objectName string, sourceFilePath string, options *minio.PutObjectOptions) (*minio.UploadInfo, error)
+		FGetObject(ctx context.Context, objectName, saveFilePath string, options *minio.GetObjectOptions) error
 		CreateBucket(ctx context.Context, bucketName string, location string) error
 	}
 
 	customOssModel struct {
-		oss *uploader
+		oss *GoMinio
 	}
 )
 
@@ -30,21 +29,17 @@ func (c *customOssModel) Client() *minio.Client {
 	return c.oss.client
 }
 
-func (c *customOssModel) Init(conf Config) *uploader {
-	c.oss, _ = newUploader(conf)
+func (c *customOssModel) Init(conf Config) *GoMinio {
+	c.oss, _ = newGoMinio(conf)
 	return c.oss
 }
 
-func (c *customOssModel) ContentType(value string) *uploader {
-	return c.oss.ContentType(value)
+func (c *customOssModel) FPutObject(ctx context.Context, objectName string, sourceFilePath string, options *minio.PutObjectOptions) (*minio.UploadInfo, error) {
+	return c.oss.FPutObject(ctx, objectName, sourceFilePath, options)
 }
 
-func (c *customOssModel) Options(opts minio.PutObjectOptions) *uploader {
-	return c.oss.Options(opts)
-}
-
-func (c *customOssModel) Upload(ctx context.Context, objectName string, filePath string) (*minio.UploadInfo, error) {
-	return c.oss.Upload(ctx, objectName, filePath)
+func (c *customOssModel) FGetObject(ctx context.Context, objectName, saveFilePath string, options *minio.GetObjectOptions) error {
+	return c.oss.FGetObject(ctx, objectName, saveFilePath, options)
 }
 
 func (c *customOssModel) CreateBucket(ctx context.Context, bucketName string, location string) error {
