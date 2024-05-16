@@ -5,6 +5,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type FileUploadResult struct {
@@ -26,6 +27,8 @@ func UploadFile(assetsDir string, file *multipart.FileHeader) (*FileUploadResult
 			return nil, err
 		}
 	}
+
+	fullName = strings.ToLower(fullName)
 
 	originalPath := filepath.Join(assetsDir, fullName)
 	if ok, _ := goutils.Exist(originalPath); !ok {

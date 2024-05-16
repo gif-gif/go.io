@@ -20,14 +20,14 @@ type (
 	}
 )
 
-func (c *customOssModel) Client() *minio.Client {
-	return c.oss.client
-}
-
 func NewOssModel(conf Config) Oss {
 	o := &customOssModel{}
 	o.Init(conf)
 	return o
+}
+
+func (c *customOssModel) Client() *minio.Client {
+	return c.oss.client
 }
 
 func (c *customOssModel) Init(conf Config) *uploader {
