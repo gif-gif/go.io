@@ -16,6 +16,7 @@ type (
 		ListObjects(bucketName string, opts *minio.ListObjectsOptions) <-chan minio.ObjectInfo
 		ListBuckets() ([]minio.BucketInfo, error)
 		CreateBucket(ctx context.Context, bucketName string, location string) error
+		// 生成原始下载地址
 		PresignedGetObject(bucketName, objectName string, expiry time.Duration, reqParams url.Values) (u *url.URL, err error)
 	}
 
@@ -63,7 +64,6 @@ func (c *customOssModel) ListObjects(bucketName string, opts *minio.ListObjectsO
 	return c.oss.ListObjects(bucketName, opts)
 }
 
-// 生成原始下载地址
 func (c *customOssModel) PresignedGetObject(bucketName, objectName string, expiry time.Duration, reqParams url.Values) (u *url.URL, err error) {
 	return c.oss.PresignedGetObject(bucketName, objectName, expiry, reqParams)
 }
