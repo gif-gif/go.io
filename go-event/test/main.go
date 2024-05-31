@@ -1,10 +1,10 @@
 package main
 
 import (
+	gocontext "github.com/gif-gif/go.io/go-context"
 	goevent "github.com/gif-gif/go.io/go-event"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/goio"
-	"time"
 )
 
 func main() {
@@ -14,5 +14,5 @@ func main() {
 		golog.WithTag("goevent").Info(msg)
 	})
 	event.Publish("test", "test")
-	time.Sleep(time.Duration(1) * time.Second)
+	<-gocontext.Cancel().Done()
 }
