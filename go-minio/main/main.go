@@ -30,7 +30,7 @@ func createBucketTest() {
 		UseSSL:          false,
 	}
 
-	oss := gominio.NewOssModel(conf)
+	oss := gominio.New(conf)
 	bucketName := "testbucket"
 	location := "us-east-1"
 
@@ -59,7 +59,7 @@ func uploadTest() {
 		UseSSL:          false,
 	}
 
-	oss := gominio.NewOssModel(conf)
+	oss := gominio.New(conf)
 
 	for n, i := range args {
 		if n == 0 {
@@ -96,7 +96,7 @@ func getTest() {
 		UseSSL:          false,
 	}
 
-	oss := gominio.NewOssModel(conf)
+	oss := gominio.New(conf)
 
 	err := oss.FGetObject(context.Background(), "/test/2024/05/422744271b108960a4818cc91a1822d9.log", "/Users/Jerry/Desktop/bak202405/422744271b108960a4818cc91a1822d9.log", nil)
 	if err != nil {

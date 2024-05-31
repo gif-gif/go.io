@@ -25,7 +25,7 @@ type (
 	}
 )
 
-func NewOssModel(conf Config) Oss {
+func New(conf Config) Oss {
 	o := &customOssModel{}
 	o.Init(conf)
 	return o
