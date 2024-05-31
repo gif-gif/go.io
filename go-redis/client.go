@@ -25,7 +25,7 @@ func New(conf Config) (cli *Client, err error) {
 	}
 
 	if conf.AutoPing {
-		gocrons.SecondX(5, func() {
+		gocrons.New().SecondX(5, func() {
 			if err := cli.Ping().Err(); err != nil {
 				golog.WithTag("goo-redis").Error(err)
 			}

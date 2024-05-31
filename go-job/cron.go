@@ -1,25 +1,29 @@
-package gocrons
+package gojob
 
 import (
 	"fmt"
 	golog "github.com/gif-gif/go.io/go-log"
-	"github.com/robfig/cron/v3"
+	"github.com/go-co-op/gocron/v2"
 )
 
 type (
 	CronsModel struct {
-		cron *cron.Cron
+		cron gocron.Scheduler
 	}
 )
 
-func New() *CronsModel {
-	o := &CronsModel{
-		cron: cron.New(cron.WithSeconds()),
+func New() (*CronsModel, error) {
+	c, err := gocron.NewScheduler()
+	if err != nil {
+		return nil, err
 	}
-	return o
+	o := &CronsModel{
+		cron: c,
+	}
+	return o, nil
 }
 
-func (o *CronsModel) Cron() *cron.Cron {
+func (o *CronsModel) Cron() gocron.Scheduler {
 	return o.cron
 }
 
@@ -27,22 +31,22 @@ func (c *CronsModel) Start() {
 	c.cron.Start()
 }
 
-func (c *CronsModel) Stop() {
-	c.cron.Stop()
+func (c *CronsModel) Stop() error {
+	return c.cron.Shutdown()
 }
 
 func (c *CronsModel) Func(spec string, fn ...func()) {
 	for _, f := range fn {
-		_, err := c.cron.AddFunc(spec, f)
-		if err != nil {
-			golog.WithTag("gocrons").Error(err)
-		}
-	}
-}
-
-func (c *CronsModel) Job(spec string, job ...cron.Job) {
-	for _, j := range job {
-		_, err := c.cron.AddJob(spec, j)
+		_, err := c.cron.NewJob(
+			gocron.CronJob(
+				// standard cron tab parsing
+				spec,
+				true,
+			),
+			gocron.NewTask(
+				f,
+			),
+		)
 		if err != nil {
 			golog.WithTag("gocrons").Error(err)
 		}

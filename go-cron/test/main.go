@@ -1,6 +1,3 @@
-# 定时任务
-
-```
 package main
 
 import (
@@ -13,7 +10,10 @@ func main() {
 	DataChan := make(chan []byte, 20)
 	n := 1
 	cron := gocrons.New()
-	cron.Start() //启动
+	defer cron.Stop()
+	defer close(DataChan)
+
+	cron.Start()
 	cron.Second(func() {
 		if r := recover(); r != nil {
 			golog.Error(r)
@@ -40,5 +40,3 @@ func main() {
 	time.Sleep(time.Second * 5)
 
 }
-
-```

@@ -1,25 +1,29 @@
-# 定时任务
-
-```
 package main
 
 import (
-	gocrons "github.com/gif-gif/go.io/go-cron"
+	gojob "github.com/gif-gif/go.io/go-job"
 	golog "github.com/gif-gif/go.io/go-log"
 	"time"
 )
 
 func main() {
 	DataChan := make(chan []byte, 20)
+
 	n := 1
-	cron := gocrons.New()
-	cron.Start() //启动
+	cron, err := gojob.New()
+	if err != nil {
+		golog.WithTag("gojob").Error(err)
+	}
+	defer cron.Stop()
+	defer close(DataChan)
+
+	cron.Start()
 	cron.Second(func() {
 		if r := recover(); r != nil {
 			golog.Error(r)
 		}
 
-		golog.WithTag("gocrons").Info("testing")
+		golog.WithTag("gojob").Info("testing")
 		n++
 		if n > 5 {
 			n = 0
@@ -32,7 +36,7 @@ func main() {
 		for {
 			select {
 			case data := <-DataChan:
-				golog.WithTag("gocrons").Info(string(data))
+				golog.WithTag("gojob").Info(string(data))
 			}
 		}
 	}()
@@ -40,5 +44,3 @@ func main() {
 	time.Sleep(time.Second * 5)
 
 }
-
-```
