@@ -3,6 +3,7 @@ package gocrons
 import (
 	"fmt"
 	golog "github.com/gif-gif/go.io/go-log"
+	"github.com/gif-gif/go.io/goio"
 	"github.com/robfig/cron/v3"
 )
 
@@ -35,6 +36,9 @@ func (c *CronsModel) Func(spec string, fn ...func()) {
 	for _, f := range fn {
 		_, err := c.cron.AddFunc(spec, f)
 		if err != nil {
+			if goio.Env == goio.DEVELOPMENT {
+
+			}
 			golog.WithTag("gocrons").Error(err)
 		}
 	}
