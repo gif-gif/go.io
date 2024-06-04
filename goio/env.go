@@ -1,18 +1,18 @@
 package goio
 
-type Env string
+type Environment string
 
 // 库运行模式 dev|test|rt|pre|pro go-zero
 const (
-	PRODUCTION  Env = "pro"
-	PRE         Env = "pre"
-	RT          Env = "rt"
-	TEST        Env = "test"
-	DEVELOPMENT Env = "dev"
+	PRODUCTION  Environment = "pro"
+	PRE         Environment = "pre"
+	RT          Environment = "rt"
+	TEST        Environment = "test"
+	DEVELOPMENT Environment = "dev"
 )
 
 var (
-	envTags = map[Env]string{
+	envTags = map[Environment]string{
 		PRODUCTION:  "prod",
 		PRE:         "pre",
 		RT:          "rt",
@@ -21,10 +21,10 @@ var (
 	}
 )
 
-func (env Env) String() string {
+func (env Environment) String() string {
 	return string(env)
 }
 
-func (env Env) Tag() string {
+func (env Environment) Tag() string {
 	return envTags[env]
 }
