@@ -1,12 +1,16 @@
 # 发送通知
 飞书
 ```
-gomessage.FeiShu(hookUrl, "test")
+普通群消息
+gomessage.FeiShu(hookUrl, "这是普通的群消息")
 ```
 
 钉钉
 ``` 
 gomessage.InitDing("token","secret")
+
+普通群消息
+err := gomessage.DingDing("这是普通的群消息")
 
 @特定人的消息
 @对象必须为绑定钉钉的手机号
