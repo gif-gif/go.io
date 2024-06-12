@@ -18,13 +18,9 @@ func FeiShu(hookUrl string, text string) error {
 	return feishu.FeiShu(hookUrl, text)
 }
 
-func DingDing(text string) error {
+func DingDing(text string, at ...string) error {
 	if __DingDing == nil {
 		return nil
 	}
-	return __DingDing.SendMessageText(text)
-}
-
-func GetDingDing(hookUrl string, text string) *ding.Webhook {
-	return __DingDing
+	return __DingDing.SendMessageText(text, at...)
 }
