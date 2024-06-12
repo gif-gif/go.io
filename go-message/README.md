@@ -1,33 +1,19 @@
 # 发送通知
-以下是飞书机器人通知
+飞书
 ```
-package gomessage
+gomessage.FeiShu(hookUrl, "test")
+```
 
-import "testing"
+钉钉
+``` 
+gomessage.InitDing("token","secret")
 
-func TestFeiShu(t *testing.T) {
-	type args struct {
-		hookUrl string
-		text    string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-		{name: "test", args: args{
-			hookUrl: "https://open.feishu.cn/open-apis/bot/v2/hook/aa0f28f1-1663-421b-9fa9-af9b0bbe2ca4",
-			text:    "test",
-		}, wantErr: true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := FeiShu(tt.args.hookUrl, tt.args.text); (err != nil) != tt.wantErr {
-				t.Errorf("FeiShu() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
+@特定人的消息
+@对象必须为绑定钉钉的手机号
+err := gomessage.DingDing("Lucy, Harvey, 你们的程序挂了", "18578924567", "+13414567890")
+
+@所有人的消息
+err := gomessage.DingDing("这是@所有人的消息", "*")
 
 ```
+
