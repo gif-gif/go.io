@@ -7,7 +7,7 @@ gomessage.FeiShu(hookUrl, "这是普通的群消息")
 
 钉钉
 ``` 
-gomessage.InitDing("token","secret")
+gomessage.InitDingDing("token","secret")
 
 普通群消息
 err := gomessage.DingDing("这是普通的群消息")
