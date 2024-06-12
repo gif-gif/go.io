@@ -1,4 +1,4 @@
-package gomessage
+package feishu
 
 import (
 	"errors"
