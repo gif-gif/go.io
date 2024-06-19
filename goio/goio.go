@@ -3,7 +3,7 @@ package goio
 import golog "github.com/gif-gif/go.io/go-log"
 
 // 当前运行环境
-var Env Environment
+var Env Environment //string `json:",default=pro,options=dev|test|rt|pre|pro"`
 
 func Init(env Environment) {
 	Env = env
