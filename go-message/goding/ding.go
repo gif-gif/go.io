@@ -1,4 +1,4 @@
-package ding
+package goding
 
 import (
 	"bytes"
