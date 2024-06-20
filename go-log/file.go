@@ -64,8 +64,8 @@ func (fa *FileAdapter) Write(msg *Message) {
 				log.Println(r)
 			}
 		}()
-
-		fa.writeHandle(<-fa.ch)
+		c := <-fa.ch
+		fa.writeHandle(c)
 	}()
 
 	fa.ch <- msg.JSON()
