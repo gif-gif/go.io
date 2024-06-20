@@ -1,9 +1,8 @@
-package transactionex
+package gotransaction
 
 import (
 	"context"
 	"fmt"
-
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
