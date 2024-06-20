@@ -1,4 +1,4 @@
-package goo_es
+package goes
 
 import (
 	"context"

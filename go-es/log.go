@@ -1,4 +1,4 @@
-package goo_es
+package goes
 
 import (
 	golog "github.com/gif-gif/go.io/go-log"
