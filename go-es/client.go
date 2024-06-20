@@ -33,14 +33,14 @@ func New(conf Config, options ...elastic.ClientOptionFunc) (cli *client, err err
 
 	cli.cli, err = elastic.NewClient(options...)
 	if err != nil {
-		golog.WithTag("goo-es").WithField("host", conf.Addr).WithField("options", options).Error(err)
+		golog.WithTag("goes").WithField("host", conf.Addr).WithField("options", options).Error(err)
 		return
 	}
 
 	goutils.AsyncFunc(func() {
 		_, _, err := cli.cli.Ping(conf.Addr).Do(cli.ctx)
 		if err != nil {
-			golog.WithTag("goo-es").WithField("host", conf.Addr).WithField("options", options).Error(err)
+			golog.WithTag("goes").WithField("host", conf.Addr).WithField("options", options).Error(err)
 			return
 		}
 	})
@@ -48,7 +48,7 @@ func New(conf Config, options ...elastic.ClientOptionFunc) (cli *client, err err
 	goutils.AsyncFunc(func() {
 		_, err := cli.cli.ElasticsearchVersion(conf.Addr)
 		if err != nil {
-			golog.WithTag("goo-es").WithField("host", conf.Addr).WithField("options", options).Error(err)
+			golog.WithTag("goes").WithField("host", conf.Addr).WithField("options", options).Error(err)
 			return
 		}
 	})

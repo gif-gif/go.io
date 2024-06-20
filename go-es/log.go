@@ -10,7 +10,7 @@ type logger struct {
 }
 
 func (l logger) Printf(format string, v ...interface{}) {
-	log := golog.WithTag("goo-es")
+	log := golog.WithTag("goes")
 	switch l.level {
 	case golog.DEBUG:
 		log.DebugF(format, v...)

@@ -38,7 +38,7 @@ func GetClient(names ...string) *Client {
 		}
 	}
 
-	golog.WithTag("goo-redis").Error("no default redis client")
+	golog.WithTag("goredis").Error("no default redis client")
 
 	return nil
 }
@@ -54,7 +54,7 @@ func Default() *Client {
 		}
 	}
 
-	golog.WithTag("goo-redis").Error("no default redis client")
+	golog.WithTag("goredis").Error("no default redis client")
 
 	return nil
 }

@@ -1,4 +1,5 @@
-# go-clickhouse 需要升级改造为clickhouse/v2版本 
+# go-clickhouse clickhouse/v2版本 
+# 尽支持 http/https database/sql interface ，即将支持 native interface
 # 初始化 
 
 ```

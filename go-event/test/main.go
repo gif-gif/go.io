@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	goio.Init()
+	goio.Init(goio.DEVELOPMENT)
 	event := goevent.New()
 	event.Subscribe("test", func(msg goevent.Message) {
 		golog.WithTag("goevent").Info(msg)

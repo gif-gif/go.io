@@ -31,7 +31,7 @@ func (p *producer) SendMessage(topic string, message []byte) (partition int32, o
 
 	producer, err = sarama.NewSyncProducerFromClient(p.Client())
 	if err != nil {
-		golog.WithTag("goo-kafka-producer").Error(err)
+		golog.WithTag("gokafka-producer").Error(err)
 		return
 	}
 	defer producer.Close()
@@ -49,7 +49,7 @@ func (p *producer) SendAsyncMessage(topic string, message []byte, cb MessageHand
 
 	producer, err = sarama.NewAsyncProducerFromClient(p.Client())
 	if err != nil {
-		golog.WithTag("goo-kafka-producer").Error(err)
+		golog.WithTag("gokafka-producer").Error(err)
 		return
 	}
 	defer producer.Close()
@@ -60,7 +60,7 @@ func (p *producer) SendAsyncMessage(topic string, message []byte, cb MessageHand
 	case msg := <-producer.Successes():
 		cb(&ProducerMessage{msg}, nil)
 	case e := <-producer.Errors():
-		golog.WithTag("goo-kafka-producer").Error(e.Msg)
+		golog.WithTag("gokafka-producer").Error(e.Msg)
 		cb(&ProducerMessage{e.Msg}, e.Err)
 	}
 

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var __client *client
+var __client *Client
 
 func Init(conf Config) {
 	var err error

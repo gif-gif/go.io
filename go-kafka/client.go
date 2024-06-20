@@ -43,7 +43,7 @@ func (cli *client) init() (err error) {
 
 	cli.Client, err = sarama.NewClient(cli.conf.Addrs, config)
 	if err != nil {
-		golog.WithTag("goo-kafka").Error(err)
+		golog.WithTag("gokafka").Error(err)
 	}
 
 	return
