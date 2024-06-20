@@ -1,4 +1,4 @@
-# meta(facebook) marketing api
+# Meta(Facebook) Marketing Api
 ```go
 meta := gometa.Market{
     BaseApi: "https://graph.facebook.com/v17.0",
