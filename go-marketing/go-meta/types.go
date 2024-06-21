@@ -9,44 +9,43 @@ const (
 	adFields      = "adset_name,account_id,campaign_id,adset_id,ad_id,impressions,cpm,cpc,spend,clicks,objective,location,cost_per_unique_click,account_name,ctr,actions"
 )
 
-type FbCampaignStatus string
+type CampaignStatus string
 
 const (
-	ACTIVE   FbCampaignStatus = "ACTIVE"
-	PAUSED   FbCampaignStatus = "PAUSED"
-	DELETED  FbCampaignStatus = "DELETED"
-	ARCHIVED FbCampaignStatus = "ARCHIVED"
+	ACTIVE   CampaignStatus = "ACTIVE"
+	PAUSED   CampaignStatus = "PAUSED"
+	DELETED  CampaignStatus = "DELETED"
+	ARCHIVED CampaignStatus = "ARCHIVED"
 )
 
 // fb actions key
 const (
-	messaging_first_reply             = "onsite_conversion.messaging_first_reply"
-	post_engagement                   = "post_engagement"
-	page_engagement                   = "page_engagement"
-	comment                           = "comment"
-	Omni_activate_app                 = "omni_activate_app"
-	Mobile_app_install                = "mobile_app_install"
-	Omni_purchase                     = "omni_purchase"
-	messaging_conversation_started_7d = "onsite_conversion.messaging_conversation_started_7d"
-	fb_mobile_activate_app            = "app_custom_event.fb_mobile_activate_app"
-	omni_app_install                  = "omni_app_install"
-	video_view                        = "video_view"
-	post_reaction                     = "post_reaction"
-	link_click                        = "link_click"
-	post_save                         = "onsite_conversion.post_save"
+	OmniActivateApp  = "omni_activate_app"
+	MobileAppInstall = "mobile_app_install"
+	OmniPurchase     = "omni_purchase"
+	//messaging_first_reply             = "onsite_conversion.messaging_first_reply"
+	//post_engagement                   = "post_engagement"
+	//page_engagement                   = "page_engagement"
+	//comment                           = "comment"
+	//messaging_conversation_started_7d = "onsite_conversion.messaging_conversation_started_7d"
+	//fb_mobile_activate_app            = "app_custom_event.fb_mobile_activate_app"
+	//omni_app_install                  = "omni_app_install"
+	//video_view                        = "video_view"
+	//post_reaction                     = "post_reaction"
+	//link_click                        = "link_click"
+	//post_save                         = "onsite_conversion.post_save"
 )
 
 const (
-	Api_account                      = "/%s/client_ad_accounts"
-	Api_account_campaigns            = "/act_%s/campaigns"
-	Api_account_campaigns_for_coutry = "/act_%s/campaigns"
-	Api_account_adsets               = "/act_%s/adsets"
-	Api_account_ads                  = "/act_%s/ads"
-	Api_DataDetails                  = "/%s/insights"
-	Api_Refresh_Token                = "/oauth/access_token"
+	ApiAccount          = "/%s/client_ad_accounts"
+	ApiAccountCampaigns = "/act_%s/campaigns"
+	ApiAccountAdsets    = "/act_%s/adsets"
+	ApiAccountAds       = "/act_%s/ads"
+	ApiDataDetails      = "/%s/insights"
+	ApiRefreshToken     = "/oauth/access_token"
 )
 
-type FbPaging struct {
+type Paging struct {
 	Limit  int    `json:"limit,optional"`
 	Before string `json:"before,optional"`
 	After  string `json:"after,optional"`

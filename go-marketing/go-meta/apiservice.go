@@ -7,7 +7,7 @@ import (
 )
 
 func (m *Market) getAccountsByBusinessId(req *RequestData, businessId string) (*AccountResponse, error) {
-	api := m.BaseApi + Api_account
+	api := m.BaseApi + ApiAccount
 	api = fmt.Sprintf(api, businessId)
 	res := AccountResponse{}
 	params, _ := query.Values(req)

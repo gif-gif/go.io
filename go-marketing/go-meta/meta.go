@@ -33,7 +33,7 @@ func (m *Market) GetAccountAdsetesOutline(accountId string) (*AllDataResponse, e
 		Limit:       m.PageSize,
 	}
 
-	res, err := m.getAllDataByAccountId(req, accountId, Api_account_adsets)
+	res, err := m.getAllDataByAccountId(req, accountId, ApiAccountAdsets)
 	if err != nil {
 		return nil, err
 	}
@@ -51,10 +51,10 @@ func (m *Market) GetDetailsData(outlineItem *AllDataItem) (*DataDetailResponse, 
 			DateStop:    m.EndDate,
 			Limit:       m.PageSize,
 		},
-		Breakdowns: "['country']",
+		Breakdowns: "['country']", //默认以国家纬度数据请求
 	}
 
-	res, err := m.getDetailByDataId(req, outlineItem.Id, Api_DataDetails)
+	res, err := m.getDetailByDataId(req, outlineItem.Id, ApiDataDetails)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (m *Market) RefreshToken(clientId string, clientSecret string) (*TokenRespo
 		GrantType:       "fb_exchange_token",
 		FbExchangeToken: m.AccessToken,
 	}
-	api := m.BaseApi + Api_Refresh_Token
+	api := m.BaseApi + ApiRefreshToken
 	params, _ := query.Values(req)
 	res := TokenResponse{}
 	result, err := gohttpex.HttpGetValues[TokenResponse](api, params, nil, &res, 1)
