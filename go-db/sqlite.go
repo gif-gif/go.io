@@ -14,6 +14,7 @@ func InitSqlite3(dbFilePath string, config GoDbConfig) (*GoDB, error) {
 	if config.Config == nil {
 		config.Config = &gorm.Config{QueryFields: true}
 	}
+	//config.Config.DisableAutomaticPing = !config.AutoPing
 	db, err := gorm.Open(sqlite.Open(dbFilePath), config.Config)
 	if err != nil {
 		return nil, err

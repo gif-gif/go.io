@@ -12,6 +12,7 @@ func InitMysql(dataSource string, config GoDbConfig) (*GoDB, error) {
 	if config.Config == nil {
 		config.Config = &gorm.Config{QueryFields: true}
 	}
+	//config.Config.DisableAutomaticPing = !config.AutoPing
 	db, err := gorm.Open(mysql.Open(dataSource), config.Config)
 	if err != nil {
 		return nil, err
