@@ -82,7 +82,7 @@ func mysqlTest() {
 
 }
 
-func mysqlClickhouse() {
+func testClickhouse() {
 	dsn := "tcp://localhost:9000?database=gorm&username=gorm&password=gorm&read_timeout=10&write_timeout=20"
 	db, err := godb.InitMysql(dsn, godb.GoDbConfig{})
 	if err != nil {
@@ -109,5 +109,4 @@ func mysqlClickhouse() {
 	db.First(&product, "code = ?", "D42")
 	// Delete - delete product
 	db.Delete(&product, 1)
-
 }
