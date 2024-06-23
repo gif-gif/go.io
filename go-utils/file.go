@@ -139,3 +139,32 @@ func GetFileHeaderMd5Name(fileHeader *multipart.FileHeader) (string, error) {
 
 	return name, nil //+ filepath.Ext(fileHeader.Filename)
 }
+
+// 复制文件
+func CopyFile(src, dst string) error {
+	s, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(dst, s, 0o600)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// 获取当前目录下所有文件
+func GetFileList(path string) []string {
+	var fileList []string
+	files, _ := ioutil.ReadDir(path)
+	for _, f := range files {
+		if !f.IsDir() {
+			fileList = append(fileList, f.Name())
+		}
+	}
+	return fileList
+}
+
+func RemoveFile(file string) error {
+	return os.Remove(file)
+}
