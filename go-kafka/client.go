@@ -32,10 +32,10 @@ func (cli *client) init() (err error) {
 	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second // 间隔
 	config.Consumer.Offsets.Retry.Max = 3
 	config.Consumer.Offsets.Initial = sarama.OffsetNewest
-	config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategySticky
+	config.Consumer.Group.Rebalance.Strategy = sarama.NewBalanceStrategySticky()
 
 	config.ChannelBufferSize = 1000
-	config.Version = sarama.V0_10_2_0
+	//config.Version = sarama.V0_10_2_0
 
 	if cli.conf.Timeout > 0 {
 		config.Producer.Timeout = time.Duration(cli.conf.Timeout) * time.Second
