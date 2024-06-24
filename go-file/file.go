@@ -1,7 +1,8 @@
-package goutils
+package gofile
 
 import (
 	"fmt"
+	"github.com/gif-gif/go.io/go-utils"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -135,7 +136,7 @@ func GetFileHeaderMd5Name(fileHeader *multipart.FileHeader) (string, error) {
 		return "", err
 	}
 
-	name := MD5(body)
+	name := goutils.MD5(body)
 
 	return name, nil //+ filepath.Ext(fileHeader.Filename)
 }

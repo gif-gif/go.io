@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	godb "github.com/gif-gif/go.io/go-db"
+	gofile "github.com/gif-gif/go.io/go-file"
 	golog "github.com/gif-gif/go.io/go-log"
-	goutils "github.com/gif-gif/go.io/go-utils"
 	"gorm.io/gorm"
 )
 
@@ -48,7 +48,7 @@ func testSqlite3() {
 	// Delete - delete product
 	db.Delete(&product, 1)
 
-	err = goutils.RemoveFile("./test.db")
+	err = gofile.RemoveFile("./test.db")
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 	}
