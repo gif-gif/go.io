@@ -20,7 +20,8 @@ func main() {
 	goio.Init(goio.DEVELOPMENT)
 	//testSqlite3()
 	//mysqlTest()
-	testTransaction()
+	//testTransaction()
+	testHasMany()
 }
 
 func testSqlite3() {
@@ -40,7 +41,7 @@ func testSqlite3() {
 
 	// Create
 	insertProduct := &Product{Code: "D42", Price: 100}
-	db.Insert(insertProduct)
+	db.Create(insertProduct)
 	fmt.Println(insertProduct.ID)
 	// Read
 	var product Product
@@ -72,7 +73,7 @@ func mysqlTest() {
 
 	// Create
 	insertProduct := &Product{Code: "D42", Price: 100}
-	db.Insert(insertProduct)
+	db.Create(insertProduct)
 	fmt.Println(insertProduct.ID)
 	// Read
 	var product Product
@@ -102,7 +103,7 @@ func testClickhouse() {
 
 	// Create
 	insertProduct := &Product{Code: "D42", Price: 100}
-	db.Insert(insertProduct)
+	db.Create(insertProduct)
 	fmt.Println(insertProduct.ID)
 	// Read
 	var product Product
@@ -131,7 +132,7 @@ func testTransaction() {
 
 	// Create
 	insertProduct := &Product{Code: "D42", Price: 100}
-	txd := tx.Insert(insertProduct)
+	txd := tx.Create(insertProduct)
 	if txd.Error != nil {
 		fmt.Println("Insert error ", txd.Error.Error())
 		tx.Rollback()
@@ -170,6 +171,51 @@ func testTransaction() {
 	if err != nil {
 		fmt.Println("Commit error ", txd.Error.Error())
 		tx.Rollback()
+	}
+}
+
+func testHasMany() {
+	// User 有多张 CreditCard，UserID 是外键
+
+	type CreditCard struct {
+		gorm.Model
+		Number    string
+		UserRefer uint
+	}
+
+	type User struct {
+		gorm.Model
+		CreditCards []CreditCard `gorm:"foreignKey:UserRefer"`
+	}
+
+	db, err := godb.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", godb.GoDbConfig{})
+	if err != nil {
+		golog.WithTag("godb").Error(err.Error())
+		return
+	}
+	err = db.AutoMigrate(&User{})
+	if err != nil {
+		golog.WithTag("godb").Error(err.Error())
+		return
+	}
+
+	user := User{
+		CreditCards: []CreditCard{
+			CreditCard{Number: "jinzhu"},
+			CreditCard{Number: "jinzhu"},
+		},
+	}
+
+	db.Create(&user)
+	//db.Save(&user)
+
+	// 检索用户列表并预加载信用卡
+	var users []User
+	err = db.Model(&User{}).Preload("CreditCard").Find(&users).Error
+	if err != nil {
+		golog.WithTag("godb").Error("检索用户列表并预加载信用卡:" + err.Error())
+	} else {
+		fmt.Println(users)
 	}
 }
 

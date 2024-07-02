@@ -37,6 +37,19 @@ func (s *GoDB) Init(config *GoDbConfig) error {
 	return nil
 }
 
+func (s *GoDB) Model(value interface{}) *gorm.DB {
+	return s.DB.Model(value)
+}
+
+// 更新用户并完全更新其所有关联
+//
+// db.Session(&gorm.Session{FullSaveAssociations: true}).Updates(&user)
+//
+// SQL：完全更新地址、用户、电子邮件表，包括现有的关联记录
+func (s *GoDB) Session(config *gorm.Session) *gorm.DB {
+	return s.DB.Session(config)
+}
+
 // 事物开始
 //
 //	func CreateAnimals(db *gorm.DB) error {
@@ -224,7 +237,7 @@ func (s *GoDB) Exe1c(table string, dest interface{}, where string, args ...inter
 //	 Name string `gorm:"default:galeone"`
 //	 Age  int64  `gorm:"default:18"`
 //	}
-func (s *GoDB) Insert(value interface{}) (tx *gorm.DB) {
+func (s *GoDB) Create(value interface{}) (tx *gorm.DB) {
 	return s.DB.Create(value)
 }
 
@@ -239,6 +252,10 @@ func (s *GoDB) InsertSpecified(fields []string, exclude bool, value interface{})
 		}
 		return s.DB.Select(fs[0], fs[1:]...).Create(&value)
 	}
+}
+
+func (s *GoDB) Select(value interface{}, conds ...interface{}) (tx *gorm.DB) {
+	return s.DB.Select(value, conds...)
 }
 
 // Get the first record ordered by primary key
