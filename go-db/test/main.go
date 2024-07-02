@@ -5,6 +5,8 @@ import (
 	godb "github.com/gif-gif/go.io/go-db"
 	gofile "github.com/gif-gif/go.io/go-file"
 	golog "github.com/gif-gif/go.io/go-log"
+	"github.com/gif-gif/go.io/goio"
+	"github.com/gogf/gf/util/gconv"
 	"gorm.io/gorm"
 )
 
@@ -15,8 +17,10 @@ type Product struct {
 }
 
 func main() {
+	goio.Init(goio.DEVELOPMENT)
 	//testSqlite3()
-	mysqlTest()
+	//mysqlTest()
+	testTransaction()
 }
 
 func testSqlite3() {
@@ -109,4 +113,80 @@ func testClickhouse() {
 	db.First(&product, "code = ?", "D42")
 	// Delete - delete product
 	db.Delete(&product, 1)
+}
+
+func testTransaction() {
+	db, err := godb.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", godb.GoDbConfig{})
+	if err != nil {
+		golog.WithTag("godb").Error(err.Error())
+		return
+	}
+	err = db.AutoMigrate(&Product{})
+	if err != nil {
+		golog.WithTag("godb").Error(err.Error())
+		return
+	}
+
+	tx := db.BeginTransaction()
+
+	// Create
+	insertProduct := &Product{Code: "D42", Price: 100}
+	txd := tx.Insert(insertProduct)
+	if txd.Error != nil {
+		fmt.Println("Insert error ", txd.Error.Error())
+		tx.Rollback()
+		return
+	}
+
+	newId := insertProduct.ID
+
+	fmt.Println("Inserted ID: " + gconv.String(newId))
+	// Read
+	var product Product
+	txd = tx.First(&product, insertProduct.ID) // find product with integer primary key
+	if txd.Error != nil {
+		fmt.Println("not found first error ", txd.Error.Error())
+		tx.Rollback()
+		return
+	}
+
+	txd = tx.First(&product, "code = ?", "D42")
+	if txd.Error != nil {
+		fmt.Println("not found first error1 ", txd.Error.Error())
+		tx.Rollback()
+		return
+	}
+
+	deleteProduct := Product{}
+	// Delete - delete product
+	deleteProduct.ID = newId
+	txd = tx.Delete(&deleteProduct)
+	if txd.Error != nil {
+		fmt.Println("Delete error ", txd.Error.Error())
+		tx.Rollback()
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		fmt.Println("Commit error ", txd.Error.Error())
+		tx.Rollback()
+	}
+}
+
+func (u *Product) BeforeDelete(tx *gorm.DB) (err error) {
+	//if u.Role == "admin" {
+	//	return errors.New("admin user not allowed to delete")
+	//}
+
+	fmt.Println("BeforeDelete ")
+	return nil
+}
+
+func (u *Product) BeforeCreate(tx *gorm.DB) (err error) {
+	//if u.Role == "admin" {
+	//	return errors.New("admin user not allowed to delete")
+	//}
+
+	fmt.Println("BeforeCreate ")
+	return nil
 }

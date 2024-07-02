@@ -37,6 +37,110 @@ func (s *GoDB) Init(config *GoDbConfig) error {
 	return nil
 }
 
+// 事物开始
+//
+//	func CreateAnimals(db *gorm.DB) error {
+//	 // 再唠叨一下，事务一旦开始，你就应该使用 tx 处理数据
+//	 tx := db.Begin()
+//	 defer func() {
+//	   if r := recover(); r != nil {
+//	     tx.Rollback()
+//	   }
+//	 }()
+//
+//	 if err := tx.Error; err != nil {
+//	   return err
+//	 }
+//
+//	 if err := tx.Create(&Animal{Name: "Giraffe"}).Error; err != nil {
+//	    tx.Rollback()
+//	    return err
+//	 }
+//
+//	 if err := tx.Create(&Animal{Name: "Lion"}).Error; err != nil {
+//	    tx.Rollback()
+//	    return err
+//	 }
+//
+//	 return tx.Commit().Error
+//	}
+func (s *GoDB) BeginTransaction() *GoDB {
+	godb := &GoDB{
+		DB: s.DB.Begin(),
+	}
+	return godb
+}
+
+// 事物回滚
+func (s *GoDB) Rollback() {
+	s.DB.Rollback()
+}
+
+// 保存回滚点
+func (s *GoDB) SavePoint(name string) {
+	s.DB.SavePoint(name)
+}
+
+// 事物回滚到name的点击
+//
+// tx := db.Begin()
+// tx.Create(&user1)
+//
+// tx.SavePoint("sp1")
+// tx.Create(&user2)
+// tx.RollbackTo("sp1") // Rollback user2
+//
+// tx.Commit() // Commit user1
+func (s *GoDB) RollbackTo(name string) {
+	s.DB.RollbackTo(name)
+}
+
+// 提交事物
+func (s *GoDB) Commit() error {
+	return s.DB.Commit().Error
+}
+
+// package main
+//
+// import (
+//
+//	"gorm.io/gorm"
+//	"gorm.io/driver/sqlite"
+//
+// )
+//
+//	type Product struct {
+//	 gorm.Model
+//	 Code  string
+//	 Price uint
+//	}
+//
+//	func main() {
+//	 db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+//	 if err != nil {
+//	   panic("failed to connect database")
+//	 }
+//
+//	 // 迁移 schema
+//	 db.AutoMigrate(&Product{})
+//
+//	 // Create
+//	 db.Create(&Product{Code: "D42", Price: 100})
+//
+//	 // Read
+//	 var product Product
+//	 db.First(&product, 1) // 根据整型主键查找
+//	 db.First(&product, "code = ?", "D42") // 查找 code 字段值为 D42 的记录
+//
+//	 // Update - 将 product 的 price 更新为 200
+//	 db.Model(&product).Update("Price", 200)
+//	 // Update - 更新多个字段
+//	 db.Model(&product).Updates(Product{Price: 200, Code: "F42"}) // 仅更新非零值字段
+//	 db.Model(&product).Updates(map[string]interface{}{"Price": 200, "Code": "F42"})
+//
+//	 // Delete - 删除 product
+//	 db.Delete(&product, 1)
+//	}
 func (s *GoDB) AutoMigrate(values ...interface{}) error {
 	return s.DB.AutoMigrate(values...)
 }
@@ -197,6 +301,9 @@ func (s *GoDB) UpdatesByMap(model interface{}, value map[string]interface{}) (tx
 	return s.DB.Model(model).Updates(value)
 }
 
+// 如果你的模型包含了 gorm.DeletedAt字段（该字段也被包含在gorm.Model中），那么该模型将会自动获得软删除的能力！
+//
+// 当调用Delete时，GORM并不会从数据库中删除该记录，而是将该记录的DeleteAt设置为当前时间，而后的一般查询方法将无法查找到此条记录。
 func (s *GoDB) Delete(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 	return s.DB.Delete(value, conds...)
 }
