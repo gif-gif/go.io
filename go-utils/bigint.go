@@ -1,6 +1,7 @@
 package goutils
 
 import (
+	"github.com/shopspring/decimal"
 	"math/big"
 )
 
@@ -49,4 +50,32 @@ func BigIntCmp(num1 string, num2 string) int {
 	x, _ := new(big.Int).SetString(num1, 10)
 	y, _ := new(big.Int).SetString(num2, 10)
 	return x.Cmp(y)
+}
+
+func SubFloat64(a float64, b float64) float64 {
+	_a := decimal.NewFromFloat(a)
+	_b := decimal.NewFromFloat(b)
+	_c, _ := _a.Sub(_b).Float64()
+	return _c
+}
+
+func MulFloat64(a float64, b float64) float64 {
+	_a := decimal.NewFromFloat(a)
+	_b := decimal.NewFromFloat(b)
+	_c, _ := _a.Mul(_b).Float64()
+	return _c
+}
+
+func AddFloat64(a float64, b float64) float64 {
+	_a := decimal.NewFromFloat(a)
+	_b := decimal.NewFromFloat(b)
+	_c, _ := _a.Add(_b).Float64()
+	return _c
+}
+
+func DivFloat64(a float64, b float64) float64 {
+	_a := decimal.NewFromFloat(a)
+	_b := decimal.NewFromFloat(b)
+	_c, _ := _a.Div(_b).Float64()
+	return _c
 }

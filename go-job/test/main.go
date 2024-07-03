@@ -14,8 +14,8 @@ func main() {
 	if err != nil {
 		golog.WithTag("gojob").Error(err)
 	}
-	defer cron.Stop()
 	defer close(DataChan)
+	defer cron.Stop()
 
 	cron.Start()
 	cron.Second(func() {
@@ -23,7 +23,7 @@ func main() {
 			golog.Error(r)
 		}
 
-		golog.WithTag("gojob").Info("testing")
+		golog.WithTag("gojob1").Info("testing")
 		n++
 		if n > 5 {
 			n = 0
@@ -36,11 +36,13 @@ func main() {
 		for {
 			select {
 			case data := <-DataChan:
-				golog.WithTag("gojob").Info(string(data))
+				if data != nil {
+					golog.WithTag("gojob2").Info(string(data))
+				}
 			}
 		}
 	}()
 
 	time.Sleep(time.Second * 5)
-
+	golog.InfoF("end of gojob")
 }

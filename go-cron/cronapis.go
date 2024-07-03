@@ -4,7 +4,7 @@ package gocrons
 //	Cron() any
 //	Start()
 //	Stop()
-//	Func(spec string, fn ...func())
+//	CronJob(spec string, fn ...func())
 //	Job(spec string, job ...cron.Job)
 //	Day(fn ...func())
 //	DayHour(hour int, fn ...func())
