@@ -1,10 +1,3 @@
-# go-ip
-查询IP对应的国家 运营商等信息
-```
-https://www.ip2location.com/development-libraries/ip2location/go
-```
-
-```go
 package main
 
 import (
@@ -46,5 +39,3 @@ func main() {
 	time.Sleep(time.Second * 5)
 
 }
-
-```
