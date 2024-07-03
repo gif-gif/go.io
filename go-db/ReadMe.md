@@ -101,5 +101,5 @@ func testClickhouse() {
 ```
 
 ```
-gorm 事物形式操作需要支持
+mongodb 不是关系性数据库 暂时不支持
 ```

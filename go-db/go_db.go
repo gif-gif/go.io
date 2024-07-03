@@ -154,6 +154,13 @@ func (s *GoDB) Commit() error {
 //	 // Delete - 删除 product
 //	 db.Delete(&product, 1)
 //	}
+//
+// db.AutoMigrate(&User{})
+//
+// db.AutoMigrate(&User{}, &Product{}, &Order{})
+//
+// // Add table suffix when creating tables
+// db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&User{})
 func (s *GoDB) AutoMigrate(values ...interface{}) error {
 	return s.DB.AutoMigrate(values...)
 }
