@@ -1,6 +1,7 @@
 package goutils
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -11,5 +12,6 @@ func TestGenId(t *testing.T) {
 	//	fmt.Println(GenId())
 	//}
 
-	IfNot(true, []string{"aa"}, []string{})
+	aORb := IfNot[[]string](true, []string{"aa"}, []string{})
+	fmt.Print(aORb)
 }
