@@ -1,6 +1,10 @@
 # go-db 数据操作
 
 `基于 https://github.com/go-gorm/gorm 的封装，更多用法到官方`
+# 目前已封装
+- mysql
+- sqlite3
+- clickhouse
 
 ```go
 func testSqlite3() {

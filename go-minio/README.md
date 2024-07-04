@@ -1,4 +1,5 @@
 # go.minio 
+`基于 github.com/minio/minio-go/v7 封装`
 ```go
 package main
 

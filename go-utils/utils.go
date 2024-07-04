@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// 通用三目运算
 func IfNot[T any](isTrue bool, a, b T) T {
 	if isTrue {
 		return a

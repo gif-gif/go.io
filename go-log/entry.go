@@ -64,7 +64,7 @@ func (entry *Entry) Error(v ...interface{}) {
 }
 
 func (entry *Entry) ErrorF(format string, v ...interface{}) {
-	entry.output(ERROR, fmt.Sprintf(format, v...))
+	entry.output(ERROR, fmt.Errorf(format, v...).Error())
 }
 
 func (entry *Entry) Panic(v ...interface{}) {

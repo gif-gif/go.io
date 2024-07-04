@@ -14,7 +14,7 @@ func New() *Event {
 	return &Event{subscribes: map[string][]MessageChan{}}
 }
 
-// 发布
+// 发布 执行当前topic 对应的所有订阅者
 func (ev *Event) Publish(topic string, data interface{}) {
 	ev.mu.RLock()
 	defer ev.mu.RUnlock()
@@ -29,7 +29,7 @@ func (ev *Event) Publish(topic string, data interface{}) {
 	}
 }
 
-// 订阅
+// 订阅：一个topic可以对应多个处理器，（topic->handler 的关系是1:n）,一次添加一个订阅者
 func (ev *Event) Subscribe(topic string, fn SubscribeFunc) {
 	ev.mu.Lock()
 	defer ev.mu.Unlock()

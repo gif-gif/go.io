@@ -1,5 +1,8 @@
 # 定时任务
-
+```
+ 基于 github.com/robfig/cron/v3 这个库封装，很久没有更新维护了
+ 请改用 go-job 包下定时API
+```
 ```
 package main
 
