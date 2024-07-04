@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+func IfNot[T any](isTrue bool, a, b T) T {
+	if isTrue {
+		return a
+	}
+	return b
+}
+
 func IfString(isTrue bool, a, b string) string {
 	if isTrue {
 		return a
