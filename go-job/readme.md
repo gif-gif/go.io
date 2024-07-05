@@ -1,10 +1,7 @@
 # 定时任务
-```go
- 基于库： https://github.com/go-co-op/gocron/ 
- 带参数的任务函数 定时执行还没支持
+- 基于库： https://github.com/go-co-op/gocron/
+- 官方文档： https://pkg.go.dev/github.com/go-co-op/gocron/v2
 
-官方文档： https://pkg.go.dev/github.com/go-co-op/gocron/v2
-```
 ```go
 package main
 
