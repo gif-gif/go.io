@@ -24,7 +24,7 @@ func main() {
 	if err != nil {
 		golog.WithTag("gojob").Error(err)
 	}
-	//defer cron.Stop()
+	defer cron.Stop()
 	cron.Start()
 
 	job, err := cron.DurationJob(&[]gocron.JobOption{
@@ -63,6 +63,33 @@ func main() {
 	time.Sleep(time.Second * 500)
 	golog.InfoF("end of gojob")
 }
+
+func simpleUseGoJob() {
+	n := 0
+	cron, err := gojob.New()
+	if err != nil {
+		golog.WithTag("gojob").Error(err)
+	}
+	defer cron.Stop()
+	cron.Start()
+
+	job, err := cron.DurationJob(nil, 1, func(nn int) error {
+		golog.WithTag("gojobStart").Info("testing->" + gconv.String(nn))
+		time.Sleep(time.Second * 3)
+		golog.WithTag("gojobEnd").Info("testing->" + gconv.String(nn))
+		return nil
+	}, n)
+
+	if err != nil {
+		golog.WithTag("gojob").Error(err)
+	} else {
+		golog.WithTag("gojob").Info("job.ID:" + job.ID().String())
+	}
+
+	time.Sleep(time.Second * 500)
+	golog.InfoF("end of gojob")
+}
+
 
 
 ```
