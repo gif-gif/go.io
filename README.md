@@ -1,11 +1,10 @@
 # go.io
-golang development framework
+- Golang Development Framework Continuously Developing and Updating
 
 # Install
 ```
 go get -u github.com/gif-gif/go.io
 ```
-
 
 # Thanks
 - https://github.com/IBM/sarama
