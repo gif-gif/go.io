@@ -1,7 +1,7 @@
 package goredis
 
 import (
-	gocrons "github.com/gif-gif/go.io/go-cron"
+	gojob "github.com/gif-gif/go.io/go-job"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/go-redis/redis"
 )
@@ -25,7 +25,9 @@ func New(conf Config) (cli *Client, err error) {
 	}
 
 	if conf.AutoPing {
-		gocrons.New().SecondX(5, func() {
+		gj, _ := gojob.New()
+		gj.Start()
+		gj.SecondX(nil, 5, func() {
 			if err := cli.Ping().Err(); err != nil {
 				golog.WithTag("goredis").Error(err)
 			}

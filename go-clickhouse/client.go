@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"database/sql"
 	"github.com/ClickHouse/clickhouse-go/v2"
-	gocrons "github.com/gif-gif/go.io/go-cron"
+	gojob "github.com/gif-gif/go.io/go-job"
 	golog "github.com/gif-gif/go.io/go-log"
 	"time"
 )
@@ -12,7 +12,7 @@ import (
 type Client struct {
 	conf Config
 	db   *sql.DB
-	cron *gocrons.CronsModel
+	cron *gojob.CronsModel
 }
 
 func New(conf Config) (cli *Client, err error) {
@@ -78,9 +78,15 @@ func New(conf Config) (cli *Client, err error) {
 	cli.db.SetConnMaxLifetime(time.Second * time.Duration(conf.ConnMaxLifetime))
 
 	if conf.AutoPing {
-		cron := gocrons.New()
+		cron, err := gojob.New()
+		if err != nil {
+			return nil, err
+		}
 		cron.Start()
-		cron.SecondX(5, __client.ping)
+		_, err = cron.SecondX(nil, 5, __client.ping)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return
