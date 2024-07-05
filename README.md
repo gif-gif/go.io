@@ -1,13 +1,13 @@
 # go.io
 golang development framework
 
-# 安装
+# Install
 ```
 go get -u github.com/gif-gif/go.io
 ```
 
 
-# 感谢
+# Thanks
 - https://github.com/IBM/sarama
 - https://gorm.io/gorm
 - https://github.com/redis/go-redis
