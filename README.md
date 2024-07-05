@@ -21,3 +21,4 @@ go get -u github.com/gif-gif/go.io
 - https://github.com/gin-gonic/gin
 - https://github.com/go-resty/resty
 - https://github.com/olivere/elastic
+- https://github.com/mongodb/mongo-go-driver
