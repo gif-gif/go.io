@@ -52,3 +52,17 @@ func (ev *Event) Subscribe(topic string, fn SubscribeFunc) {
 		}
 	})
 }
+
+func (ev *Event) UnSubscribe(topic string) {
+	ev.mu.RLock()
+	defer ev.mu.RUnlock()
+
+	if chs, ok := ev.subscribes[topic]; ok {
+		channels := append([]MessageChan{}, chs...)
+		goutils.AsyncFunc(func() {
+			for _, ch := range channels {
+				close(ch)
+			}
+		})
+	}
+}

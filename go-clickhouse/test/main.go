@@ -10,7 +10,7 @@ import (
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-	goclickhouse.Init(goclickhouse.Config{
+	err := goclickhouse.Init(goclickhouse.Config{
 		Driver:             "clickhouse",
 		Addr:               "122.228.113.238:8124",
 		User:               "default",
@@ -19,9 +19,14 @@ func main() {
 		InsecureSkipVerify: true,
 	})
 
+	if err != nil {
+		golog.Fatal(err)
+		return
+	}
 	rows, err := goclickhouse.DB().Query("SELECT oaid FROM xzdsp.clickcb limit 10")
 	if err != nil {
 		golog.Fatal(err)
+		return
 	}
 	defer rows.Close()
 

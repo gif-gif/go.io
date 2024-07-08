@@ -1,7 +1,7 @@
 package gohttp
 
 const (
-	TAG = "gohttp-request"
+	TAG = "gohttp"
 
 	CONTENT_TYPE_XML  = "application/xml"
 	CONTENT_TYPE_JSON = "application/json"

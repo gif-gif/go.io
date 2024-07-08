@@ -22,13 +22,13 @@ func CreateDingDing(accessToken string, secret string) *goding.Webhook {
 	return ding
 }
 
-func FeiShu(hookUrl string, text string) error {
-	return gofeishu.FeiShu(hookUrl, text)
-}
-
 func DingDing(text string, at ...string) error {
 	if __DingDing == nil {
 		return nil
 	}
 	return __DingDing.SendMessageText(text, at...)
+}
+
+func FeiShu(hookUrl string, text string) error {
+	return gofeishu.FeiShu(hookUrl, text)
 }

@@ -191,7 +191,7 @@ func (c *CronsModel) DailyJob(options *[]gocron.JobOption, interval uint, hours 
 	)
 }
 
-// 隔多少秒执行 , 可以通过 gocron.WithSingletonMode(gocron.LimitModeWait)来限制重叠执行
+// 隔多少秒执行
 func (c *CronsModel) DurationJob(options *[]gocron.JobOption, seconds int, fn any, parameters ...any) (gocron.Job, error) {
 	if options == nil {
 		options = &[]gocron.JobOption{}

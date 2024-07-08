@@ -6,21 +6,33 @@ import (
 )
 
 // 捕获panic
-func Recovery() {
+func Recovery(errFn func(err any)) {
 	if r := recover(); r != nil {
-		golog.Error(r)
+		if errFn == nil {
+			errFn(r)
+		} else {
+			golog.Error(r)
+		}
 	}
+}
+
+// 异步执行（安全）errFn = nil 时自动Recovery 不会Panic
+func AsyncFuncPanic(fn func(), errFn func(err any)) {
+	go func() {
+		defer Recovery(errFn)
+		fn()
+	}()
 }
 
 // 异步执行（安全）
 func AsyncFunc(fn func()) {
 	go func() {
-		defer Recovery()
+		defer Recovery(nil)
 		fn()
 	}()
 }
 
-// 异步并发执行（安全）
+// 异步并发执行（安全
 func AsyncFuncGroup(fns ...func()) {
 	var wg sync.WaitGroup
 
@@ -31,6 +43,23 @@ func AsyncFuncGroup(fns ...func()) {
 				defer wg.Done()
 				fn()
 			})
+		}(fn)
+	}
+
+	wg.Wait()
+}
+
+// 异步并发执行（安全）errFn = nil 时自动Recovery 不会Panic
+func AsyncFuncGroupPanic(errFn func(err any), fns ...func()) {
+	var wg sync.WaitGroup
+
+	for _, fn := range fns {
+		wg.Add(1)
+		func(fn func()) {
+			AsyncFuncPanic(func() {
+				defer wg.Done()
+				fn()
+			}, errFn)
 		}(fn)
 	}
 
