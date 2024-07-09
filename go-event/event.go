@@ -5,17 +5,17 @@ import (
 	"sync"
 )
 
-type Event struct {
+type GoEvent struct {
 	subscribes map[string][]MessageChan
 	mu         sync.RWMutex
 }
 
-func New() *Event {
-	return &Event{subscribes: map[string][]MessageChan{}}
+func New() *GoEvent {
+	return &GoEvent{subscribes: map[string][]MessageChan{}}
 }
 
 // 发布 执行当前topic 对应的所有订阅者
-func (ev *Event) Publish(topic string, data interface{}) {
+func (ev *GoEvent) Publish(topic string, data interface{}) {
 	ev.mu.RLock()
 	defer ev.mu.RUnlock()
 
@@ -30,7 +30,7 @@ func (ev *Event) Publish(topic string, data interface{}) {
 }
 
 // 订阅：一个topic可以对应多个处理器，（topic->handler 的关系是1:n）,一次添加一个订阅者
-func (ev *Event) Subscribe(topic string, fn SubscribeFunc) {
+func (ev *GoEvent) Subscribe(topic string, fn SubscribeFunc) {
 	ev.mu.Lock()
 	defer ev.mu.Unlock()
 
@@ -53,7 +53,7 @@ func (ev *Event) Subscribe(topic string, fn SubscribeFunc) {
 	})
 }
 
-func (ev *Event) UnSubscribe(topic string) {
+func (ev *GoEvent) UnSubscribe(topic string) {
 	ev.mu.RLock()
 	defer ev.mu.RUnlock()
 

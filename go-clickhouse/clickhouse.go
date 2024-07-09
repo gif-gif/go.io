@@ -2,7 +2,7 @@ package goclickhouse
 
 import "database/sql"
 
-var __client *Client
+var __client *GoClickHouse
 
 func DB() *sql.DB {
 	return __client.db
@@ -20,7 +20,7 @@ func Init(conf Config) error {
 }
 
 // 创建一个连接
-func CreateConnection(conf Config) (*Client, error) {
+func CreateConnection(conf Config) (*GoClickHouse, error) {
 	client, err := New(conf)
 	if err != nil {
 		return nil, err

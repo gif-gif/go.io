@@ -9,13 +9,13 @@ import (
 	"time"
 )
 
-type Client struct {
+type GoClickHouse struct {
 	conf Config
 	db   *sql.DB
 	cron *gojob.GoJob
 }
 
-func New(conf Config) (cli *Client, err error) {
+func New(conf Config) (cli *GoClickHouse, err error) {
 
 	if conf.DialTimeout == 0 {
 		conf.DialTimeout = 60
@@ -31,7 +31,7 @@ func New(conf Config) (cli *Client, err error) {
 		conf.ConnMaxLifetime = 60 * 60
 	}
 
-	cli = &Client{conf: conf}
+	cli = &GoClickHouse{conf: conf}
 
 	getTls := &tls.Config{
 		InsecureSkipVerify: conf.InsecureSkipVerify,
@@ -63,7 +63,7 @@ func New(conf Config) (cli *Client, err error) {
 		},
 		BlockBufferSize:      10,
 		MaxCompressionBuffer: 10240,
-		ClientInfo: clickhouse.ClientInfo{ // optional, please see Client info section in the README.md
+		ClientInfo: clickhouse.ClientInfo{ // optional, please see GoClickHouse info section in the README.md
 			Products: []struct {
 				Name    string
 				Version string
@@ -92,7 +92,7 @@ func New(conf Config) (cli *Client, err error) {
 	return
 }
 
-func (cli *Client) ping() {
+func (cli *GoClickHouse) ping() {
 	if cli.db == nil {
 		return
 	}

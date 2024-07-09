@@ -6,12 +6,12 @@ import (
 	"github.com/go-redis/redis"
 )
 
-type Client struct {
+type GoRedis struct {
 	*redis.Client
 }
 
-func New(conf Config) (cli *Client, err error) {
-	cli = &Client{}
+func New(conf Config) (cli *GoRedis, err error) {
+	cli = &GoRedis{}
 
 	cli.Client = redis.NewClient(&redis.Options{
 		Addr:     conf.Addr,

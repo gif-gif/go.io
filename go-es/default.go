@@ -4,14 +4,14 @@ import (
 	"github.com/olivere/elastic"
 )
 
-var __client *client
+var __client *GoEs
 
 func Init(conf Config, options ...elastic.ClientOptionFunc) (err error) {
 	__client, err = New(conf, options...)
 	return
 }
 
-func Client() *client {
+func Client() *GoEs {
 	return __client
 }
 

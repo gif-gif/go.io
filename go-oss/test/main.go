@@ -49,11 +49,7 @@ func main() {
 		conf.Bucket = ""
 	}
 
-	up, err := gooss.New(conf)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
+	up := gooss.Init(conf)
 
 	for n, i := range args {
 		if n == 0 {

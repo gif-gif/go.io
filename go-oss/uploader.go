@@ -10,15 +10,15 @@ import (
 	"strings"
 )
 
-type uploader struct {
+type Uploader struct {
 	conf    Config
 	client  *oss.Client
 	bucket  *oss.Bucket
 	options []oss.Option
 }
 
-func New(conf Config) (*uploader, error) {
-	o := &uploader{
+func New(conf Config) (*Uploader, error) {
+	o := &Uploader{
 		conf:    conf,
 		options: []oss.Option{},
 	}
@@ -42,17 +42,17 @@ func New(conf Config) (*uploader, error) {
 	return o, nil
 }
 
-func (o *uploader) ContentType(value string) *uploader {
+func (o *Uploader) ContentType(value string) *Uploader {
 	o.options = append(o.options, oss.ContentType(value))
 	return o
 }
 
-func (o *uploader) Options(opts ...oss.Option) *uploader {
+func (o *Uploader) Options(opts ...oss.Option) *Uploader {
 	o.options = append(o.options, opts...)
 	return o
 }
 
-func (o *uploader) Upload(filename string, body []byte) (string, error) {
+func (o *Uploader) Upload(filename string, body []byte) (string, error) {
 	if filename == "" {
 		return "", errors.New("文件名为空")
 	}
@@ -83,10 +83,10 @@ func (o *uploader) Upload(filename string, body []byte) (string, error) {
 	return url, nil
 }
 
-func (o *uploader) getClient() (*oss.Client, error) {
+func (o *Uploader) getClient() (*oss.Client, error) {
 	return oss.New(o.conf.Endpoint, o.conf.AccessKeyId, o.conf.AccessKeySecret)
 }
 
-func (o *uploader) getBucket() (*oss.Bucket, error) {
+func (o *Uploader) getBucket() (*oss.Bucket, error) {
 	return o.client.Bucket(o.conf.Bucket)
 }

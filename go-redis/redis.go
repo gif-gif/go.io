@@ -4,7 +4,7 @@ import (
 	golog "github.com/gif-gif/go.io/go-log"
 )
 
-var __clients = map[string]*Client{}
+var __clients = map[string]*GoRedis{}
 
 func Init(configs ...Config) (err error) {
 	for _, conf := range configs {
@@ -22,7 +22,7 @@ func Init(configs ...Config) (err error) {
 	return
 }
 
-func GetClient(names ...string) *Client {
+func GetClient(names ...string) *GoRedis {
 	name := "default"
 	if l := len(names); l > 0 {
 		name = names[0]
@@ -43,7 +43,7 @@ func GetClient(names ...string) *Client {
 	return nil
 }
 
-func Default() *Client {
+func Default() *GoRedis {
 	if cli, ok := __clients["default"]; ok {
 		return cli
 	}

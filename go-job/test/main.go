@@ -20,22 +20,25 @@ func main() {
 	cron.Start()
 
 	job, err := cron.DurationJob(&[]gocron.JobOption{
-		gocron.WithLimitedRuns(2),                         //最大执行次数
+		gocron.WithLimitedRuns(20),                        //最大执行次数
 		gocron.WithSingletonMode(gocron.LimitModeWait),    // 限制重叠执行
 		gocron.WithStartAt(gocron.WithStartImmediately()), //马上开始
 		gocron.WithEventListeners(
 			gocron.AfterJobRunsWithError(
 				func(jobID uuid.UUID, jobName string, err error) {
 					golog.WithTag("AfterJobRunsWithError-gojob").Error(jobID, jobName, err.Error())
+					cron.Stop()
 				},
 			),
 			gocron.AfterJobRunsWithPanic(
 				func(jobID uuid.UUID, jobName string, err any) {
 					golog.WithTag("AfterJobRunsWithPanic-gojob").Error(jobID, jobName, err)
+					cron.Stop()
 				},
 			),
 			gocron.AfterLockError(func(jobID uuid.UUID, jobName string, err error) {
 				golog.WithTag("AfterLockError-gojob").Error(jobID, jobName, err.Error())
+				cron.Stop()
 			}),
 		),
 	}, 1, func(nn int) error {

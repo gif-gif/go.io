@@ -3,11 +3,11 @@ package goevent
 import "sync"
 
 var (
-	__event *Event
+	__event *GoEvent
 	__once  sync.Once
 )
 
-func Default() *Event {
+func Default() *GoEvent {
 	return __event
 }
 

@@ -12,14 +12,14 @@ import (
 
 //var MongoDSN = "mongodb://root:ab15eb8e12ea@122.228.113.230:27017"
 
-type Client struct {
+type GoMongo struct {
 	*mongo.Client
 	conf Config
 	ctx  context.Context
 }
 
-func New(conf Config) (cli *Client, err error) {
-	cli = &Client{conf: conf, ctx: context.TODO()}
+func New(conf Config) (cli *GoMongo, err error) {
+	cli = &GoMongo{conf: conf, ctx: context.TODO()}
 
 	var uri string
 	if conf.EnablePassword {
@@ -53,11 +53,11 @@ func New(conf Config) (cli *Client, err error) {
 	return
 }
 
-func (cli *Client) WithContext(ctx context.Context) *Client {
+func (cli *GoMongo) WithContext(ctx context.Context) *GoMongo {
 	cli.ctx = ctx
 	return cli
 }
 
-func (cli *Client) DB() *mongo.Database {
+func (cli *GoMongo) DB() *mongo.Database {
 	return cli.Database(cli.conf.Database)
 }
