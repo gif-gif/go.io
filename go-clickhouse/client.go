@@ -12,7 +12,7 @@ import (
 type Client struct {
 	conf Config
 	db   *sql.DB
-	cron *gojob.CronsModel
+	cron *gojob.GoJob
 }
 
 func New(conf Config) (cli *Client, err error) {

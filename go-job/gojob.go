@@ -8,35 +8,35 @@ import (
 )
 
 type (
-	CronsModel struct {
+	GoJob struct {
 		cron gocron.Scheduler
 	}
 )
 
-func New(options ...gocron.SchedulerOption) (*CronsModel, error) {
+func New(options ...gocron.SchedulerOption) (*GoJob, error) {
 	c, err := gocron.NewScheduler(options...)
 	if err != nil {
 		return nil, err
 	}
-	o := &CronsModel{
+	o := &GoJob{
 		cron: c,
 	}
 	return o, nil
 }
 
-func (o *CronsModel) Cron() gocron.Scheduler {
+func (o *GoJob) Cron() gocron.Scheduler {
 	return o.cron
 }
 
-func (c *CronsModel) Start() {
+func (c *GoJob) Start() {
 	c.cron.Start()
 }
 
-func (c *CronsModel) Stop() error {
+func (c *GoJob) Stop() error {
 	return c.cron.Shutdown()
 }
 
-func (c *CronsModel) RemoveJob(jobID uuid.UUID) error {
+func (c *GoJob) RemoveJob(jobID uuid.UUID) error {
 	return c.cron.RemoveJob(jobID)
 }
 
@@ -72,7 +72,7 @@ func (c *CronsModel) RemoveJob(jobID uuid.UUID) error {
 // _ = s.StopJobs()
 //
 // 定时执行启动 开始时间
-func (c *CronsModel) WithStartAt(start time.Time) gocron.JobOption {
+func (c *GoJob) WithStartAt(start time.Time) gocron.JobOption {
 	//start := time.Date(9999, 9, 9, 9, 9, 9, 9, time.UTC)
 	return gocron.WithStartAt(
 		gocron.WithStartDateTime(start),
@@ -80,7 +80,7 @@ func (c *CronsModel) WithStartAt(start time.Time) gocron.JobOption {
 }
 
 // interval 月频, 0-6-->周日 周一 ... 周六, hours 具体执行时间列表
-func (c *CronsModel) MonthlyJob(options *[]gocron.JobOption, interval uint, daysOfTheMonth []int, hours []uint, minute uint, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) MonthlyJob(options *[]gocron.JobOption, interval uint, daysOfTheMonth []int, hours []uint, minute uint, fn any, parameters ...any) (gocron.Job, error) {
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
@@ -107,7 +107,7 @@ func (c *CronsModel) MonthlyJob(options *[]gocron.JobOption, interval uint, days
 }
 
 // interval 周频, 0-6-->周日 周一 ... 周六, hours 具体执行时间列表
-func (c *CronsModel) WeeklyJob(options *[]gocron.JobOption, interval uint, daysOfTheWeek []time.Weekday, hours []uint, minutes uint, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) WeeklyJob(options *[]gocron.JobOption, interval uint, daysOfTheWeek []time.Weekday, hours []uint, minutes uint, fn any, parameters ...any) (gocron.Job, error) {
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
@@ -134,7 +134,7 @@ func (c *CronsModel) WeeklyJob(options *[]gocron.JobOption, interval uint, daysO
 }
 
 // 当前时间 seconds 秒之后执行一次
-func (c *CronsModel) OneTimeJobForSeconds(options *[]gocron.JobOption, seconds uint, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) OneTimeJobForSeconds(options *[]gocron.JobOption, seconds uint, fn any, parameters ...any) (gocron.Job, error) {
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
@@ -151,7 +151,7 @@ func (c *CronsModel) OneTimeJobForSeconds(options *[]gocron.JobOption, seconds u
 }
 
 // 当前时间 minute 分钟之后执行一次
-func (c *CronsModel) OneTimeJobForMinute(options *[]gocron.JobOption, minute uint, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) OneTimeJobForMinute(options *[]gocron.JobOption, minute uint, fn any, parameters ...any) (gocron.Job, error) {
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
@@ -168,7 +168,7 @@ func (c *CronsModel) OneTimeJobForMinute(options *[]gocron.JobOption, minute uin
 }
 
 // 每天定时执行
-func (c *CronsModel) DailyJob(options *[]gocron.JobOption, interval uint, hours []uint, minute uint, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) DailyJob(options *[]gocron.JobOption, interval uint, hours []uint, minute uint, fn any, parameters ...any) (gocron.Job, error) {
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
@@ -192,7 +192,7 @@ func (c *CronsModel) DailyJob(options *[]gocron.JobOption, interval uint, hours 
 }
 
 // 隔多少秒执行
-func (c *CronsModel) DurationJob(options *[]gocron.JobOption, seconds int, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) DurationJob(options *[]gocron.JobOption, seconds int, fn any, parameters ...any) (gocron.Job, error) {
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
@@ -212,7 +212,7 @@ func (c *CronsModel) DurationJob(options *[]gocron.JobOption, seconds int, fn an
 }
 
 // DurationRandomJob 定义一个新作业，该作业以提供的最小和最大持续时间值之间的随机间隔运行
-func (c *CronsModel) DurationRandomJob(options *[]gocron.JobOption, minDuration, maxDuration time.Duration, function any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) DurationRandomJob(options *[]gocron.JobOption, minDuration, maxDuration time.Duration, function any, parameters ...any) (gocron.Job, error) {
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
@@ -229,7 +229,7 @@ func (c *CronsModel) DurationRandomJob(options *[]gocron.JobOption, minDuration,
 }
 
 // spec is crontab pattern crontab 表达式
-func (c *CronsModel) CronJob(spec string, options *[]gocron.JobOption, function any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) CronJob(spec string, options *[]gocron.JobOption, function any, parameters ...any) (gocron.Job, error) {
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
@@ -248,46 +248,46 @@ func (c *CronsModel) CronJob(spec string, options *[]gocron.JobOption, function 
 }
 
 // crontab 每天0点0分0秒执行
-func (c *CronsModel) Day(options *[]gocron.JobOption, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) Day(options *[]gocron.JobOption, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob("0 0 0 * * *", options, fn, parameters...)
 }
 
 // crontab 每天x点0分0秒执行
-func (c *CronsModel) DayHour(options *[]gocron.JobOption, hour int, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) DayHour(options *[]gocron.JobOption, hour int, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob(fmt.Sprintf("0 0 %d * * *", hour), options, fn, parameters...)
 }
 
 // crontab 每天x点x分0秒执行
-func (c *CronsModel) DayHourMinute(options *[]gocron.JobOption, hour, minute int, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) DayHourMinute(options *[]gocron.JobOption, hour, minute int, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob(fmt.Sprintf("0 %d %d * * *", minute, hour), options, fn, parameters...)
 }
 
 // crontab 每小时执行
-func (c *CronsModel) Hour(options *[]gocron.JobOption, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) Hour(options *[]gocron.JobOption, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob("0 0 */1 * * *", options, fn, parameters...)
 }
 
 // crontab 每隔x小时执行
-func (c *CronsModel) HourX(options *[]gocron.JobOption, x int, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) HourX(options *[]gocron.JobOption, x int, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob(fmt.Sprintf("0 0 */%d * * *", x), options, fn, parameters...)
 }
 
 // crontab 每分钟执行
-func (c *CronsModel) Minute(options *[]gocron.JobOption, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) Minute(options *[]gocron.JobOption, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob("0 */1 * * * *", options, fn, parameters...)
 }
 
 // crontab 每隔x分钟执行
-func (c *CronsModel) MinuteX(options *[]gocron.JobOption, x int, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) MinuteX(options *[]gocron.JobOption, x int, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob(fmt.Sprintf("0 */%d * * * *", x), options, fn, parameters...)
 }
 
 // crontab 每秒钟执行
-func (c *CronsModel) Second(options *[]gocron.JobOption, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) Second(options *[]gocron.JobOption, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob("* * * * * *", options, fn, parameters...)
 }
 
 // crontab 每隔x秒执行
-func (c *CronsModel) SecondX(options *[]gocron.JobOption, x int, fn any, parameters ...any) (gocron.Job, error) {
+func (c *GoJob) SecondX(options *[]gocron.JobOption, x int, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob(fmt.Sprintf("*/%d * * * * *", x), options, fn, parameters...)
 }
