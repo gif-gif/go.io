@@ -21,7 +21,7 @@ func main() {
 		golog.WithTag("goredis").Error(err)
 	}
 
-	cmd := c.Set("goredis", "goredis", time.Duration(0))
+	cmd := c.Set("goredis", "goredis", time.Duration(10)*time.Second)
 	if cmd.Err() != nil {
 		golog.WithTag("goredis").Error(cmd.Err())
 	}

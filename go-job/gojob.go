@@ -237,7 +237,7 @@ func (c *GoJob) CronJob(spec string, options *[]gocron.JobOption, function any, 
 		gocron.CronJob(
 			// standard cron tab parsing
 			spec,
-			true,
+			true, //六位crontab 规则时true
 		),
 		gocron.NewTask(
 			function,
