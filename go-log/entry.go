@@ -3,7 +3,6 @@ package golog
 import (
 	"fmt"
 	"log"
-	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -77,12 +76,10 @@ func (entry *Entry) PanicF(format string, v ...interface{}) {
 
 func (entry *Entry) Fatal(v ...interface{}) {
 	entry.output(FATAL, v...)
-	os.Exit(1)
 }
 
 func (entry *Entry) FatalF(format string, v ...interface{}) {
 	entry.output(FATAL, fmt.Sprintf(format, v...))
-	os.Exit(1)
 }
 
 func (entry *Entry) output(level Level, v ...interface{}) {

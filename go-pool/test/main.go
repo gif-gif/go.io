@@ -10,8 +10,14 @@ import (
 	"time"
 )
 
+func timeCost(start time.Time) {
+	tc := time.Since(start)
+	fmt.Printf("time cost = %v\n", tc.Seconds())
+}
+
 func main() {
 	goio.Init(goio.DEVELOPMENT)
+	defer timeCost(time.Now())
 	testGroupContext()
 }
 
@@ -60,7 +66,7 @@ func testFixedSize() {
 }
 
 func testContext() {
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*10) //超时或者取消ctx 时池子会被关闭，未开始执行的任务会被取消执行
 
 	gp := gopool.NewContextPool(10, 10, ctx)
 	defer gp.StopAndWait()

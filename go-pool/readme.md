@@ -1,4 +1,4 @@
-# GoPool for workers
+# GoPool for workers 并发请求 go routines 池
 
 - 基于 https://github.com/alitto/pond 封装 ，也可以直接用pond
 
@@ -66,7 +66,7 @@ func testFixedSize() {
 }
 
 func testContext() {
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*10) //超时或者取消ctx 时池子会被关闭，未开始执行的任务会被取消执行
 
 	gp := gopool.NewContextPool(10, 10, ctx)
 	defer gp.StopAndWait()
@@ -149,5 +149,6 @@ func testGroupContext() {
 		golog.InfoF("end of GroupContext")
 	}
 }
+
 
 ```
