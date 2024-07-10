@@ -40,6 +40,10 @@ func (c *GoJob) RemoveJob(jobID uuid.UUID) error {
 	return c.cron.RemoveJob(jobID)
 }
 
+func (c *GoJob) NewJob(jobDefinition gocron.JobDefinition, task gocron.Task, options ...gocron.JobOption) (gocron.Job, error) {
+	return c.cron.NewJob(jobDefinition, task, options...)
+}
+
 //job options start
 
 // 在某一时刻运行
@@ -89,7 +93,7 @@ func (c *GoJob) MonthlyJob(options *[]gocron.JobOption, interval uint, daysOfThe
 		hoursAtTime = append(hoursAtTime, gocron.NewAtTime(hour, minute, 0))
 	}
 
-	return c.cron.NewJob(
+	return c.NewJob(
 		gocron.MonthlyJob(
 			interval,
 			gocron.NewDaysOfTheMonth(daysOfTheMonth[0], daysOfTheMonth[1:]...),
@@ -116,7 +120,7 @@ func (c *GoJob) WeeklyJob(options *[]gocron.JobOption, interval uint, daysOfTheW
 		hoursAtTime = append(hoursAtTime, gocron.NewAtTime(hour, minutes, 0))
 	}
 
-	return c.cron.NewJob(
+	return c.NewJob(
 		gocron.WeeklyJob(
 			interval,
 			gocron.NewWeekdays(daysOfTheWeek[0], daysOfTheWeek[1:]...),
@@ -138,7 +142,7 @@ func (c *GoJob) OneTimeJobForSeconds(options *[]gocron.JobOption, seconds uint, 
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
-	return c.cron.NewJob(
+	return c.NewJob(
 		gocron.OneTimeJob(
 			gocron.OneTimeJobStartDateTime(time.Now().Add(time.Duration(seconds)*time.Second)),
 		),
@@ -155,7 +159,7 @@ func (c *GoJob) OneTimeJobForMinute(options *[]gocron.JobOption, minute uint, fn
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
-	return c.cron.NewJob(
+	return c.NewJob(
 		gocron.OneTimeJob(
 			gocron.OneTimeJobStartDateTime(time.Now().Add(time.Duration(minute)*time.Minute)),
 		),
@@ -178,7 +182,7 @@ func (c *GoJob) DailyJob(options *[]gocron.JobOption, interval uint, hours []uin
 		hoursAtTime = append(hoursAtTime, gocron.NewAtTime(hour, minute, 0))
 	}
 
-	return c.cron.NewJob(
+	return c.NewJob(
 		gocron.DailyJob(interval, gocron.NewAtTimes(
 			gocron.NewAtTime(hours[0], minute, 0),
 			hoursAtTime...,
@@ -197,7 +201,7 @@ func (c *GoJob) DurationJob(options *[]gocron.JobOption, seconds int, fn any, pa
 		options = &[]gocron.JobOption{}
 	}
 
-	return c.cron.NewJob(
+	return c.NewJob(
 		gocron.DurationJob(
 			time.Duration(seconds)*time.Second,
 		),
@@ -216,7 +220,7 @@ func (c *GoJob) DurationRandomJob(options *[]gocron.JobOption, minDuration, maxD
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
-	return c.cron.NewJob(
+	return c.NewJob(
 		gocron.DurationRandomJob(
 			minDuration, maxDuration,
 		),
@@ -233,11 +237,11 @@ func (c *GoJob) CronJob(spec string, options *[]gocron.JobOption, function any, 
 	if options == nil {
 		options = &[]gocron.JobOption{}
 	}
-	return c.cron.NewJob(
+	return c.NewJob(
 		gocron.CronJob(
 			// standard cron tab parsing
 			spec,
-			true, //六位crontab 规则时true
+			true, //六位crontab 规则时true，带秒位
 		),
 		gocron.NewTask(
 			function,
