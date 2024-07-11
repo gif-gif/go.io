@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	gohttpx "github.com/gif-gif/go.io/go-http/go-httpex"
-	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/goio"
 	"time"
 )
@@ -32,7 +31,8 @@ func main() {
 	res := &gohttpx.Response{}
 	err := gohttpx.HttpPostJson[gohttpx.Response](&req, res)
 	if err != nil {
-		golog.ErrorF("Error: %+v\n", err)
+		//golog.ErrorF("Error: \n", err.ErrorInfo())
+		fmt.Println(err.ErrorInfo())
 	} else {
 		fmt.Println(res)
 	}

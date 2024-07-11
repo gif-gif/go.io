@@ -1,6 +1,7 @@
 package gohttpx
 
 import (
+	"errors"
 	"github.com/go-resty/resty/v2"
 	"net/http"
 	"strings"
@@ -46,6 +47,7 @@ func doHttpRequest[T any](req *Request, t *T) *HttpError {
 			Get(req.Url)
 	}
 
+	req.TraceInfo = resp.Request.TraceInfo() //调试信息
 	if err != nil {
 		return &HttpError{
 			Error:          err,
@@ -61,7 +63,7 @@ func doHttpRequest[T any](req *Request, t *T) *HttpError {
 			Msg:            "request timeout or unknown error",
 		}
 	}
-	req.TraceInfo = resp.Request.TraceInfo() //调试信息
+
 	respData, ok := resp.Result().(*T)
 	if !ok {
 		return &HttpError{
@@ -114,7 +116,9 @@ func HttpRequest[T any](req *Request, t *T) *HttpError {
 
 		errs := &HttpError{
 			HttpStatusCode: HttpRetryError,
+			Error:          errors.New("HttpRetryError error"),
 		}
+		errs.Errors = append(errs.Errors, err)
 		for _, url := range req.Urls {
 			req.Url = url
 			err = doHttpRequest[T](req, t)
@@ -129,27 +133,28 @@ func HttpRequest[T any](req *Request, t *T) *HttpError {
 }
 
 // 带多个Urls重试逻辑,并发请求
-func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
-	err := doHttpRequest[T](req, t)
-	if err == nil {
-		return nil
-	} else {
-		if len(req.Urls) == 0 { //没有重试urls
-			return err
-		}
-
-		errs := &HttpError{
-			HttpStatusCode: HttpRetryError,
-		}
-		for _, url := range req.Urls {
-			req.Url = url
-			err = doHttpRequest[T](req, t)
-			if err == nil { //请求成功了直接返回
-				return err
-			} else {
-				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
-			}
-		}
-		return errs
-	}
-}
+//func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
+//	err := doHttpRequest[T](req, t)
+//	if err == nil {
+//		return nil
+//	} else {
+//		if len(req.Urls) == 0 { //没有重试urls
+//			return err
+//		}
+//
+//		errs := &HttpError{
+//			HttpStatusCode: HttpRetryError,
+//			Error:          errors.New("HttpRetryError error"),
+//		}
+//		for _, url := range req.Urls {
+//			req.Url = url
+//			err = doHttpRequest[T](req, t)
+//			if err == nil { //请求成功了直接返回
+//				return err
+//			} else {
+//				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
+//			}
+//		}
+//		return errs
+//	}
+//}
