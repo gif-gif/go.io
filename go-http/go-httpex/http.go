@@ -81,6 +81,9 @@ func doHttpRequest[T any](req *Request, t *T) *HttpError {
 		}
 	}
 
+	req.ResponseProto = resp.Proto()
+	req.ResponseTime = resp.Time()
+
 	return nil
 }
 
