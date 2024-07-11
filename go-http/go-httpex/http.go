@@ -7,7 +7,7 @@ import (
 )
 
 // Headers["Accept"] = "application/json" for default
-func doHttpRequest[T any](req Request, t *T) *HttpError {
+func doHttpRequest[T any](req *Request, t *T) *HttpError {
 	if req.Url == "" || !strings.HasPrefix(req.Url, "http") {
 		return &HttpError{
 			HttpStatusCode: HttpParamsError,
@@ -61,7 +61,7 @@ func doHttpRequest[T any](req Request, t *T) *HttpError {
 			Msg:            "request timeout or unknown error",
 		}
 	}
-
+	req.TraceInfo = resp.Request.TraceInfo() //调试信息
 	respData, ok := resp.Result().(*T)
 	if !ok {
 		return &HttpError{
@@ -82,7 +82,7 @@ func doHttpRequest[T any](req Request, t *T) *HttpError {
 	return nil
 }
 
-func HttpPostJson[T any](req Request, t *T) *HttpError {
+func HttpPostJson[T any](req *Request, t *T) *HttpError {
 	if req.Headers == nil {
 		req.Headers = make(map[string]string)
 	}
@@ -92,18 +92,18 @@ func HttpPostJson[T any](req Request, t *T) *HttpError {
 	return HttpRequest[T](req, t)
 }
 
-func HttpPost[T any](req Request, t *T) *HttpError {
+func HttpPost[T any](req *Request, t *T) *HttpError {
 	req.Method = POST
 	return HttpRequest[T](req, t)
 }
 
-func HttpGet[T any](req Request, t *T) *HttpError {
+func HttpGet[T any](req *Request, t *T) *HttpError {
 	req.Method = GET
 	return HttpRequest[T](req, t)
 }
 
 // 带多个Urls重试逻辑
-func HttpRequest[T any](req Request, t *T) *HttpError {
+func HttpRequest[T any](req *Request, t *T) *HttpError {
 	err := doHttpRequest[T](req, t)
 	if err == nil {
 		return nil

@@ -30,7 +30,7 @@ func main() {
 	}
 
 	res := &gohttpx.Response{}
-	err := gohttpx.HttpPostJson[gohttpx.Response](req, res)
+	err := gohttpx.HttpPostJson[gohttpx.Response](&req, res)
 	if err != nil {
 		golog.ErrorF("Error: %+v\n", err)
 	} else {
