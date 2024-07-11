@@ -1,19 +1,46 @@
-package goio
+package gohttpx
+
+import "time"
+
+const (
+	TAG = "gohttpx"
+
+	CONTENT_TYPE_XML  = "application/xml"
+	CONTENT_TYPE_JSON = "application/json"
+	CONTENT_TYPE_FORM = "application/x-www-form-urlencoded"
+)
+
+const (
+	POST = "post"
+	GET  = "get"
+)
+
+const (
+	HttpUnknownError = 1000
+	HttpRetryError   = 2000
+	HttpParamsError  = 3000
+)
+
+type Request struct {
+	Url           string
+	Urls          []string // 如果有值，当url 请求失败时继续用这里的接口尝试，直到成功返回或者全部失败
+	Method        string
+	Body          interface{}       //post body 参数
+	QueryParams   map[string]string //get 参数
+	Headers       map[string]string
+	Timeout       time.Duration
+	RetryCount    int
+	RetryWaitTime time.Duration
+}
+
+type HttpError struct {
+	HttpStatusCode int
+	Msg            string
+	Error          error
+	Errors         []*HttpError //重试逻辑的错误列表
+}
 
 type res struct{}
-
-type OrderItem struct {
-	Column string `json:"column"`
-	Asc    bool   `json:"asc"`
-}
-
-type Page struct {
-	PageNo    int64        `json:"page_no,optional"`
-	PageSize  int64        `json:"page_size,optional"`
-	StartTime int64        `json:"start_time,optional"`
-	EndTime   int64        `json:"end_time,optional"`
-	SortBy    []*OrderItem `json:"sort_by,optional"`
-}
 
 type Response struct {
 	Code int64       `json:"code"`

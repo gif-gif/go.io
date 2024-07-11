@@ -1,331 +1,127 @@
-package gohttpex
+package gohttpx
 
 import (
 	"github.com/go-resty/resty/v2"
-	"github.com/goccy/go-json"
-	"github.com/gogf/gf/util/gconv"
-	"github.com/pkg/errors"
 	"net/http"
-	"net/url"
 	"strings"
-	"time"
 )
 
-// GetClientIp returns the client ip of this request without port.
-// Note that this ip address might be modified by client header.
-func GetClientIp(r *http.Request) string {
-	clientIp := ""
-	realIps := r.Header.Get("X-Forwarded-For")
-	if realIps != "" && len(realIps) != 0 && !strings.EqualFold("unknown", realIps) {
-		ipArray := strings.Split(realIps, ",")
-		clientIp = ipArray[0]
-		if clientIp != "" {
-			//fmt.Printf("GetClientIp X-Forwarded-For:%s\n", clientIp)
-			return clientIp
+// Headers["Accept"] = "application/json" for default
+func doHttpRequest[T any](req Request, t *T) (*T, *HttpError) {
+	if req.Url == "" || !strings.HasPrefix(req.Url, "http") {
+		return nil, &HttpError{
+			HttpStatusCode: HttpParamsError,
+			Msg:            "url is invalid",
+		}
+	}
+	var (
+		restyClient = resty.New().
+			SetTimeout(req.Timeout).
+			SetRetryCount(req.RetryCount).
+			SetRetryWaitTime(req.RetryWaitTime)
+	)
+
+	if req.Headers == nil {
+		req.Headers = make(map[string]string)
+		req.Headers["Accept"] = CONTENT_TYPE_JSON
+	} else {
+		req.Headers["Accept"] = CONTENT_TYPE_JSON
+	}
+
+	var resp *resty.Response
+	var err error
+	request := restyClient.R()
+	if req.Method == POST {
+		resp, err = request.
+			SetBody(req.Body).
+			SetQueryParams(req.QueryParams).
+			SetResult(t).
+			SetHeaders(req.Headers).
+			Post(req.Url)
+	} else {
+		resp, err = request.
+			SetResult(t).
+			SetQueryParams(req.QueryParams).
+			SetHeaders(req.Headers).
+			Get(req.Url)
+	}
+
+	if err != nil {
+		return nil, &HttpError{
+			Error:          err,
+			HttpStatusCode: HttpUnknownError,
+			Msg:            "request timeout or unknown error",
 		}
 	}
 
-	if clientIp == "" {
-		realIps := r.Header.Get("X-Forward-For")
-		if realIps != "" && len(realIps) != 0 && !strings.EqualFold("unknown", realIps) {
-			ipArray := strings.Split(realIps, ",")
-			clientIp = ipArray[0]
-			if clientIp != "" {
-				return clientIp
+	if resp.StatusCode() != http.StatusOK {
+		return nil, &HttpError{
+			Error:          err,
+			HttpStatusCode: resp.StatusCode(),
+			Msg:            "request timeout or unknown error",
+		}
+	}
+
+	respData, ok := resp.Result().(*T)
+	if !ok {
+		return nil, &HttpError{
+			Error:          err,
+			HttpStatusCode: resp.StatusCode(),
+			Msg:            "Response T is invalid",
+		}
+	}
+
+	if respData == nil {
+		return nil, &HttpError{
+			Error:          err,
+			HttpStatusCode: resp.StatusCode(),
+			Msg:            "Response data is empty",
+		}
+	}
+
+	return respData, nil
+}
+
+func HttpPostJson[T any](req Request, t *T) (*T, *HttpError) {
+	if req.Headers == nil {
+		req.Headers = make(map[string]string)
+	}
+
+	req.Headers["Content-Type"] = CONTENT_TYPE_JSON
+	req.Method = POST
+	return HttpRequest[T](req, t)
+}
+
+func HttpPost[T any](req Request, t *T) (*T, *HttpError) {
+	req.Method = POST
+	return HttpRequest[T](req, t)
+}
+
+func HttpGet[T any](req Request, t *T) (*T, *HttpError) {
+	req.Method = GET
+	return HttpRequest[T](req, t)
+}
+
+// 带多个Urls重试逻辑
+func HttpRequest[T any](req Request, t *T) (*T, *HttpError) {
+	res, err := doHttpRequest[T](req, t)
+	if err == nil {
+		return res, nil
+	} else {
+		if len(req.Urls) == 0 { //没有重试urls
+			return nil, err
+		}
+
+		errs := &HttpError{}
+		for _, url := range req.Urls {
+			req.Url = url
+			res, err = doHttpRequest[T](req, t)
+			if err == nil { //请求成功了直接返回
+				return res, err
+			} else {
+				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
 			}
 		}
+		return nil, errs
 	}
-
-	if clientIp == "" || strings.EqualFold("unknown", realIps) {
-		clientIp = r.Header.Get("Proxy-Client-IP")
-	}
-	if clientIp == "" || strings.EqualFold("unknown", realIps) {
-		clientIp = r.Header.Get("WL-Proxy-Client-IP")
-	}
-	if clientIp == "" || strings.EqualFold("unknown", realIps) {
-		clientIp = r.Header.Get("HTTP_CLIENT_IP")
-	}
-	if clientIp == "" || strings.EqualFold("unknown", realIps) {
-		clientIp = r.Header.Get("HTTP_X_FORWARDED_FOR")
-	}
-	if clientIp == "" || strings.EqualFold("unknown", realIps) {
-		clientIp = r.Header.Get("X-Real-IP")
-	}
-	if clientIp == "" || strings.EqualFold("unknown", realIps) {
-		clientIp = r.RemoteAddr
-	}
-
-	return clientIp
-}
-
-func HttpGetValuesResultBody(url string, params url.Values, headers map[string]string, retryCount int) ([]byte, error) {
-	var (
-		restyClient = resty.New().
-			SetTimeout(time.Second * 20).
-			EnableTrace().
-			SetRetryCount(retryCount).
-			SetRetryWaitTime(2 * time.Second)
-	)
-
-	resp, err := restyClient.R().
-		//EnableTrace().
-		SetQueryParamsFromValues(params).
-		SetHeaders(headers).
-		Get(url)
-
-	//fmt.Println("Response Info:")
-	//fmt.Println("  Error      :", err)
-	//fmt.Println("  Status Code:", resp.StatusCode())
-	//fmt.Println("  Status     :", resp.Status())
-	//fmt.Println("  Proto      :", resp.Proto())
-	//fmt.Println("  Time       :", resp.Time())
-	//fmt.Println("  Received At:", resp.ReceivedAt())
-	//fmt.Println("  Body       :\n", resp)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode() != http.StatusOK {
-		return nil, errors.New("请求错误" + gconv.String(resp.StatusCode()))
-	}
-
-	//ti := res.Request.TraceInfo()
-	return resp.Body(), nil
-}
-
-func HttpGetValues[T any](url string, params url.Values, headers map[string]string, t *T, retryCount int) (*T, error) {
-	var (
-		restyClient = resty.New().
-			SetTimeout(time.Second * 20).
-			EnableTrace().
-			SetRetryCount(retryCount).
-			SetRetryWaitTime(2 * time.Second)
-	)
-
-	if headers == nil {
-		headers = make(map[string]string)
-		headers["Accept"] = "application/json"
-	} else {
-		headers["Accept"] = "application/json"
-	}
-
-	resp, err := restyClient.R().
-		//EnableTrace().
-		SetQueryParamsFromValues(params).
-		SetResult(t).
-		SetHeaders(headers).
-		Get(url)
-
-	//fmt.Println("Response Info:")
-	//fmt.Println("  Error      :", err)
-	//fmt.Println("  Status Code:", resp.StatusCode())
-	//fmt.Println("  Status     :", resp.Status())
-	//fmt.Println("  Proto      :", resp.Proto())
-	//fmt.Println("  Time       :", resp.Time())
-	//fmt.Println("  Received At:", resp.ReceivedAt())
-	//fmt.Println("  Body       :\n", resp)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode() != http.StatusOK {
-		//respData, ok := resp.Result().(*T)
-		e1 := json.Unmarshal(resp.Body(), &t)
-		if e1 != nil {
-			return nil, errors.New("http Statusis not [200]OK : " + gconv.String(resp.StatusCode()) + ",body:" + string(resp.Body()))
-		}
-		return t, nil
-	}
-
-	//ti := res.Request.TraceInfo()
-
-	respData, ok := resp.Result().(*T)
-	if !ok {
-		return nil, errors.New("params must be not empty ok is false")
-	}
-	if respData == nil {
-		return nil, errors.New("data must be not empty")
-	}
-
-	return respData, nil
-}
-
-func HttpGet[T any](url string, params string, headers map[string]string, t *T, retryCount int) (*T, error) {
-	var (
-		restyClient = resty.New().
-			SetTimeout(time.Second * 20).
-			EnableTrace().
-			SetRetryCount(retryCount).
-			SetRetryWaitTime(2 * time.Second)
-	)
-
-	//value, _ := query.Values(OpenAiBalanceRequest{
-	//	StartDate: req.StartDate,
-	//	EndDate:   req.EndDate,
-	//})SetFormDataFromValues
-	if headers == nil {
-		headers = make(map[string]string)
-		headers["Accept"] = "application/json"
-	} else {
-		headers["Accept"] = "application/json"
-	}
-
-	resp, err := restyClient.R().
-		//EnableTrace().
-		SetQueryString(params).
-		SetResult(t).
-		SetHeaders(headers).
-		Get(url)
-
-	//fmt.Println("Response Info:")
-	//fmt.Println("  Error      :", err)
-	//fmt.Println("  Status Code:", resp.StatusCode())
-	//fmt.Println("  Status     :", resp.Status())
-	//fmt.Println("  Proto      :", resp.Proto())
-	//fmt.Println("  Time       :", resp.Time())
-	//fmt.Println("  Received At:", resp.ReceivedAt())
-	//fmt.Println("  Body       :\n", resp)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode() != http.StatusOK {
-		//respData, ok := resp.Result().(*T)
-		e1 := json.Unmarshal(resp.Body(), &t)
-		if e1 != nil {
-			return nil, errors.New("http Statusis not [200]OK : " + gconv.String(resp.StatusCode()) + ",body:" + string(resp.Body()))
-		}
-		return t, nil
-	}
-
-	//ti := res.Request.TraceInfo()
-
-	respData, ok := resp.Result().(*T)
-	if !ok {
-		return nil, errors.New("params must be not empty ok is false")
-	}
-	if respData == nil {
-		return nil, errors.New("data must be not empty")
-	}
-
-	return respData, nil
-}
-
-func HttpPost[T any](url string, params map[string]interface{}, headers map[string]string, t *T) (*T, error) {
-	var (
-		restyClient = resty.New().
-			SetTimeout(time.Second * 10).
-			EnableTrace().
-			SetRetryCount(0).
-			SetRetryWaitTime(200 * time.Millisecond)
-	)
-
-	if headers == nil {
-		headers = make(map[string]string)
-		headers["Accept"] = "application/json"
-	} else {
-		headers["Accept"] = "application/json"
-	}
-
-	//value, _ := query.Values(OpenAiBalanceRequest{
-	//	StartDate: req.StartDate,
-	//	EndDate:   req.EndDate,
-	//})SetFormDataFromValues
-
-	resp, err := restyClient.R().
-		//EnableTrace().
-		SetBody(params).
-		SetResult(t).
-		SetHeaders(headers).
-		Post(url)
-
-	//fmt.Println("Response Info:")
-	//fmt.Println("  Error      :", err)
-	//fmt.Println("  Status Code:", resp.StatusCode())
-	//fmt.Println("  Status     :", resp.Status())
-	//fmt.Println("  Proto      :", resp.Proto())
-	//fmt.Println("  Time       :", resp.Time())
-	//fmt.Println("  Received At:", resp.ReceivedAt())
-	//fmt.Println("  Body       :\n", resp)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode() != http.StatusOK {
-		return nil, errors.New("params must be not empty : " + gconv.String(resp.StatusCode()))
-	}
-
-	//ti := res.Request.TraceInfo()
-
-	respData, ok := resp.Result().(*T)
-	if !ok {
-		return nil, errors.New("params must be not empty ok is false")
-	}
-	if respData == nil {
-		return nil, errors.New("data must be not empty")
-	}
-
-	return respData, nil
-}
-
-func HttpPostJson[T any](url string, params string, headers map[string]string, timeout int, t *T) (*T, error) {
-	var (
-		restyClient = resty.New().
-			SetTimeout(time.Second * time.Duration(timeout)).
-			EnableTrace().
-			SetRetryCount(0).
-			SetRetryWaitTime(200 * time.Millisecond)
-	)
-
-	if headers == nil {
-		headers = make(map[string]string)
-		headers["Accept"] = "application/json"
-	} else {
-		headers["Accept"] = "application/json"
-	}
-
-	//value, _ := query.Values(OpenAiBalanceRequest{
-	//	StartDate: req.StartDate,
-	//	EndDate:   req.EndDate,
-	//})SetFormDataFromValues
-	headers["Content-Type"] = "application/json"
-	resp, err := restyClient.R().
-		//EnableTrace().
-		SetBody(params).
-		SetResult(t).
-		SetHeaders(headers).
-		Post(url)
-
-	//fmt.Println("Response Info:")
-	//fmt.Println("  Error      :", err)
-	//fmt.Println("  Status Code:", resp.StatusCode())
-	//fmt.Println("  Status     :", resp.Status())
-	//fmt.Println("  Proto      :", resp.Proto())
-	//fmt.Println("  Time       :", resp.Time())
-	//fmt.Println("  Received At:", resp.ReceivedAt())
-	//fmt.Println("  Body       :\n", resp)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode() != http.StatusOK {
-		return nil, errors.New("code:" + gconv.String(resp.StatusCode()))
-	}
-
-	//ti := res.Request.TraceInfo()
-
-	respData, ok := resp.Result().(*T)
-	if !ok {
-		return nil, errors.New("params must be not empty ok is false")
-	}
-	if respData == nil {
-		return nil, errors.New("data must be not empty")
-	}
-
-	return respData, nil
 }

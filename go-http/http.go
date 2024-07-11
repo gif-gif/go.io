@@ -2,7 +2,56 @@ package gohttp
 
 import (
 	"io"
+	"net/http"
+	"strings"
 )
+
+// GetClientIp returns the client ip of this request without port.
+// Note that this ip address might be modified by client header.
+func GetClientIp(r *http.Request) string {
+	clientIp := ""
+	realIps := r.Header.Get("X-Forwarded-For")
+	if realIps != "" && len(realIps) != 0 && !strings.EqualFold("unknown", realIps) {
+		ipArray := strings.Split(realIps, ",")
+		clientIp = ipArray[0]
+		if clientIp != "" {
+			//fmt.Printf("GetClientIp X-Forwarded-For:%s\n", clientIp)
+			return clientIp
+		}
+	}
+
+	if clientIp == "" {
+		realIps := r.Header.Get("X-Forward-For")
+		if realIps != "" && len(realIps) != 0 && !strings.EqualFold("unknown", realIps) {
+			ipArray := strings.Split(realIps, ",")
+			clientIp = ipArray[0]
+			if clientIp != "" {
+				return clientIp
+			}
+		}
+	}
+
+	if clientIp == "" || strings.EqualFold("unknown", realIps) {
+		clientIp = r.Header.Get("Proxy-Client-IP")
+	}
+	if clientIp == "" || strings.EqualFold("unknown", realIps) {
+		clientIp = r.Header.Get("WL-Proxy-Client-IP")
+	}
+	if clientIp == "" || strings.EqualFold("unknown", realIps) {
+		clientIp = r.Header.Get("HTTP_CLIENT_IP")
+	}
+	if clientIp == "" || strings.EqualFold("unknown", realIps) {
+		clientIp = r.Header.Get("HTTP_X_FORWARDED_FOR")
+	}
+	if clientIp == "" || strings.EqualFold("unknown", realIps) {
+		clientIp = r.Header.Get("X-Real-IP")
+	}
+	if clientIp == "" || strings.EqualFold("unknown", realIps) {
+		clientIp = r.RemoteAddr
+	}
+
+	return clientIp
+}
 
 func New(opts ...Option) *Request {
 	r := &Request{
