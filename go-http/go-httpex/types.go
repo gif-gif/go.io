@@ -1,6 +1,7 @@
 package gohttpx
 
 import (
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-resty/resty/v2"
 	"time"
 )
@@ -54,6 +55,31 @@ type Response struct {
 	Code int64       `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data,omitempty"`
+}
+
+func (r *Request) SetHeader(name string, value string) {
+	if r.Headers == nil {
+		r.Headers = make(map[string]string)
+	}
+	r.Headers[name] = value
+}
+
+func (r *Request) SetQueryParams(name string, value string) {
+	if r.QueryParams == nil {
+		r.QueryParams = make(map[string]string)
+	}
+	r.QueryParams[name] = value
+}
+
+func (r *Request) setUrl(url string) {
+	r.Url = url
+}
+
+// 重复会去重
+func (r *Request) AddUrl(url string) {
+	if !goutils.IsInArray[string](r.Urls, url) {
+		r.Urls = append(r.Urls, url)
+	}
 }
 
 // 请求成功

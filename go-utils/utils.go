@@ -9,6 +9,17 @@ import (
 	"time"
 )
 
+// 元素都转换成字符串比较
+func IsInArray[T any](arr []T, target T) bool {
+	for _, t := range arr {
+		tt := gconv.String(target)
+		if gconv.String(t) == tt {
+			return true
+		}
+	}
+	return false
+}
+
 // 通用三目运算
 func IfNot[T any](isTrue bool, a, b T) T {
 	if isTrue {

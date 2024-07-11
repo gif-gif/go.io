@@ -41,18 +41,6 @@ func (c *SelectController[T]) MysqlWhere(column string) (string, []any) {
 	return whereString + conditions, params
 }
 
-// 元素都转换成字符串比较
-func IsInArray[T any](arr []T, target T) bool {
-	for _, num := range arr {
-		tt := gconv.String(target)
-		tt = strings.ReplaceAll(tt, "`", "")
-		if gconv.String(num) == tt {
-			return true
-		}
-	}
-	return false
-}
-
 func WhereIntArray[T int | int64 | int32](items []int64) string {
 	if len(items) == 0 {
 		return ""

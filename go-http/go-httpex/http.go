@@ -127,3 +127,29 @@ func HttpRequest[T any](req *Request, t *T) *HttpError {
 		return errs
 	}
 }
+
+// 带多个Urls重试逻辑,并发请求
+func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
+	err := doHttpRequest[T](req, t)
+	if err == nil {
+		return nil
+	} else {
+		if len(req.Urls) == 0 { //没有重试urls
+			return err
+		}
+
+		errs := &HttpError{
+			HttpStatusCode: HttpRetryError,
+		}
+		for _, url := range req.Urls {
+			req.Url = url
+			err = doHttpRequest[T](req, t)
+			if err == nil { //请求成功了直接返回
+				return err
+			} else {
+				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
+			}
+		}
+		return errs
+	}
+}
