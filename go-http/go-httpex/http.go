@@ -47,7 +47,6 @@ func doHttpRequest[T any](req *Request, t *T) *HttpError {
 			Get(req.Url)
 	}
 
-	req.TraceInfo = resp.Request.TraceInfo() //调试信息
 	if err != nil {
 		return &HttpError{
 			Error:          err,
@@ -63,7 +62,7 @@ func doHttpRequest[T any](req *Request, t *T) *HttpError {
 			Msg:            "request timeout or unknown error",
 		}
 	}
-
+	req.TraceInfo = resp.Request.TraceInfo() //调试信息
 	respData, ok := resp.Result().(*T)
 	if !ok {
 		return &HttpError{
