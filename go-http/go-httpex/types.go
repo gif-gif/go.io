@@ -57,6 +57,34 @@ type Response struct {
 	Data interface{} `json:"data,omitempty"`
 }
 
+func (r *Request) SetMethod(method string) {
+	r.Method = method
+}
+
+func (r *Request) SetBody(body interface{}) {
+	r.Body = body
+}
+
+func (r *Request) SetTimeout(timeout time.Duration) {
+	r.Timeout = timeout
+}
+
+func (r *Request) SetRetryCount(tryCount int) {
+	r.RetryCount = tryCount
+}
+
+func (r *Request) SetIsAll(b bool) {
+	r.IsAll = b
+}
+
+func (r *Request) SetIsConcurrency(b bool) {
+	r.IsConcurrency = b
+}
+
+func (r *Request) SetRetryWaitTime(waitTime time.Duration) {
+	r.RetryWaitTime = waitTime
+}
+
 func (r *Request) SetHeader(name string, value string) {
 	if r.Headers == nil {
 		r.Headers = make(map[string]string)
