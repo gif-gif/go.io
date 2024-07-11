@@ -45,6 +45,7 @@ type Request struct {
 	TraceInfo     resty.TraceInfo
 	ResponseTime  time.Duration
 	ResponseProto string
+	Response      *resty.Response
 }
 
 type HttpError struct {
