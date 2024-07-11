@@ -8,7 +8,7 @@ import (
 // 捕获panic
 func Recovery(errFn func(err any)) {
 	if r := recover(); r != nil {
-		if errFn == nil {
+		if errFn != nil {
 			errFn(r)
 		} else {
 			golog.Error(r)

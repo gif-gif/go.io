@@ -54,8 +54,8 @@ func (ev *GoEvent) Subscribe(topic string, fn SubscribeFunc) {
 }
 
 func (ev *GoEvent) UnSubscribe(topic string) {
-	ev.mu.RLock()
-	defer ev.mu.RUnlock()
+	ev.mu.Lock()
+	defer ev.mu.Unlock()
 
 	if chs, ok := ev.subscribes[topic]; ok {
 		channels := append([]MessageChan{}, chs...)
