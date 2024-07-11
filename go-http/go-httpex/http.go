@@ -7,9 +7,9 @@ import (
 )
 
 // Headers["Accept"] = "application/json" for default
-func doHttpRequest[T any](req Request, t *T) (*T, *HttpError) {
+func doHttpRequest[T any](req Request, t *T) *HttpError {
 	if req.Url == "" || !strings.HasPrefix(req.Url, "http") {
-		return nil, &HttpError{
+		return &HttpError{
 			HttpStatusCode: HttpParamsError,
 			Msg:            "url is invalid",
 		}
@@ -47,7 +47,7 @@ func doHttpRequest[T any](req Request, t *T) (*T, *HttpError) {
 	}
 
 	if err != nil {
-		return nil, &HttpError{
+		return &HttpError{
 			Error:          err,
 			HttpStatusCode: HttpUnknownError,
 			Msg:            "request timeout or unknown error",
@@ -55,7 +55,7 @@ func doHttpRequest[T any](req Request, t *T) (*T, *HttpError) {
 	}
 
 	if resp.StatusCode() != http.StatusOK {
-		return nil, &HttpError{
+		return &HttpError{
 			Error:          err,
 			HttpStatusCode: resp.StatusCode(),
 			Msg:            "request timeout or unknown error",
@@ -64,7 +64,7 @@ func doHttpRequest[T any](req Request, t *T) (*T, *HttpError) {
 
 	respData, ok := resp.Result().(*T)
 	if !ok {
-		return nil, &HttpError{
+		return &HttpError{
 			Error:          err,
 			HttpStatusCode: resp.StatusCode(),
 			Msg:            "Response T is invalid",
@@ -72,17 +72,17 @@ func doHttpRequest[T any](req Request, t *T) (*T, *HttpError) {
 	}
 
 	if respData == nil {
-		return nil, &HttpError{
+		return &HttpError{
 			Error:          err,
 			HttpStatusCode: resp.StatusCode(),
 			Msg:            "Response data is empty",
 		}
 	}
 
-	return respData, nil
+	return nil
 }
 
-func HttpPostJson[T any](req Request, t *T) (*T, *HttpError) {
+func HttpPostJson[T any](req Request, t *T) *HttpError {
 	if req.Headers == nil {
 		req.Headers = make(map[string]string)
 	}
@@ -92,36 +92,38 @@ func HttpPostJson[T any](req Request, t *T) (*T, *HttpError) {
 	return HttpRequest[T](req, t)
 }
 
-func HttpPost[T any](req Request, t *T) (*T, *HttpError) {
+func HttpPost[T any](req Request, t *T) *HttpError {
 	req.Method = POST
 	return HttpRequest[T](req, t)
 }
 
-func HttpGet[T any](req Request, t *T) (*T, *HttpError) {
+func HttpGet[T any](req Request, t *T) *HttpError {
 	req.Method = GET
 	return HttpRequest[T](req, t)
 }
 
 // 带多个Urls重试逻辑
-func HttpRequest[T any](req Request, t *T) (*T, *HttpError) {
-	res, err := doHttpRequest[T](req, t)
+func HttpRequest[T any](req Request, t *T) *HttpError {
+	err := doHttpRequest[T](req, t)
 	if err == nil {
-		return res, nil
+		return nil
 	} else {
 		if len(req.Urls) == 0 { //没有重试urls
-			return nil, err
+			return err
 		}
 
-		errs := &HttpError{}
+		errs := &HttpError{
+			HttpStatusCode: HttpRetryError,
+		}
 		for _, url := range req.Urls {
 			req.Url = url
-			res, err = doHttpRequest[T](req, t)
+			err = doHttpRequest[T](req, t)
 			if err == nil { //请求成功了直接返回
-				return res, err
+				return err
 			} else {
 				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
 			}
 		}
-		return nil, errs
+		return errs
 	}
 }

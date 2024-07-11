@@ -15,7 +15,7 @@ func main() {
 		Url: "http://localhost:100",
 		Urls: []string{
 			"http://localhost:200",
-			"http://localhost:200",
+			"http://localhost:300",
 			"http://localhost:400",
 		},
 		QueryParams: map[string]string{"name": "jk"},
@@ -30,7 +30,7 @@ func main() {
 	}
 
 	res := &gohttpx.Response{}
-	res, err := gohttpx.HttpPostJson[gohttpx.Response](req, res)
+	err := gohttpx.HttpPostJson[gohttpx.Response](req, res)
 	if err != nil {
 		golog.ErrorF("Error: %+v\n", err)
 	} else {
