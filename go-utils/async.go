@@ -1,8 +1,10 @@
 package goutils
 
 import (
+	"fmt"
 	golog "github.com/gif-gif/go.io/go-log"
 	"sync"
+	"time"
 )
 
 // 捕获panic
@@ -69,8 +71,11 @@ func AsyncFuncGroupPanic(errFn func(err any), fns ...func()) {
 func AsyncFuncGroupOneSuccess(fns ...func()) {
 	var wg sync.WaitGroup
 	lockCount := len(fns)
-	for _, fn := range fns {
+	for i := 0; i < lockCount; i++ {
 		wg.Add(1)
+	}
+
+	for _, fn := range fns {
 		func(fn func()) {
 			AsyncFunc(func() {
 				defer wg.Done()
@@ -84,4 +89,24 @@ func AsyncFuncGroupOneSuccess(fns ...func()) {
 	}
 
 	wg.Wait()
+}
+
+func testRaceSpeed() {
+	var fns []func()
+	fns = append(fns, func() {
+		time.Sleep(5 * time.Second)
+		fmt.Println("Hello 5")
+	})
+
+	fns = append(fns, func() {
+		time.Sleep(10 * time.Second)
+		fmt.Println("Hello 1")
+	})
+
+	fns = append(fns, func() {
+		time.Sleep(3 * time.Second)
+		fmt.Println("Hello 3")
+	})
+
+	AsyncFuncGroupOneSuccess(fns...)
 }
