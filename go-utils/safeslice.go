@@ -2,7 +2,6 @@ package goutils
 
 import (
 	golock "github.com/gif-gif/go.io/go-lock"
-	"sync"
 )
 
 // 读写锁 + 顺序获取（循环）
@@ -17,7 +16,7 @@ type SafeSlice[T comparable] struct {
 func NewSafeSlice[T comparable]() *SafeSlice[T] {
 	return &SafeSlice[T]{
 		lock: &golock.GoLock{
-			MuteRW: *new(sync.RWMutex),
+			//MuteRW: *new(sync.RWMutex),
 		},
 	}
 }
