@@ -2,6 +2,7 @@ package gohttpx
 
 import (
 	"errors"
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-resty/resty/v2"
 	"net/http"
 	"strings"
@@ -21,7 +22,6 @@ func doHttpRequest[T any](req *Request, t *T) *HttpError {
 			SetRetryCount(req.RetryCount).
 			SetRetryWaitTime(req.RetryWaitTime)
 	)
-
 	if req.Headers == nil {
 		req.Headers = make(map[string]string)
 		req.Headers["Accept"] = CONTENT_TYPE_JSON
@@ -108,6 +108,9 @@ func HttpGet[T any](req *Request, t *T) *HttpError {
 
 // 带多个Urls重试逻辑
 func HttpRequest[T any](req *Request, t *T) *HttpError {
+	if req.IsConcurrency { //是并发开启
+		return HttpConcurrencyRequest[T](req, t)
+	}
 	err := doHttpRequest[T](req, t)
 	if err == nil {
 		return nil
@@ -125,7 +128,7 @@ func HttpRequest[T any](req *Request, t *T) *HttpError {
 			req.Url = url
 			err = doHttpRequest[T](req, t)
 			if err == nil { //请求成功了直接返回
-				return err
+				return nil
 			} else {
 				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
 			}
@@ -134,29 +137,50 @@ func HttpRequest[T any](req *Request, t *T) *HttpError {
 	}
 }
 
-// 带多个Urls重试逻辑,并发请求
-//func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
-//	err := doHttpRequest[T](req, t)
-//	if err == nil {
-//		return nil
-//	} else {
-//		if len(req.Urls) == 0 { //没有重试urls
-//			return err
-//		}
-//
-//		errs := &HttpError{
-//			HttpStatusCode: HttpRetryError,
-//			Error:          errors.New("HttpRetryError error"),
-//		}
-//		for _, url := range req.Urls {
-//			req.Url = url
-//			err = doHttpRequest[T](req, t)
-//			if err == nil { //请求成功了直接返回
-//				return err
-//			} else {
-//				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
-//			}
-//		}
-//		return errs
-//	}
-//}
+// 带多个Urls重试逻辑,并发请求,速度快先到达后 直接返回，其他请求取消
+func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
+	var err *HttpError
+	if !req.IsAll {
+		err = doHttpRequest[T](req, t)
+		if err == nil {
+			return nil
+		}
+	} else {
+		if req.Url != "" { //把当前加进来起并发
+			req.Urls = append(req.Urls, req.Url)
+		}
+	}
+
+	if len(req.Urls) == 0 { //没有urls
+		return err
+	}
+
+	errs := &HttpError{
+		HttpStatusCode: HttpRetryError,
+		Error:          errors.New("HttpRetryError error"),
+	}
+	if err != nil {
+		errs.Errors = append(errs.Errors, err)
+	}
+	isSuccess := false
+	fns := []func(){}
+	for _, url := range req.Urls {
+		reqNew := *req
+		reqNew.Url = url
+		fns = append(fns, func() {
+			err = doHttpRequest[T](&reqNew, t)
+			if err != nil {
+				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
+			} else {
+				isSuccess = true
+				//请求成功了应该直接返回，剩下的请求结果忽略
+			}
+		})
+	}
+
+	goutils.AsyncFuncGroupOneSuccess(fns...)
+	if isSuccess {
+		return nil
+	}
+	return errs
+}
