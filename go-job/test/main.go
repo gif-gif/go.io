@@ -68,10 +68,8 @@ func simpleUseGoJob() {
 	defer cron.Stop()
 	cron.Start()
 
-	job, err := cron.DurationJob(nil, 1, func(nn int) error {
-		golog.WithTag("gojobStart").Info("testing->" + gconv.String(nn))
-		time.Sleep(time.Second * 3)
-		golog.WithTag("gojobEnd").Info("testing->" + gconv.String(nn))
+	job, err := cron.SecondX(nil, 1, func(nn int) error {
+		golog.WithTag("gojob").Info("testing->" + gconv.String(nn))
 		return nil
 	}, n)
 

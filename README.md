@@ -105,6 +105,34 @@ func main() {
 }
 
 ```
+### gojob 模块
+
+```go
+func simpleUseGoJob() {
+	n := 0
+	cron, err := gojob.New()
+	if err != nil {
+		golog.WithTag("gojob").Error(err)
+	}
+	defer cron.Stop()
+	cron.Start()
+
+	job, err := cron.SecondX(nil, 1, func(nn int) error {
+		golog.WithTag("gojob").Info("testing->" + gconv.String(nn))
+		return nil
+	}, n)
+
+	if err != nil {
+		golog.WithTag("gojob").Error(err)
+	} else {
+		golog.WithTag("gojob").Info("job.ID:" + job.ID().String())
+	}
+
+	time.Sleep(time.Second * 500)
+	golog.InfoF("end of gojob")
+}
+```
+
 ### gopool 模块
 ```go
 func testDynamicSize() {
