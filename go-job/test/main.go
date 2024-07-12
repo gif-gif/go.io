@@ -4,6 +4,7 @@ import (
 	"fmt"
 	gojob "github.com/gif-gif/go.io/go-job"
 	golog "github.com/gif-gif/go.io/go-log"
+	"github.com/gif-gif/go.io/goio"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/gogf/gf/util/gconv"
 	"github.com/google/uuid"
@@ -11,6 +12,12 @@ import (
 )
 
 func main() {
+	goio.Init(goio.DEVELOPMENT)
+	//testJob()
+	simpleUseGoJob()
+}
+
+func testJob() {
 	n := 0
 	cron, err := gojob.New()
 	if err != nil {
