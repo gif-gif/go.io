@@ -15,6 +15,7 @@ func timeCost(start time.Time) {
 	fmt.Printf("time cost = %v\n", tc.Seconds())
 }
 
+// TODO: 并发怎么迅速取消或者停止，http 比如请求最快的直接返回
 func main() {
 	goio.Init(goio.DEVELOPMENT)
 	defer timeCost(time.Now())
@@ -135,9 +136,11 @@ func testGroupContext() {
 			fmt.Printf("Task #%d started\n", n)
 			time.Sleep(1 * time.Second)
 			fmt.Printf("Task #%d finished\n", n)
+
 			if n > 1 { //出错后其他未开始任务执行会被取消
 				return fmt.Errorf("test group error")
 			}
+
 			return nil
 		})
 	}

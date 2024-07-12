@@ -1,3 +1,6 @@
+# Go-LOCK
+- 用法
+```go
 package main
 
 import (
@@ -22,7 +25,7 @@ func testGoPool() {
 	gp := gopool.NewFixedSizePool(10, 10)
 	defer gp.StopAndWait()
 	group := gp.NewTaskGroup()
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 10; i++ {
 		group.Submit(func() {
 			for i := 1000; i > 0; i-- {
 				lock.WLockFunc(func(parameters ...any) {
@@ -58,3 +61,5 @@ func testSyncLock() {
 
 	fmt.Scanf("\n") //等待子线程全部结束
 }
+
+```
