@@ -1,16 +1,50 @@
 # go.io
 - Golang Development Framework Continuously Developing and Updating
 
-# Install
+## How to install
 ```
 go get -u github.com/gif-gif/go.io
 ```
 
-# 设计目标
+## How to use
+
+### Worker pool with dynamic size
+```go
+package main
+
+import (
+	"fmt"
+	golog "github.com/gif-gif/go.io/go-log"
+	gomessage "github.com/gif-gif/go.io/go-message"
+	"github.com/gif-gif/go.io/goio"
+)
+
+type Config struct {
+	Name   string
+	FeiShu string
+	Mode   string
+}
+
+func main() {
+	c := Config{}
+	goio.Init(goio.Environment(c.Mode))
+	golog.WithHook(func(msg *golog.Message) {
+		if msg.Level > golog.ERROR { //致命错误以上
+			gomessage.FeiShu(c.FeiShu, fmt.Sprintf(">> %s/%s >> %s",
+				c.Name, c.Mode, string(msg.JSON())))
+		}
+	})
+}
+
+```
+- 各个模块功能在go-[模块]目录中readme或者testCase中找到使用方法
+
+## 设计目标
 - goio 提供了常用库封装，支持必要的简洁使用功能，在其之上可以进二次开发，以提供更好的代码维护；
 - 以跨平台跨项目为首要原则，以减少二次开发的成本；
+- 各个模块逻辑保持唯一不重复
 
-# 开发规范
+## 开发规范
 - dev 分之开发，跑测试case，确定没问题 合并到 main 分支跑测试case
 - main 发布 release，版本号修改
 
@@ -23,9 +57,9 @@ go get -u github.com/gif-gif/go.io
 
 #### 新功能
 - 如果新增功能对已有功能不影响，请提供可以开启/关闭的开关（如 flag），并使新功能保持默认关闭的状态；
-- 大型新功能（比如增加一个新的协议）开发之前，请先提交一个 issue，讨论完毕之后再进行开发。
+- 大型新功能（比如增加一个新的模块）开发之前，请先提交一个 issue，讨论完毕之后再进行开发。
 
-# Thanks
+## Thanks
 - https://github.com/IBM/sarama
 - https://gorm.io/gorm
 - https://github.com/redis/go-redis
