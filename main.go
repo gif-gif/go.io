@@ -26,5 +26,5 @@ func main() {
 		}
 	})
 
-	golog.WithTag("aaaa").ErrorF("Starting tests")
+	golog.WithTag("goio").ErrorF("Starting tests")
 }
