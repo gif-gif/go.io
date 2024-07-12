@@ -52,7 +52,6 @@ func AsyncFuncGroup(fns ...func()) {
 // 异步并发执行（安全）errFn = nil 时自动Recovery 不会Panic
 func AsyncFuncGroupPanic(errFn func(err any), fns ...func()) {
 	var wg sync.WaitGroup
-
 	for _, fn := range fns {
 		wg.Add(1)
 		func(fn func()) {
@@ -60,6 +59,27 @@ func AsyncFuncGroupPanic(errFn func(err any), fns ...func()) {
 				defer wg.Done()
 				fn()
 			}, errFn)
+		}(fn)
+	}
+
+	wg.Wait()
+}
+
+// 异步并发执行（安全) 只要其中一个执行完成（不能嵌套使用），释放所有等待锁。目的是比执行速度
+func AsyncFuncGroupOneSuccess(fns ...func()) {
+	var wg sync.WaitGroup
+	lockCount := len(fns)
+	for _, fn := range fns {
+		wg.Add(1)
+		func(fn func()) {
+			AsyncFunc(func() {
+				defer wg.Done()
+				fn()
+				//有一个执行完成后其他的都退出阻塞
+				for i := 0; i < lockCount-1; i++ {
+					wg.Done()
+				}
+			})
 		}(fn)
 	}
 
