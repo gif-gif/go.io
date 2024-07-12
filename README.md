@@ -8,7 +8,7 @@ go get -u github.com/gif-gif/go.io
 
 ## How to use
 
-### Worker pool with dynamic size
+### 项目启动时初始化 ,日志文件默认在项目目录下 logs/date.log  
 ```go
 package main
 
@@ -28,6 +28,8 @@ type Config struct {
 func main() {
 	c := Config{}
 	goio.Init(goio.Environment(c.Mode))
+	//golog.SetAdapter(golog.NewFileAdapter()) //当前工程目录logs/date.log, 可通过这个设置改变日志输出目录 
+	//不设置 golog.SetAdapter 默认控制台输出
 	golog.WithHook(func(msg *golog.Message) {
 		if msg.Level > golog.ERROR { //致命错误以上
 			gomessage.FeiShu(c.FeiShu, fmt.Sprintf(">> %s/%s >> %s",
@@ -37,7 +39,107 @@ func main() {
 }
 
 ```
-- 各个模块功能在go-[模块]目录中readme或者testCase中找到使用方法
+### GoHttp 模块使用
+```go
+package main
+
+import (
+	"fmt"
+	gohttpx "github.com/gif-gif/go.io/go-http/go-httpex"
+	golog "github.com/gif-gif/go.io/go-log"
+	"github.com/gif-gif/go.io/goio"
+	"time"
+)
+
+func main() {
+	goio.Init(goio.DEVELOPMENT)
+
+	req := gohttpx.Request{
+		Url: "http://localhost:100",
+		Urls: []string{
+			"http://localhost:200",
+			"http://localhost:300",
+			"http://localhost:400",
+		},
+		QueryParams: map[string]string{"name": "jk"},
+		Timeout:     time.Second * 2,
+	}
+	type httpRequest struct {
+		Email string `json:"email"`
+	}
+
+	req.Body = &httpRequest{
+		Email: "test@gmail.com",
+	}
+
+	res := &gohttpx.Response{}
+	err := gohttpx.HttpPostJson[gohttpx.Response](&req, res)
+	if err != nil {
+		golog.ErrorF("Error: %+v\n", err)
+	} else {
+		fmt.Println(res)
+	}
+
+	time.Sleep(10 * time.Second)
+}
+
+```
+### gopool 模块使用
+```go
+func testDynamicSize() {
+	gp := gopool.NewDynamicSizePool(100, 10)
+	defer gp.StopAndWait()
+
+	cron, _ := gojob.New()
+	defer cron.Stop()
+	cron.Start()
+	cron.SecondX(nil, 1, func() {
+		gp.PrintPoolStats()
+	})
+
+	for i := 0; i < 1000; i++ {
+		n := i
+		gp.Submit(func() {
+			fmt.Printf("Running task #%d\n", n)
+			time.Sleep(1 * time.Second)
+		})
+	}
+
+	golog.InfoF("end of Submit")
+}
+```
+### godb 模块
+- 支持 sqllite3 mysql clickhouse 等；
+```go
+func mysqlTest() {
+	db, err := godb.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", godb.GoDbConfig{})
+	if err != nil {
+		golog.WithTag("godb").Error(err.Error())
+		return
+	}
+	err = db.AutoMigrate(&Product{})
+	if err != nil {
+		golog.WithTag("godb").Error(err.Error())
+		return
+	}
+
+	// Create
+	insertProduct := &Product{Code: "D42", Price: 100}
+	db.Create(insertProduct)
+	fmt.Println(insertProduct.ID)
+	// Read
+	var product Product
+	tx := db.First(&product, 1) // find product with integer primary key
+	if tx.Error != nil {
+		fmt.Println("not found first ", tx.Error.Error())
+	}
+	db.First(&product, "code = ?", "D42")
+	// Delete - delete product
+	db.Delete(&product, 1)
+
+}
+```
+- 其他各个模块功能在go-[模块]目录中readme或者testCase中找到使用方法
 
 ## 设计目标
 - goio 提供了常用库封装，支持必要的简洁使用功能，在其之上可以进二次开发，以提供更好的代码维护；
