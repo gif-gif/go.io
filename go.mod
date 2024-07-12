@@ -6,7 +6,7 @@ require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
 	github.com/ClickHouse/clickhouse-go/v2 v2.25.0
 	github.com/IBM/sarama v1.43.2
-	github.com/alitto/pond v1.9.0
+	github.com/alitto/pond v1.9.1
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/dchest/captcha v1.0.0
 	github.com/gin-gonic/gin v1.10.0
