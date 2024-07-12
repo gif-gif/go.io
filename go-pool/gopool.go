@@ -5,6 +5,7 @@ import (
 	"github.com/alitto/pond"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/prometheus/client_golang/prometheus"
+	"time"
 )
 
 type GoPool struct {
@@ -28,6 +29,25 @@ func New(maxWorkers, maxCapacity int, options ...pond.Option) *GoPool {
 
 func (g *GoPool) StopAndWait() {
 	g.pool.StopAndWait()
+}
+
+// Stop会导致此池停止接受新任务，并向所有workers发出退出信号。
+// worker正在执行的任务将一直持续到完成（除非流程终止）。
+// 队列中的任务将不会被执行。
+// 此方法返回一个上下文对象，当池完全停止时，该对象将被取消。
+func (g *GoPool) Stop() context.Context {
+	return g.pool.Stop()
+}
+
+// StopAndWaitFor停止此池并等待队列中的所有任务完成
+// 或者达到给定的截止日期，以先到者为准。
+func (g *GoPool) StopAndWaitFor(deadline time.Duration) {
+	g.pool.StopAndWaitFor(deadline)
+}
+
+// 如果池已停止并且不再接受任务，则Stopped返回true，否则返回false。
+func (g *GoPool) Stopped() bool {
+	return g.pool.Stopped()
 }
 
 // Create a buffered (non-blocking) pool that can scale up to maxWorkers workers

@@ -168,6 +168,9 @@ func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
 		reqNew := *req
 		reqNew.Url = url
 		fns = append(fns, func() {
+			if isSuccess {
+				return
+			}
 			err = doHttpRequest[T](&reqNew, t)
 			if err != nil {
 				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
