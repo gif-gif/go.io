@@ -1,4 +1,4 @@
-package gooss
+package goalioss
 
 type Config struct {
 	AccessKeyId     string `json:"access_key_id" yaml:"access_key_id"`

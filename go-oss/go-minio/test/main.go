@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	gominio "github.com/gif-gif/go.io/go-minio"
+	gominio2 "github.com/gif-gif/go.io/go-oss/go-minio"
 	"github.com/minio/minio-go/v7"
 	"net/url"
 	"os"
@@ -21,7 +21,7 @@ var (
 )
 
 func createBucketTest() {
-	conf := gominio.Config{
+	conf := gominio2.Config{
 		AccessKeyId:     *AccessKeyId,
 		AccessKeySecret: *AccessKeySecret,
 		Endpoint:        *Endpoint,
@@ -30,7 +30,7 @@ func createBucketTest() {
 		UseSSL:          false,
 	}
 
-	oss := gominio.New(conf)
+	oss := gominio2.New(conf)
 	bucketName := "testbucket"
 	location := "us-east-1"
 
@@ -50,7 +50,7 @@ func uploadTest() {
 		return
 	}
 
-	conf := gominio.Config{
+	conf := gominio2.Config{
 		AccessKeyId:     *AccessKeyId,
 		AccessKeySecret: *AccessKeySecret,
 		Endpoint:        *Endpoint,
@@ -59,7 +59,7 @@ func uploadTest() {
 		UseSSL:          false,
 	}
 
-	oss := gominio.New(conf)
+	oss := gominio2.New(conf)
 
 	for n, i := range args {
 		if n == 0 {
@@ -87,7 +87,7 @@ func uploadTest() {
 
 func getTest() {
 
-	conf := gominio.Config{
+	conf := gominio2.Config{
 		AccessKeyId:     *AccessKeyId,
 		AccessKeySecret: *AccessKeySecret,
 		Endpoint:        *Endpoint,
@@ -96,7 +96,7 @@ func getTest() {
 		UseSSL:          false,
 	}
 
-	oss := gominio.New(conf)
+	oss := gominio2.New(conf)
 
 	err := oss.FGetObject(context.Background(), "/test/2024/05/422744271b108960a4818cc91a1822d9.log", "/Users/Jerry/Desktop/bak202405/422744271b108960a4818cc91a1822d9.log", nil)
 	if err != nil {

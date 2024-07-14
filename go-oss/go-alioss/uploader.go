@@ -1,4 +1,4 @@
-package gooss
+package goalioss
 
 import (
 	"bytes"

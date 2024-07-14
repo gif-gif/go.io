@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	gooss "github.com/gif-gif/go.io/go-oss"
+	goalioss "github.com/gif-gif/go.io/go-oss/go-alioss"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gif-gif/go.io/goio"
 	"io/ioutil"
@@ -28,7 +28,7 @@ func main() {
 		return
 	}
 
-	conf := gooss.Config{
+	conf := goalioss.Config{
 		AccessKeyId:     *AccessKeyId,
 		AccessKeySecret: *AccessKeySecret,
 		Endpoint:        *Endpoint,
@@ -49,7 +49,7 @@ func main() {
 		conf.Bucket = ""
 	}
 
-	up := gooss.Init(conf)
+	up := goalioss.Init(conf)
 
 	for n, i := range args {
 		if n == 0 {
