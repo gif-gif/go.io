@@ -1,9 +1,10 @@
 package goredis
 
 import (
+	"context"
 	gojob "github.com/gif-gif/go.io/go-job"
 	golog "github.com/gif-gif/go.io/go-log"
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 type GoRedis struct {
@@ -18,8 +19,8 @@ func New(conf Config) (cli *GoRedis, err error) {
 		Password: conf.Password,
 		DB:       conf.DB,
 	})
-
-	if err = cli.Ping().Err(); err != nil {
+	ctx := context.Background()
+	if err = cli.Ping(ctx).Err(); err != nil {
 		golog.WithTag("goredis").Error(err)
 		return
 	}
@@ -28,8 +29,8 @@ func New(conf Config) (cli *GoRedis, err error) {
 		gj, _ := gojob.New()
 		gj.Start()
 		gj.SecondX(nil, 5, func() {
-			if err := cli.Ping().Err(); err != nil {
-				golog.WithTag("goredis").Error(err)
+			if err := cli.Ping(ctx).Err(); err != nil {
+				golog.WithTag("goredis").Fatal("redis ping error:", err)
 			}
 		})
 	}
