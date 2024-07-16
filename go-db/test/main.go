@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	godb "github.com/gif-gif/go.io/go-db"
+	"github.com/gif-gif/go.io/go-db/gogorm"
 	gofile "github.com/gif-gif/go.io/go-file"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/goio"
@@ -25,7 +25,7 @@ func main() {
 }
 
 func testSqlite3() {
-	db, err := godb.InitSqlite3("./test.db", godb.GoDbConfig{
+	db, err := gogorm.InitSqlite3("./test.db", gogorm.GormDbConfig{
 		MaxOpen:      100,
 		MaxIdleCount: 10,
 	})
@@ -60,7 +60,7 @@ func testSqlite3() {
 }
 
 func mysqlTest() {
-	db, err := godb.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", godb.GoDbConfig{})
+	db, err := gogorm.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", gogorm.GormDbConfig{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
@@ -89,7 +89,7 @@ func mysqlTest() {
 
 func testClickhouse() {
 	dsn := "tcp://localhost:9000?database=gorm&username=gorm&password=gorm&read_timeout=10&write_timeout=20"
-	db, err := godb.InitMysql(dsn, godb.GoDbConfig{})
+	db, err := gogorm.InitMysql(dsn, gogorm.GormDbConfig{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
@@ -117,7 +117,7 @@ func testClickhouse() {
 }
 
 func testTransaction() {
-	db, err := godb.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", godb.GoDbConfig{})
+	db, err := gogorm.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", gogorm.GormDbConfig{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
@@ -188,7 +188,7 @@ func testHasMany() {
 		CreditCards []CreditCard `gorm:"foreignKey:UserRefer"`
 	}
 
-	db, err := godb.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", godb.GoDbConfig{})
+	db, err := gogorm.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", gogorm.GormDbConfig{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return

@@ -1,24 +1,24 @@
-package godb
+package gogorm
 
 import (
 	golog "github.com/gif-gif/go.io/go-log"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/clickhouse"
 	"gorm.io/gorm"
 )
 
-// 初始化MySQL
-func InitMysql(dataSource string, config GoDbConfig) (*GoDB, error) {
-	golog.Info("init Mysql")
+// 初始化CLICKHOUSE
+func InitClickHouse(dataSource string, config GormDbConfig) (*GormDB, error) {
+	golog.Info("init ClickHouse")
 	if config.Config == nil {
 		config.Config = &gorm.Config{QueryFields: true}
 	}
 	//config.Config.DisableAutomaticPing = !config.AutoPing
-	db, err := gorm.Open(mysql.Open(dataSource), config.Config)
+	db, err := gorm.Open(clickhouse.Open(dataSource), config.Config)
 	if err != nil {
 		return nil, err
 	}
 
-	m := &GoDB{
+	m := &GormDB{
 		DB: db,
 	}
 

@@ -8,8 +8,8 @@ import (
 
 func TestClient_DocCreate(t *testing.T) {
 	conf := Config{
-		Addr:     "http://192.168.1.100:9200",
-		User:     "elastic",
+		Addr:     "http://122.228.113.238:9200",
+		User:     "es",
 		Password: "123456",
 	}
 	if err := Init(conf); err != nil {

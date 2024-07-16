@@ -205,5 +205,6 @@ func mysqlTest() {
 - https://github.com/gin-gonic/gin
 - https://github.com/go-resty/resty
 - https://github.com/olivere/elastic
+- https://github.com/elastic/go-elasticsearch
 - https://github.com/mongodb/mongo-go-driver
 - https://github.com/alitto/pond

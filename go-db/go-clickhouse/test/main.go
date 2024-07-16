@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	goclickhouse "github.com/gif-gif/go.io/go-clickhouse"
+	goclickhouse2 "github.com/gif-gif/go.io/go-db/go-clickhouse"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/goio"
 	"log"
@@ -10,7 +10,7 @@ import (
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-	err := goclickhouse.Init(goclickhouse.Config{
+	err := goclickhouse2.Init(goclickhouse2.Config{
 		Driver:             "clickhouse",
 		Addr:               "122.228.113.238:8124",
 		User:               "default",
@@ -23,7 +23,7 @@ func main() {
 		golog.Fatal(err)
 		return
 	}
-	rows, err := goclickhouse.DB().Query("SELECT oaid FROM xzdsp.clickcb limit 10")
+	rows, err := goclickhouse2.DB().Query("SELECT oaid FROM xzdsp.clickcb limit 10")
 	if err != nil {
 		golog.Fatal(err)
 		return

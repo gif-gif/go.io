@@ -8,7 +8,7 @@ import (
 
 func TestClient_DocGet(t *testing.T) {
 	conf := Config{
-		Addr:      "http://192.168.1.100:9200",
+		Addr:      "http://122.228.113.238:9200",
 		User:      "elastic",
 		Password:  "123456",
 		EnableLog: true,

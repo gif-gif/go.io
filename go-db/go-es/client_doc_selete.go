@@ -1,7 +1,6 @@
 package goes
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/olivere/elastic"
 )
@@ -17,31 +16,31 @@ func (cli *GoEs) DocGet(index, id string, m interface{}) (resp *elastic.GetResul
 		return
 	}
 	if m != nil {
-		json.Unmarshal(resp.Source, &m)
+		//json.Unmarshal(resp.Source, &m)
 	}
 	return
 }
 
 // 文档 - 查询文档 - 根据ID集合
 func (cli *GoEs) DocMultiGet(index string, ids []string, m interface{}) (resp *elastic.MgetResponse, err error) {
-	ms := cli.cli.MultiGet()
-	for _, id := range ids {
-		ms.Add(elastic.NewMultiGetItem().Index(index).Id(id))
-	}
-	resp, err = ms.Do(cli.ctx)
-	if err != nil {
-		return
-	}
-	if m != nil {
-		var arr []interface{}
-		for _, doc := range resp.Docs {
-			var _m interface{}
-			json.Unmarshal(doc.Source, &_m)
-			arr = append(arr, _m)
-		}
-		b, _ := json.Marshal(&arr)
-		json.Unmarshal(b, &m)
-	}
+	//ms := cli.cli.MultiGet()
+	//for _, id := range ids {
+	//	ms.Add(elastic.NewMultiGetItem().Index(index).Id(id))
+	//}
+	//resp, err = ms.Do(cli.ctx)
+	//if err != nil {
+	//	return
+	//}
+	//if m != nil {
+	//	var arr []interface{}
+	//	for _, doc := range resp.Docs {
+	//		var _m interface{}
+	//		//json.Unmarshal(doc.Source, &_m)
+	//		arr = append(arr, _m)
+	//	}
+	//	b, _ := json.Marshal(&arr)
+	//	json.Unmarshal(b, &m)
+	//}
 	return
 }
 

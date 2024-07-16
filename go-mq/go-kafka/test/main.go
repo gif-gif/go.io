@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	gokafka "github.com/gif-gif/go.io/go-kafka"
 	golog "github.com/gif-gif/go.io/go-log"
+	gokafka2 "github.com/gif-gif/go.io/go-mq/go-kafka"
 	"gorm.io/gorm"
 	"time"
 )
@@ -19,7 +19,7 @@ type Account struct {
 }
 
 func main() {
-	err := gokafka.Init(gokafka.Config{
+	err := gokafka2.Init(gokafka2.Config{
 		Addrs:    []string{"212.129.60.103:30092"},
 		User:     "admin",
 		Password: "payda6b4eb0f3",
@@ -29,7 +29,7 @@ func main() {
 		golog.WithTag("gokafka").Error(err.Error())
 		return
 	}
-	
+
 	msg := Account{}
 	b, err := json.Marshal(msg)
 	if err != nil {
@@ -37,7 +37,7 @@ func main() {
 		return
 	}
 
-	_, _, err = gokafka.Producer().SendMessage("biu_account", b)
+	_, _, err = gokafka2.Producer().SendMessage("biu_account", b)
 	if err != nil {
 		golog.WithTag("gokafka").Error(err.Error())
 		return

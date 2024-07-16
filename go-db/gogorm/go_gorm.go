@@ -1,15 +1,15 @@
-package godb
+package gogorm
 
 import (
 	"gorm.io/gorm"
 	"time"
 )
 
-type GoDB struct {
+type GormDB struct {
 	DB *gorm.DB
 }
 
-func (s *GoDB) Init(config *GoDbConfig) error {
+func (s *GormDB) Init(config *GormDbConfig) error {
 	sqlDB, err := s.DB.DB()
 	if err != nil {
 		return err
@@ -37,7 +37,7 @@ func (s *GoDB) Init(config *GoDbConfig) error {
 	return nil
 }
 
-func (s *GoDB) Model(value interface{}) *gorm.DB {
+func (s *GormDB) Model(value interface{}) *gorm.DB {
 	return s.DB.Model(value)
 }
 
@@ -46,7 +46,7 @@ func (s *GoDB) Model(value interface{}) *gorm.DB {
 // db.Session(&gorm.Session{FullSaveAssociations: true}).Updates(&user)
 //
 // SQL：完全更新地址、用户、电子邮件表，包括现有的关联记录
-func (s *GoDB) Session(config *gorm.Session) *gorm.DB {
+func (s *GormDB) Session(config *gorm.Session) *gorm.DB {
 	return s.DB.Session(config)
 }
 
@@ -77,20 +77,20 @@ func (s *GoDB) Session(config *gorm.Session) *gorm.DB {
 //
 //	 return tx.Commit().Error
 //	}
-func (s *GoDB) BeginTransaction() *GoDB {
-	godb := &GoDB{
+func (s *GormDB) BeginTransaction() *GormDB {
+	godb := &GormDB{
 		DB: s.DB.Begin(),
 	}
 	return godb
 }
 
 // 事物回滚
-func (s *GoDB) Rollback() {
+func (s *GormDB) Rollback() {
 	s.DB.Rollback()
 }
 
 // 保存回滚点
-func (s *GoDB) SavePoint(name string) {
+func (s *GormDB) SavePoint(name string) {
 	s.DB.SavePoint(name)
 }
 
@@ -104,12 +104,12 @@ func (s *GoDB) SavePoint(name string) {
 // tx.RollbackTo("sp1") // Rollback user2
 //
 // tx.Commit() // Commit user1
-func (s *GoDB) RollbackTo(name string) {
+func (s *GormDB) RollbackTo(name string) {
 	s.DB.RollbackTo(name)
 }
 
 // 提交事物
-func (s *GoDB) Commit() error {
+func (s *GormDB) Commit() error {
 	return s.DB.Commit().Error
 }
 
@@ -161,18 +161,18 @@ func (s *GoDB) Commit() error {
 //
 // // Add table suffix when creating tables
 // db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&User{})
-func (s *GoDB) AutoMigrate(values ...interface{}) error {
+func (s *GormDB) AutoMigrate(values ...interface{}) error {
 	return s.DB.AutoMigrate(values...)
 }
 
 // clickhouse Set table options after AutoMigrate
 //
 //	db.Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").AutoMigrate(&User{})
-func (s *GoDB) Set(key string, value interface{}) (tx *gorm.DB) {
+func (s *GormDB) Set(key string, value interface{}) (tx *gorm.DB) {
 	return s.DB.Set(key, value)
 }
 
-func (s *GoDB) Get(key string) (interface{}, bool) {
+func (s *GormDB) Get(key string) (interface{}, bool) {
 	return s.DB.Get(key)
 }
 
@@ -192,7 +192,7 @@ func (s *GoDB) Get(key string) (interface{}, bool) {
 //
 // var users []User
 // db.Raw("UPDATE users SET name = ? WHERE age = ? RETURNING id, name", "jinzhu", 20).Scan(&users)
-func (s *GoDB) Raw(sql string, dest interface{}, values ...interface{}) (tx *gorm.DB) {
+func (s *GormDB) Raw(sql string, dest interface{}, values ...interface{}) (tx *gorm.DB) {
 	return s.DB.Raw(sql, values...).Scan(dest)
 }
 
@@ -201,11 +201,11 @@ func (s *GoDB) Raw(sql string, dest interface{}, values ...interface{}) (tx *gor
 //
 // // Exec with SQL Expression
 // db.Exec("UPDATE users SET money = ? WHERE name = ?", gorm.Expr("money * ? + ?", 10000, 1), "jinzhu")
-func (s *GoDB) Exec(sql string, values ...interface{}) (tx *gorm.DB) {
+func (s *GormDB) Exec(sql string, values ...interface{}) (tx *gorm.DB) {
 	return s.DB.Exec(sql, values...)
 }
 
-func (s *GoDB) Exe1c(table string, dest interface{}, where string, args ...interface{}) (tx *gorm.DB) {
+func (s *GormDB) Exe1c(table string, dest interface{}, where string, args ...interface{}) (tx *gorm.DB) {
 	return s.DB.Table(table).Where(where, args).Scan(dest)
 }
 
@@ -244,12 +244,12 @@ func (s *GoDB) Exe1c(table string, dest interface{}, where string, args ...inter
 //	 Name string `gorm:"default:galeone"`
 //	 Age  int64  `gorm:"default:18"`
 //	}
-func (s *GoDB) Create(value interface{}) (tx *gorm.DB) {
+func (s *GormDB) Create(value interface{}) (tx *gorm.DB) {
 	return s.DB.Create(value)
 }
 
 // 特殊字段处理 Insert or Batch Insert
-func (s *GoDB) InsertSpecified(fields []string, exclude bool, value interface{}) (tx *gorm.DB) {
+func (s *GormDB) InsertSpecified(fields []string, exclude bool, value interface{}) (tx *gorm.DB) {
 	if exclude {
 		return s.DB.Omit(fields...).Create(&value)
 	} else {
@@ -261,7 +261,7 @@ func (s *GoDB) InsertSpecified(fields []string, exclude bool, value interface{})
 	}
 }
 
-func (s *GoDB) Select(value interface{}, conds ...interface{}) (tx *gorm.DB) {
+func (s *GormDB) Select(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 	return s.DB.Select(value, conds...)
 }
 
@@ -271,14 +271,14 @@ func (s *GoDB) Select(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 // var product Product
 // db.First(&product, 1) // find product with integer primary key
 // db.First(&product, "code = ?", "D42") // find product with code D42
-func (s *GoDB) First(value interface{}, conds ...interface{}) (tx *gorm.DB) {
+func (s *GormDB) First(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 	return s.DB.First(value, conds...)
 }
 
 // Get last record, ordered by primary key desc
 //
 // SELECT * FROM users ORDER BY id DESC LIMIT 1;
-func (s *GoDB) Last(value interface{}, conds ...interface{}) (tx *gorm.DB) {
+func (s *GormDB) Last(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 	return s.DB.Last(value, conds...)
 }
 
@@ -288,7 +288,7 @@ func (s *GoDB) Last(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 //	check error ErrRecordNotFound
 //
 // errors.Is(result.Error, gorm.ErrRecordNotFound)
-func (s *GoDB) FindOne(value interface{}, conds ...interface{}) (tx *gorm.DB) {
+func (s *GormDB) FindOne(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 	return s.DB.Take(value, conds...)
 }
 
@@ -299,35 +299,35 @@ func (s *GoDB) FindOne(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 //	 }
 //	 return
 //	}
-func (s *GoDB) Find(value interface{}, conds ...interface{}) (tx *gorm.DB) {
+func (s *GormDB) Find(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 	return s.DB.Find(value, conds...)
 }
 
-func (s *GoDB) FirstOrCreate(value interface{}, conds ...interface{}) (tx *gorm.DB) {
+func (s *GormDB) FirstOrCreate(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 	return s.DB.FirstOrCreate(value, conds...)
 }
 
-func (s *GoDB) Save(value interface{}) (tx *gorm.DB) {
+func (s *GormDB) Save(value interface{}) (tx *gorm.DB) {
 	return s.DB.Save(value)
 }
 
-func (s *GoDB) Update(model interface{}, column string, value interface{}) (tx *gorm.DB) {
+func (s *GormDB) Update(model interface{}, column string, value interface{}) (tx *gorm.DB) {
 	return s.DB.Model(model).Update(column, value)
 }
 
 // db.Model(&product).Updates(Product{Price: 200, Code: "F42"}) // non-zero fields
-func (s *GoDB) Updates(model interface{}, value interface{}) (tx *gorm.DB) {
+func (s *GormDB) Updates(model interface{}, value interface{}) (tx *gorm.DB) {
 	return s.DB.Model(model).Updates(value)
 }
 
 // db.Model(&product).Updates(map[string]interface{}{"Price": 200, "Code": "F42"})
-func (s *GoDB) UpdatesByMap(model interface{}, value map[string]interface{}) (tx *gorm.DB) {
+func (s *GormDB) UpdatesByMap(model interface{}, value map[string]interface{}) (tx *gorm.DB) {
 	return s.DB.Model(model).Updates(value)
 }
 
 // 如果你的模型包含了 gorm.DeletedAt字段（该字段也被包含在gorm.Model中），那么该模型将会自动获得软删除的能力！
 //
 // 当调用Delete时，GORM并不会从数据库中删除该记录，而是将该记录的DeleteAt设置为当前时间，而后的一般查询方法将无法查找到此条记录。
-func (s *GoDB) Delete(value interface{}, conds ...interface{}) (tx *gorm.DB) {
+func (s *GormDB) Delete(value interface{}, conds ...interface{}) (tx *gorm.DB) {
 	return s.DB.Delete(value, conds...)
 }

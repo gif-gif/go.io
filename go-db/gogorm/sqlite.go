@@ -1,4 +1,4 @@
-package godb
+package gogorm
 
 import (
 	golog "github.com/gif-gif/go.io/go-log"
@@ -9,7 +9,7 @@ import (
 // 初始化sqlite3
 //
 // Example: dbFilePath : /user/db/sqlite3.db
-func InitSqlite3(dbFilePath string, config GoDbConfig) (*GoDB, error) {
+func InitSqlite3(dbFilePath string, config GormDbConfig) (*GormDB, error) {
 	golog.Info("init Sqlite3")
 	if config.Config == nil {
 		config.Config = &gorm.Config{QueryFields: true}
@@ -20,7 +20,7 @@ func InitSqlite3(dbFilePath string, config GoDbConfig) (*GoDB, error) {
 		return nil, err
 	}
 
-	s := &GoDB{
+	s := &GormDB{
 		DB: db,
 	}
 

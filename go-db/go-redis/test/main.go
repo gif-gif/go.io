@@ -1,13 +1,13 @@
 package main
 
 import (
+	goredis2 "github.com/gif-gif/go.io/go-db/go-redis"
 	golog "github.com/gif-gif/go.io/go-log"
-	goredis "github.com/gif-gif/go.io/go-redis"
 	"time"
 )
 
 func main() {
-	config := goredis.Config{
+	config := goredis2.Config{
 		Name:     "goredis",
 		Addr:     "127.0.0.1:6379",
 		Password: "",
@@ -16,7 +16,7 @@ func main() {
 		AutoPing: true,
 	}
 
-	c, err := goredis.New(config)
+	c, err := goredis2.New(config)
 	if err != nil {
 		golog.WithTag("goredis").Error(err)
 	}
