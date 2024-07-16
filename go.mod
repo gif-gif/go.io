@@ -9,6 +9,7 @@ require (
 	github.com/alitto/pond v1.9.1
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/dchest/captcha v1.0.0
+	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-co-op/gocron/v2 v2.8.0
 	github.com/go-resty/resty/v2 v2.13.1
@@ -20,7 +21,10 @@ require (
 	github.com/olivere/elastic v6.2.37+incompatible
 	github.com/oschwald/geoip2-golang v1.11.0
 	github.com/prometheus/client_golang v1.18.0
+	github.com/redis/go-redis/v9 v9.5.4
+	github.com/rs/zerolog v1.33.0
 	github.com/shopspring/decimal v1.4.0
+	github.com/silenceper/wechat/v2 v2.1.6
 	github.com/zeromicro/go-zero v1.6.5
 	go.mongodb.org/mongo-driver v1.16.0
 	golang.org/x/text v0.16.0
@@ -49,7 +53,6 @@ require (
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.6.0 // indirect
-	github.com/elastic/go-elasticsearch/v8 v8.14.0 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
@@ -104,12 +107,10 @@ require (
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
-	github.com/redis/go-redis/v9 v9.5.4 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
-	github.com/silenceper/wechat/v2 v2.1.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
