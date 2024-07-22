@@ -1,4 +1,4 @@
-package gotgbot
+package ext
 
 import (
 	"crypto/hmac"
