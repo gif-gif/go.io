@@ -5,32 +5,21 @@ import (
 	gotgbot "github.com/gif-gif/go.io/go-tgbot"
 	"github.com/gogf/gf/util/gconv"
 	tele "gopkg.in/telebot.v3"
-	"strconv"
 	"time"
 )
 
-type recipientString string
-
-func (r recipientString) Recipient() string {
-	return "5562314141"
-}
-
-type ChatID int64
-
 // Recipient returns chat ID (see Recipient interface).
-func (i ChatID) Recipient() string {
-	return strconv.FormatInt(int64(i), 10)
-}
 
 func main() {
+	var chatId int64 = 5562314141
 	pref := &gotgbot.TelegramBot{
 		Product:    "test",
-		Token:      "7107568224:AAFgdiEsDqtFvBBScIfWku9IB8jr9Dpl-dw",
+		Token:      "Token",
 		WebAppUrl:  "https://www.google.com",
 		StartReply: "hello",
 	}
 
-	gobot, err := gotgbot.CreateOfflineBot(pref)
+	gobot, err := gotgbot.CreateOfflineBot(pref) // TODO离线模式测试
 	if err != nil {
 		golog.Error(err.Error())
 		return
@@ -95,15 +84,10 @@ func main() {
 	})
 	golog.WithTag("gotgbot").Info(trace)
 
-	// ReplyMarkup is a part of SendOptions,
-	// but often it's the only option you need
-	gobot.SendMsgText(5562314141, "text")
-	gobot.SendFromUrlPhotos(ChatID(5562314141), []string{"https://developer.android.google.cn/static/studio/images/run/adb_wifi-quick_settings.png?hl=zh-cn"})
+	gobot.SendMsgText(chatId, "text")
+	gobot.SendFromUrlPhotos(gotgbot.ChatID(chatId), []string{"https://developer.android.google.cn/static/studio/images/run/adb_wifi-quick_settings.png?hl=zh-cn"})
 
-	// flags: no notification && no web link preview
 	go gobot.StartBot()
-
-	time.Sleep(2 * time.Second)
 
 	time.Sleep(1000 * time.Second)
 }
