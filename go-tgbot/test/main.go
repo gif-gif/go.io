@@ -88,6 +88,6 @@ func main() {
 	gobot.SendFromUrlPhotos(gotgbot.ChatID(chatId), []string{"https://developer.android.google.cn/static/studio/images/run/adb_wifi-quick_settings.png?hl=zh-cn"})
 
 	go gobot.StartBot()
-
+	gobot.StopBot()
 	time.Sleep(1000 * time.Second)
 }

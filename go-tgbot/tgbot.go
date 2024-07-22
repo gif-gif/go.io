@@ -7,9 +7,10 @@ import (
 )
 
 type GoTgBot struct {
-	bot    *telebot.Bot
-	reply  *telebot.ReplyMarkup
-	config *TelegramBot
+	bot     *telebot.Bot
+	reply   *telebot.ReplyMarkup
+	config  *TelegramBot
+	started bool
 }
 
 func CreateOfflineBot(config *TelegramBot) (*GoTgBot, error) {
@@ -55,10 +56,15 @@ func (g *GoTgBot) GetBot() *telebot.Bot {
 }
 
 func (g *GoTgBot) StopBot() {
+	if !g.started {
+		return
+	}
+	g.started = false
 	g.bot.Stop()
 }
 
 func (g *GoTgBot) StartBot() {
+	g.started = true
 	g.bot.Start()
 }
 
