@@ -15,23 +15,23 @@ func New() *GoTgBots {
 }
 
 // 同一个产品只会存在一个，后一个添加的覆盖前面添加
-func (g *GoTgBots) CreateBot(config *TelegramBot) error {
+func (g *GoTgBots) CreateBot(config *TelegramBot) (*GoTgBot, error) {
 	if config.Product == "" {
-		return fmt.Errorf("product must be empty")
+		return nil, fmt.Errorf("product must be empty")
 	}
 
 	old := g.bots[config.Product]
 	if old != nil {
-		return fmt.Errorf("Already exists a bot for %s", config.Product)
+		return nil, fmt.Errorf("Already exists a bot for %s", config.Product)
 	}
 
 	bot, err := Create(config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	g.bots[config.Product] = bot
-	return nil
+	return bot, nil
 }
 
 func (g *GoTgBots) StopBot(product string) {

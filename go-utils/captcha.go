@@ -6,6 +6,9 @@ import (
 	"github.com/dchest/captcha"
 )
 
+//TODO: https://github.com/mojocn/base64Captcha
+//https://github.com/wenlng/go-captcha (高级)
+
 // 获取图片验证码
 func CaptchaGet(width, height int) map[string]string {
 	if width == 0 {
