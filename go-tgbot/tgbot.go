@@ -1,7 +1,10 @@
 package gotgbot
 
 import (
+	"errors"
 	"fmt"
+	"github.com/gogf/gf/crypto/gmd5"
+	"github.com/gogf/gf/util/gconv"
 	"gopkg.in/telebot.v3"
 	"time"
 )
@@ -13,6 +16,7 @@ type GoTgBot struct {
 	started bool
 }
 
+// 离线测试
 func CreateOfflineBot(config *TelegramBot) (*GoTgBot, error) {
 	bot, err := telebot.NewBot(telebot.Settings{Synchronous: true, Offline: true})
 	if err != nil {
@@ -25,7 +29,7 @@ func CreateOfflineBot(config *TelegramBot) (*GoTgBot, error) {
 	}, nil
 }
 
-// 同一个产品只会存在一个，后一个添加的覆盖前面添加
+// 同一个产品只会存在一个
 func Create(config *TelegramBot) (*GoTgBot, error) {
 	if config.Product == "" {
 		return nil, fmt.Errorf("product must be empty")
@@ -49,6 +53,38 @@ func Create(config *TelegramBot) (*GoTgBot, error) {
 		config: config,
 		reply:  bot.NewMarkup(),
 	}, nil
+}
+
+// /start
+func (g *GoTgBot) CreateWebAppStartCommand(menuButtonText string) {
+	var (
+		menu = &telebot.ReplyMarkup{
+			InlineKeyboard: [][]telebot.InlineButton{{
+				{
+					Text:   menuButtonText,
+					WebApp: &telebot.WebApp{URL: g.config.WebAppUrl},
+				},
+			}},
+		}
+	)
+
+	g.Handle("/start", func(c telebot.Context) error {
+		return c.Send(g.config.StartReply, menu)
+	})
+}
+
+func (g *GoTgBot) CreateMyAccountCommand(commandText string) {
+	g.Handle(commandText, func(c telebot.Context) error {
+		accountMd5, err := gmd5.Encrypt(gconv.String(c.Chat().ID))
+		if err != nil {
+			return err
+		}
+		_, err = g.SendMsgText(c.Chat().ID, accountMd5)
+		if err != nil {
+			return errors.New("failed to send message")
+		}
+		return nil
+	})
 }
 
 func (g *GoTgBot) GetBot() *telebot.Bot {

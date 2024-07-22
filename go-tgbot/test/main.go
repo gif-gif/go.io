@@ -14,12 +14,12 @@ func main() {
 	var chatId int64 = 5562314141
 	pref := &gotgbot.TelegramBot{
 		Product:    "test",
-		Token:      "Token",
+		Token:      "7107568224:AAFgdiEsDqtFvBBScIfWku9IB8jr9Dpl-dw",
 		WebAppUrl:  "https://www.google.com",
 		StartReply: "hello",
 	}
 
-	gobot, err := gotgbot.CreateOfflineBot(pref) // TODO离线模式测试
+	gobot, err := gotgbot.Create(pref) // TODO离线模式测试
 	if err != nil {
 		golog.Error(err.Error())
 		return
@@ -39,6 +39,8 @@ func main() {
 	gobot.Handle("/start", func(c tele.Context) error {
 		return c.Send(pref.StartReply, menu)
 	})
+
+	gobot.CreateMyAccountCommand("/account")
 
 	var trace []string
 
@@ -85,7 +87,10 @@ func main() {
 	golog.WithTag("gotgbot").Info(trace)
 
 	gobot.SendMsgText(chatId, "text")
-	gobot.SendFromUrlPhotos(gotgbot.ChatID(chatId), []string{"https://developer.android.google.cn/static/studio/images/run/adb_wifi-quick_settings.png?hl=zh-cn"})
+	gobot.SendFromUrlPhotos(gotgbot.ChatID(chatId), []string{
+		"https://developer.android.google.cn/static/studio/images/run/adb_wifi-quick_settings.png?hl=zh-cn",
+		"https://biuvip.com/bot/how_agents_buy_tokens.png",
+	})
 
 	go gobot.StartBot()
 	gobot.StopBot()
