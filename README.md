@@ -161,7 +161,7 @@ func testDynamicSize() {
 - 支持 sqllite3 mysql clickhouse 等；
 ```go
 func mysqlTest() {
-	db, err := godb.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", godb.GoDbConfig{})
+	db, err := gogorm.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", godb.GoDbConfig{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
