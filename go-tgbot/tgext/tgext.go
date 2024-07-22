@@ -1,4 +1,4 @@
-package ext
+package tgext
 
 import (
 	"crypto/hmac"
