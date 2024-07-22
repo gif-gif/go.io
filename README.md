@@ -208,3 +208,16 @@ func mysqlTest() {
 - https://github.com/elastic/go-elasticsearch
 - https://github.com/mongodb/mongo-go-driver
 - https://github.com/alitto/pond
+- https://github.com/tucnak/telebot
+- https://github.com/PaulSonOfLars/gotgbot
+
+
+## 杂项
+
+|Status|Value|
+|:----|:---:|
+|Stars|[![Stars](https://img.shields.io/github/stars/gif-gif/go.io)](https://github.com/gif-gif/go.io)
+|Forks|[![Forks](https://img.shields.io/github/forks/gif-gif/go.io)](https://github.com/gif-gif/go.io)
+|License|[![License](https://img.shields.io/github/license/gif-gif/go.io)](https://github.com/gif-gif/go.io)
+|Issues|[![Issues](https://img.shields.io/github/issues/gif-gif/go.io)](https://github.com/gif-gif/go.io)
+|Release Downloads|[![Downloads](https://img.shields.io/github/downloads/gif-gif/go.io/total.svg)](https://github.com/gif-gif/go.io/releases)

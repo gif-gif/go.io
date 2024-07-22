@@ -4,7 +4,7 @@
 - https://github.com/go-telegram-bot-api/telegram-bot-api
 - https://github.com/m1guelpf/chatgpt-telegram
 
-#### 新
+#### bot 仓库
 - https://github.com/tucnak/telebot
 - https://github.com/PaulSonOfLars/gotgbot
 - https://github.com/go-telegram/bot
