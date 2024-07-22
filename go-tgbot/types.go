@@ -1,4 +1,4 @@
-package gotgbot1
+package gotgbot
 
 import "strconv"
 
