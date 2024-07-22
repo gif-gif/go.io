@@ -8,6 +8,7 @@ type TelegramBot struct {
 	WebAppUrl  string `yaml:"WebAppUrl,optional" json:"webAppUrl,optional"`
 	StartReply string `yaml:"StartReply" json:"startReply,optional"`
 	Timeout    int    `yaml:"Timeout,optional" json:"timeout,optional"` //s
+	Open       bool   `yaml:"Open,optional" json:"open,optional"`       //是否开启
 }
 
 type ChatID int64
