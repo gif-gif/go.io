@@ -40,8 +40,8 @@ func Create(config *TelegramBot) (*GoTgBot, error) {
 		config.Timeout = 10
 	}
 
-	if config.LinkSignTimeout == 0 {
-		config.LinkSignTimeout = 20
+	if config.SignTimeout == 0 {
+		config.SignTimeout = 20
 	}
 
 	pref := telebot.Settings{
@@ -222,5 +222,5 @@ func (g *GoTgBot) ReplyMarkup() *telebot.ReplyMarkup {
 }
 
 func (g *GoTgBot) CheckSign(ts int64, sign string) bool {
-	return goutils.CheckSign(g.config.Secret, g.config.LinkSignTimeout, ts, sign)
+	return goutils.CheckSign(g.config.SignSecret, g.config.SignTimeout, ts, sign)
 }
