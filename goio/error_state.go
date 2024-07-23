@@ -6,8 +6,9 @@ const SUCCESS_REQUEST = 0
 
 // client
 const ERROR_REQUEST int64 = 400
-const ERROR_TOKEN_EXPIRE int64 = 401
+const ERROR_UNAUTHORIZED int64 = 401
 const ERROR_FORBIDDEN int64 = 403
+const ERROR_NOTFOUND int64 = 404
 const ERROR_INVALID int64 = -1
 
 // server
