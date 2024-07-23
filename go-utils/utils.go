@@ -9,6 +9,19 @@ import (
 	"time"
 )
 
+// 常用签名验证, sign md5 小写
+func CheckSign(secret string, linkSignTimeout int64, ts int64, sign string) bool {
+	if linkSignTimeout == 0 {
+		linkSignTimeout = 20
+	}
+	tsStep := time.Now().Unix() - ts
+	if math.Abs(gconv.Float64(tsStep)) > gconv.Float64(linkSignTimeout) { //连接超时
+		return false
+	}
+	serverSign := Md5([]byte(gconv.String(ts) + secret))
+	return serverSign == sign
+}
+
 // 元素都转换成字符串比较
 func IsInArray[T any](arr []T, target T) bool {
 	for _, t := range arr {

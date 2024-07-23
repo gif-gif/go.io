@@ -3,6 +3,7 @@ package gotgbot
 import (
 	"errors"
 	"fmt"
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gogf/gf/crypto/gmd5"
 	"github.com/gogf/gf/util/gconv"
 	"gopkg.in/telebot.v3"
@@ -37,6 +38,10 @@ func Create(config *TelegramBot) (*GoTgBot, error) {
 
 	if config.Timeout == 0 {
 		config.Timeout = 10
+	}
+
+	if config.LinkSignTimeout == 0 {
+		config.LinkSignTimeout = 20
 	}
 
 	pref := telebot.Settings{
@@ -214,4 +219,8 @@ func (g *GoTgBot) CreateMiddleware(middleware func(c telebot.Context, next teleb
 
 func (g *GoTgBot) ReplyMarkup() *telebot.ReplyMarkup {
 	return g.reply
+}
+
+func (g *GoTgBot) CheckSign(ts int64, sign string) bool {
+	return goutils.CheckSign(g.config.Secret, g.config.LinkSignTimeout, ts, sign)
 }

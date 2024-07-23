@@ -21,10 +21,18 @@ import (
 	"strings"
 )
 
+// MD5 大写
 func MD5(buf []byte) string {
 	h := md5.New()
 	h.Write(buf)
 	return strings.ToUpper(hex.EncodeToString(h.Sum(nil)))
+}
+
+// Md5小写
+func Md5(buf []byte) string {
+	h := md5.New()
+	h.Write(buf)
+	return strings.ToLower(hex.EncodeToString(h.Sum(nil)))
 }
 
 func SHA1(buf []byte) string {
