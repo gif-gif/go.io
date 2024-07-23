@@ -45,8 +45,12 @@ func Create(config *TelegramBot) (*GoTgBot, error) {
 	}
 
 	pref := telebot.Settings{
-		Token:  config.Token,
-		Poller: &telebot.LongPoller{Timeout: time.Duration(config.Timeout) * time.Second},
+		Token:       config.Token,
+		URL:         config.ApiUrl,
+		Offline:     config.Offline,
+		Synchronous: config.Synchronous,
+		ParseMode:   config.ParseMode,
+		Poller:      &telebot.LongPoller{Timeout: time.Duration(config.Timeout) * time.Second},
 	}
 
 	bot, err := telebot.NewBot(pref)
