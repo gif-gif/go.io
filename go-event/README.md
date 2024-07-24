@@ -1,4 +1,4 @@
-# go-event
+# go-event 基于 chan
 
 ```
 观察者中心

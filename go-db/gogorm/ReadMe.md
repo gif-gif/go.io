@@ -6,6 +6,8 @@
 - mysql
 - sqlite3
 - clickhouse
+- postgresql
+- sqlserver
 
 ```go
 func testSqlite3() {
