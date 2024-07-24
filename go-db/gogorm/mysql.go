@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// 初始化MySQL
+// 初始化MySQL OR TiDB(TiDB is compatible with MySQL protocol.)
 func InitMysql(dataSource string, config GormDbConfig) (*GormDB, error) {
 	golog.Info("init Mysql")
 	if config.Config == nil {

@@ -21,7 +21,8 @@ func main() {
 	//testSqlite3()
 	//mysqlTest()
 	//testTransaction()
-	testHasMany()
+	postgreSqlTest()
+	//testHasMany()
 }
 
 func testSqlite3() {
@@ -217,6 +218,34 @@ func testHasMany() {
 	} else {
 		fmt.Println(users)
 	}
+}
+
+func postgreSqlTest() {
+	db, err := gogorm.InitPostgreSql("host=122.228.113.238 user=postgres password=223238 dbname=passwall port=5432 sslmode=disable TimeZone=Asia/Shanghai", gogorm.GormDbConfig{})
+	if err != nil {
+		golog.WithTag("godb").Error(err.Error())
+		return
+	}
+	err = db.AutoMigrate(&Product{})
+	if err != nil {
+		golog.WithTag("godb").Error(err.Error())
+		return
+	}
+
+	// Create
+	insertProduct := &Product{Code: "D42", Price: 100}
+	db.Create(insertProduct)
+	fmt.Println(insertProduct.ID)
+	// Read
+	var product Product
+	tx := db.First(&product, 1) // find product with integer primary key
+	if tx.Error != nil {
+		fmt.Println("not found first ", tx.Error.Error())
+	}
+	db.First(&product, "code = ?", "D42")
+	// Delete - delete product
+	db.Delete(&product, 1)
+
 }
 
 func (u *Product) BeforeDelete(tx *gorm.DB) (err error) {
