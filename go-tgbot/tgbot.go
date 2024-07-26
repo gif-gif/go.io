@@ -17,7 +17,11 @@ type GoTgBot struct {
 	started bool
 }
 
-// 离线测试
+// 离线测试, 模拟用户发命令
+//
+//	b.ProcessUpdate(tele.Update{
+//		Message: &tele.Message{Text: "/a"},
+//	})
 func CreateOfflineBot(config *TelegramBot) (*GoTgBot, error) {
 	bot, err := telebot.NewBot(telebot.Settings{Synchronous: true, Offline: true})
 	if err != nil {
