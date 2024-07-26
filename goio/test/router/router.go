@@ -8,7 +8,7 @@ import (
 
 func Routes(r *gin.RouterGroup) {
 	r.POST("/health", goio.Handler(common_controller.Health{}))
-
+	r.POST("/login", goio.Handler(common_controller.Login{}))
 	r.Use(verifySign)
 	{
 		r.POST("/captcha/get", goio.Handler(common_controller.Captcha{}))
