@@ -1,5 +1,6 @@
 # Golang 控制tg相关api封装
 
+- 基于 https://github.com/tucnak/telebot
 ```go
 package main
 
