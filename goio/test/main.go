@@ -1,7 +1,3 @@
-# go.io
-framework interfaces and configurations for libraries
-
-```go
 package main
 
 import (
@@ -28,9 +24,3 @@ func startSever() {
 	// 启动
 	s.Run(":1000")
 }
-```
-
-```javascript
-curl --location --request POST 'http://127.0.0.1:1000/health' \
---header 'User-Agent: Apifox/1.0.0 (https://apifox.com)'
-```

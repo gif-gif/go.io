@@ -10,8 +10,11 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/dchest/captcha v1.0.0
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
+	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
+	github.com/gin-contrib/pprof v1.5.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-co-op/gocron/v2 v2.8.0
+	github.com/go-playground/validator/v10 v10.20.0
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/gogf/gf v1.16.9
 	github.com/google/go-querystring v1.1.0
@@ -27,6 +30,7 @@ require (
 	github.com/zeromicro/go-zero v1.6.5
 	go.mongodb.org/mongo-driver v1.16.0
 	golang.org/x/text v0.16.0
+	google.golang.org/grpc v1.63.2
 	gopkg.in/telebot.v3 v3.3.6
 	gorm.io/driver/clickhouse v0.6.1
 	gorm.io/driver/mysql v1.5.7
@@ -65,7 +69,6 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
@@ -153,7 +156,6 @@ require (
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240227224415-6ceb2ff114de // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240227224415-6ceb2ff114de // indirect
-	google.golang.org/grpc v1.63.2 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

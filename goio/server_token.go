@@ -8,12 +8,11 @@ import (
 	"time"
 )
 
-// 生成 Token 验证Token
 type Token struct {
-	AppId     string
-	OpenId    string
-	NonceStr  string
-	Timestamp int64
+	AppId     string `json:"app_id"`
+	OpenId    int64  `json:"data"`
+	NonceStr  string `json:"nonce"`
+	Timestamp int64  `json:"ts"`
 }
 
 func (t *Token) Bytes() []byte {
@@ -25,10 +24,10 @@ func (t *Token) String() string {
 	return string(t.Bytes())
 }
 
-func CreateToken(appId string, openId string) (tokenStr string, err error) {
+func CreateToken(appId string, openid int64) (tokenStr string, err error) {
 	token := &Token{
 		AppId:     appId,
-		OpenId:    openId,
+		OpenId:    openid,
 		NonceStr:  goutils.NonceStr(),
 		Timestamp: time.Now().Unix(),
 	}
@@ -54,17 +53,17 @@ func ParseToken(tokenStr, appId string) (token *Token, err error) {
 		tokenBuf = goutils.Base64Decode(tokenStr)
 		key      = goutils.MD5([]byte(appId))
 		iv       = key[8:24]
-		decBuf   []byte
+		b        []byte
 	)
 
-	decBuf, err = goutils.AESCBCDecrypt(tokenBuf, []byte(key), []byte(iv))
+	b, err = goutils.AESCBCDecrypt(tokenBuf, []byte(key), []byte(iv))
 	if err != nil {
 		golog.Error(err.Error())
 		return
 	}
 
 	token = new(Token)
-	if err = json.Unmarshal(decBuf, token); err != nil {
+	if err = json.Unmarshal(b, token); err != nil {
 		golog.Error(err.Error())
 		return
 	}
