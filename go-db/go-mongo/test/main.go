@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	gomongo2 "github.com/gif-gif/go.io/go-db/go-mongo"
+	gomongo "github.com/gif-gif/go.io/go-db/go-mongo"
 	golog "github.com/gif-gif/go.io/go-log"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	config := gomongo2.Config{
+	config := gomongo.Config{
 		Name:     "",
 		Addr:     "127.0.0.1:27017",
 		User:     "",
@@ -19,11 +19,13 @@ func main() {
 		AutoPing: true,
 	}
 
-	client, err := gomongo2.New(config)
+	err := gomongo.Init(config)
 	if err != nil {
 		golog.ErrorF("error:%v", err)
 		return
 	}
+
+	client := gomongo.Default()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

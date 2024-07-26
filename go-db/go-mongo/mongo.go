@@ -4,6 +4,7 @@ import golog "github.com/gif-gif/go.io/go-log"
 
 var __clients = map[string]*GoMongo{}
 
+// 可以一次初始化多个Mongo实例或者 多次调用初始化多个实例
 func Init(configs ...Config) (err error) {
 	for _, conf := range configs {
 		name := conf.Name
