@@ -9,6 +9,7 @@ require (
 	github.com/alitto/pond v1.9.1
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/dchest/captcha v1.0.0
+	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-co-op/gocron/v2 v2.8.0
 	github.com/go-resty/resty/v2 v2.13.1
@@ -29,7 +30,9 @@ require (
 	gopkg.in/telebot.v3 v3.3.6
 	gorm.io/driver/clickhouse v0.6.1
 	gorm.io/driver/mysql v1.5.7
+	gorm.io/driver/postgres v1.5.9
 	gorm.io/driver/sqlite v1.5.6
+	gorm.io/driver/sqlserver v1.5.3
 	gorm.io/gorm v1.25.10
 )
 
@@ -51,6 +54,7 @@ require (
 	github.com/eapache/go-resiliency v1.6.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.6.0 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
@@ -154,7 +158,5 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/postgres v1.5.9 // indirect
-	gorm.io/driver/sqlserver v1.5.3 // indirect
 	lukechampine.com/uint128 v1.3.0 // indirect
 )

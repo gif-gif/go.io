@@ -8,6 +8,7 @@
 - clickhouse
 - postgresql
 - sqlserver
+- tidb
 
 ```go
 func testSqlite3() {
