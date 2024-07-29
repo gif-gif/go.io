@@ -3,26 +3,44 @@ package main
 import (
 	"fmt"
 	golog "github.com/gif-gif/go.io/go-log"
-	gopool "github.com/gif-gif/go.io/go-pool"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gif-gif/go.io/goio"
 	"github.com/gogf/gf/util/gconv"
 	"time"
 )
 
+// PayPlanItemConfig 结构体定义
+type PayPlanItemConfig struct {
+	Id     string  `json:"id"`
+	Title  string  `json:"title"`
+	Price  float64 `json:"price"`
+	IRT    int64   `json:"IRT,optional"`
+	INR    int64   `json:"INR,optional"`
+	MMK    int64   `json:"mmk,optional"`
+	Weight int64   `json:"weight,optional"`
+}
+
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-	testSign()
-	gp := gopool.NewFixedSizePool(10, 10)
-	defer gp.StopAndWait()
-	s := []string{"s1", "s2", "s3"}
-	sa := goutils.NewSafeSlice[string]()
-	sa.Sets(s)
-	for i := 0; i < 10; i++ { //并发
-		gp.Submit(func() {
-			fmt.Println(sa.Get())
-		})
+	config := PayPlanItemConfig{
+		Id:     "123",
+		Title:  "Sample Plan",
+		Price:  99.99,
+		IRT:    1000,
+		INR:    2000,
+		MMK:    3000,
+		Weight: 50,
 	}
+
+	// 获取字段值
+	fieldName := "Price"
+	value, err := goutils.GetFieldValue(&config, fieldName)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Printf("The value of field '%s' is: %v\n", fieldName, value)
 	time.Sleep(30 * time.Second)
 }
 

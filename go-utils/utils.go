@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/util/gconv"
 	"math"
 	"math/rand"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -108,4 +109,27 @@ func GenValidateCode(width int) string {
 		fmt.Fprintf(&sb, "%d", numeric[rand.Intn(r)])
 	}
 	return sb.String()
+}
+
+// 通过反射获取结构体字段的值
+func GetFieldValue(config interface{}, fieldName string) (interface{}, error) {
+	v := reflect.ValueOf(config)
+
+	// 确保传入的是一个指针
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	// 确保传入的是结构体
+	if v.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("expected a struct, but got %s", v.Kind())
+	}
+
+	// 获取字段值
+	field := v.FieldByName(fieldName)
+	if !field.IsValid() {
+		return nil, fmt.Errorf("no such field: %s in struct", fieldName)
+	}
+
+	return field.Interface(), nil
 }
