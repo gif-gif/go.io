@@ -1,8 +1,11 @@
 package gocaptcha
 
 import (
+	"context"
 	"fmt"
+	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	"github.com/mojocn/base64Captcha"
+	"time"
 )
 
 // 默认内存，分布式用redis等
@@ -18,6 +21,29 @@ import (
 //		//Verify captcha's answer directly
 //		Verify(id, answer string, clear bool) bool
 //	}
+
+type RedisStore struct {
+	redis   *goredis.GoRedis
+	Context context.Context
+}
+
+func (r *RedisStore) Set(id string, value string) error {
+	r.redis.SetEx(r.Context, id, value, 10*time.Minute)
+	return nil
+}
+
+func (r *RedisStore) Get(id string, clear bool) string {
+	rst := r.redis.Get(r.Context, id).Val()
+	if clear {
+		r.redis.Del(r.Context, id)
+	}
+	return rst
+}
+
+func (r *RedisStore) Verify(id, answer string, clear bool) bool {
+	rst := r.Get(id, clear)
+	return rst == answer
+}
 
 type configJsonBody struct {
 	Id            string
@@ -38,8 +64,22 @@ type CaptchaData struct {
 
 type GoCaptcha struct {
 	store base64Captcha.Store //验证码信息自定义存储
+
 }
 
+// new other store
+func NewRedis(config goredis.Config) (*GoCaptcha, error) {
+	err := goredis.Init(config)
+	if err != nil {
+		return nil, err
+	}
+	return &GoCaptcha{
+		store: &RedisStore{
+			redis:   goredis.GetClient(config.Name),
+			Context: context.Background(),
+		},
+	}, nil
+}
 func New(store base64Captcha.Store) *GoCaptcha {
 	return &GoCaptcha{
 		store: store,

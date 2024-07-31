@@ -4,6 +4,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	gocaptcha "github.com/gif-gif/go.io/go-captcha"
+	goredis "github.com/gif-gif/go.io/go-db/go-redis"
+	golog "github.com/gif-gif/go.io/go-log"
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gin-gonic/gin"
 	"github.com/mojocn/base64Captcha"
 	"log"
@@ -121,44 +125,44 @@ func captchaVerifyHandle(w http.ResponseWriter, r *http.Request) {
 
 // start a net/http server
 func main() {
-	//serve Vuejs+ElementUI+Axios Web Application
-	//http.Handle("/", http.FileServer(http.Dir("./static")))
-	//
-	////api for create captcha
-	//http.HandleFunc("/api/getCaptcha", generateCaptchaHandler)
-	//
-	////api for verify captcha
-	//http.HandleFunc("/api/verifyCaptcha", captchaVerifyHandle)
-	//
-	//fmt.Println("Server is at :1000")
-	//if err := http.ListenAndServe(":1000", nil); err != nil {
-	//	log.Fatal(err)
-	//}
+	config := goredis.Config{
+		Name:     "gocaptcha-goredis",
+		Addr:     "127.0.0.1:6379",
+		Password: "",
+		DB:       0,
+		Prefix:   "gocaptcha",
+		AutoPing: true,
+	}
+
+	a, err := gocaptcha.NewRedis(config)
+	if err != nil {
+		golog.Error(err.Error())
+		return
+	}
+	goutils.InitCaptcha(a)
 	simpleServer()
 }
 
 func simpleServer() {
 	r := gin.Default()
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
 
-	// 静态页面返回
-	//r.LoadHTMLGlob("templates/*")
-	//r.GET("/", func(c *gin.Context) {
-	//	c.HTML(200, "index.tmpl", gin.H{
-	//		"title": "Parse-video",
-	//	})
-	//})
-
 	r.GET("/api/getCaptcha", func(c *gin.Context) {
-		generateCaptchaHandler(c.Writer, c.Request)
+		//generateCaptchaHandler(c.Writer, c.Request)
+
+		//c.JSON(http.StatusOK, goutils.CaptchaGet(240, 60))
+		//c.JSON(http.StatusOK, goutils.CaptchaStringGet(240, 60))
+		//c.JSON(http.StatusOK, goutils.CaptchaMathGet(240, 60))
+		c.JSON(http.StatusOK, goutils.CaptchaAudioGet("123456"))
 	})
 
 	r.POST("/api/verifyCaptcha", func(c *gin.Context) {
-		captchaVerifyHandle(c.Writer, c.Request)
+		goutils.CaptchaVerify("yCjHYaNyAJdVT8yNER6r", "111")
 	})
 
 	srv := &http.Server{
