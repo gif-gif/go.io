@@ -8,7 +8,6 @@ require (
 	github.com/IBM/sarama v1.43.2
 	github.com/alitto/pond v1.9.1
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
-	github.com/dchest/captcha v1.0.0
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-contrib/pprof v1.5.0
@@ -21,6 +20,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/ip2location/ip2location-go/v9 v9.7.0
 	github.com/minio/minio-go/v7 v7.0.70
+	github.com/mojocn/base64Captcha v1.3.6
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/oschwald/geoip2-golang v1.11.0
 	github.com/prometheus/client_golang v1.18.0
@@ -74,6 +74,7 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -150,6 +151,7 @@ require (
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
+	golang.org/x/image v0.18.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect

@@ -1,13 +1,13 @@
 package goutils
 
 import (
-	"bytes"
-	"fmt"
-	"github.com/dchest/captcha"
+	gocaptcha "github.com/gif-gif/go.io/go-captch"
 )
 
 //TODO: https://github.com/mojocn/base64Captcha
 //https://github.com/wenlng/go-captcha (高级)
+
+var defaultCaptcha = gocaptcha.NewDefault()
 
 // 获取图片验证码
 func CaptchaGet(width, height int) map[string]string {
@@ -18,20 +18,21 @@ func CaptchaGet(width, height int) map[string]string {
 		height = 80
 	}
 
-	var buf bytes.Buffer
-
-	id := captcha.NewLen(4)
-	captcha.WriteImage(&buf, id, width, height)
-
-	b64 := fmt.Sprintf("data:image/png;base64,%s", Base64Encode(buf.Bytes()))
+	data, err := defaultCaptcha.DigitCaptcha(width, height, 4)
+	if err != nil {
+		return map[string]string{
+			"id":          "",
+			"base64image": "",
+		}
+	}
 
 	return map[string]string{
-		"id":          id,
-		"base64image": b64,
+		"id":          data.CaptchaId,
+		"base64image": data.Data,
 	}
 }
 
 // 验证图片验证码
 func CaptchaVerify(id, code string) bool {
-	return captcha.VerifyString(id, code)
+	return defaultCaptcha.CaptchaVerify(id, code)
 }
