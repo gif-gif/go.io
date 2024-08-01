@@ -210,7 +210,8 @@ func mysqlTest() {
 - https://github.com/alitto/pond
 - https://github.com/tucnak/telebot
 - https://github.com/PaulSonOfLars/gotgbot
-
+- https://github.com/mojocn/base64Captcha
+- https://github.com/wenlng/go-captcha
 
 ## 杂项
 
