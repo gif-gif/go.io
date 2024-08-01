@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	golog "github.com/gif-gif/go.io/go-log"
-	gokafka2 "github.com/gif-gif/go.io/go-mq/go-kafka"
+	gokafka "github.com/gif-gif/go.io/go-mq/go-kafka"
 	"gorm.io/gorm"
 	"time"
 )
@@ -19,7 +19,7 @@ type Account struct {
 }
 
 func main() {
-	err := gokafka2.Init(gokafka2.Config{
+	err := gokafka.Init(gokafka.Config{
 		Addrs:    []string{"212.129.60.103:30092"},
 		User:     "admin",
 		Password: "payda6b4eb0f3",
@@ -37,7 +37,12 @@ func main() {
 		return
 	}
 
-	_, _, err = gokafka2.Producer().SendMessage("biu_account", b)
+	gokafka.Consumer().Consume("biu_account", func(msg *gokafka.ConsumerMessage, consumerErr *gokafka.ConsumerError) error {
+		golog.WithTag("gokafka").Info(msg.Topic)
+		return nil
+	})
+
+	_, _, err = gokafka.Producer().SendMessage("biu_account", b)
 	if err != nil {
 		golog.WithTag("gokafka").Error(err.Error())
 		return
