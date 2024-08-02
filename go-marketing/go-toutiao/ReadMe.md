@@ -1,1 +1,1 @@
-# Meta(Toutiao) Marketing Api
+# Toutiao Marketing Api

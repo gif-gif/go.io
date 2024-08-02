@@ -212,6 +212,8 @@ func mysqlTest() {
 - https://github.com/PaulSonOfLars/gotgbot
 - https://github.com/mojocn/base64Captcha
 - https://github.com/wenlng/go-captcha
+- https://github.com/mochi-mqtt/server
+- https://github.com/eclipse/paho.mqtt.golang
 
 ## 杂项
 

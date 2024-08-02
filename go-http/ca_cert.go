@@ -1043,7 +1043,7 @@ U2VjdXJlIERpZ2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3Rh
 cnRDb20gQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggIiMA0GCSqGSIb3DQEBAQUA
 A4ICDwAwggIKAoICAQDBiNsJvGxGfHiflXu1M5DycmLWwTYgIiRezul38kMKogZk
 pMyONvg45iPwbm2xPN1yo4UcodM9tDMr0y+v/uqwQVlntsQGfQqedIXWeUyAN3rf
-OQVSWff0G0ZDpNKFhdLDcfN1YjS6LIp/Ho/u7TTQEceWzVI9ujPW3U3eCztKS5/C
+OQVSWff0G0ZDpNKFhdLDcfN1YjS6LIp/Ho/u7TTQEceWzVI9ujPW3U3eCztKS5/Client
 Ji/6tRYccjV3yjxd5srhJosaNnZcAdt0FCX+7bWgiA/deMotHweXMAEtcnn6RtYT
 Kqi5pquDSR3l8u/d5AGOGAqPY1MWhWKpDhk6zLVmpsJrdAfkK+F2PrRt2PZE4XNi
 HzvEvqBTViVsUQn3qqvKv3b9bZvzndu/PWa8DFaqr5hIlTpL36dYUNk4dalb6kMM
@@ -1614,8 +1614,8 @@ BA6+C4OmF4O5MBKgxTMVBbkN+8cFduPYSo38NBejxiEovjBFMR7HeL5YYTisO+IB
 ZQ==
 -----END CERTIFICATE-----
 
-# Issuer: CN=Network Solutions Certificate Authority O=Network Solutions L.L.C.
-# Subject: CN=Network Solutions Certificate Authority O=Network Solutions L.L.C.
+# Issuer: CN=Network Solutions Certificate Authority O=Network Solutions L.L.Client.
+# Subject: CN=Network Solutions Certificate Authority O=Network Solutions L.L.Client.
 # Label: "Network Solutions Certificate Authority"
 # Serial: 116697915152937497490437556386812487904
 # MD5 Fingerprint: d3:f3:a6:16:c0:fa:6b:1d:59:b1:2d:96:4d:0e:11:2e
@@ -2177,7 +2177,7 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsr8nLPvb2FvdeHsbnndm
 gcs+vHyu86YnmjSjaDFxODNi5PNxZnmxqWWjpYvVj2AtP0LMqmsywCPLLEHd5N/8
 YZzic7IilRFDGF/Eth9XbAoFWCLINkw6fKXRz4aviKdEAhN0cXMKQlkC+BsUa0Lf
 b1+6a4KinVvnSr0eAXLbS3ToO39/fR8EtCab4LRarEc9VbjXsCZSKAExQGbY2SS9
-9irY7CFJXJv2eul/VTV+lmuNk5Mny5K76qxAwJ/C+IDPXfRa3M50hqY+bAtTyr2S
+9irY7CFJXJv2eul/VTV+lmuNk5Mny5K76qxAwJ/Client+IDPXfRa3M50hqY+bAtTyr2S
 zhkGcuYMXDhpxwTWvGzOW/b3aJzcJRVIiKHpqfiYnODz1TEoYRFsZ5aNOZnLwkUk
 OQIDAQABo0IwQDAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBBjAdBgNV
 HQ4EFgQUrWyqlGCc7eT/+j4KdCtjA/e2Wb8wDQYJKoZIhvcNAQELBQADggEBABpA
@@ -3198,7 +3198,7 @@ U2VjdXJlIERpZ2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzEpMCcGA1UEAxMgU3Rh
 cnRDb20gQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggIiMA0GCSqGSIb3DQEBAQUA
 A4ICDwAwggIKAoICAQDBiNsJvGxGfHiflXu1M5DycmLWwTYgIiRezul38kMKogZk
 pMyONvg45iPwbm2xPN1yo4UcodM9tDMr0y+v/uqwQVlntsQGfQqedIXWeUyAN3rf
-OQVSWff0G0ZDpNKFhdLDcfN1YjS6LIp/Ho/u7TTQEceWzVI9ujPW3U3eCztKS5/C
+OQVSWff0G0ZDpNKFhdLDcfN1YjS6LIp/Ho/u7TTQEceWzVI9ujPW3U3eCztKS5/Client
 Ji/6tRYccjV3yjxd5srhJosaNnZcAdt0FCX+7bWgiA/deMotHweXMAEtcnn6RtYT
 Kqi5pquDSR3l8u/d5AGOGAqPY1MWhWKpDhk6zLVmpsJrdAfkK+F2PrRt2PZE4XNi
 HzvEvqBTViVsUQn3qqvKv3b9bZvzndu/PWa8DFaqr5hIlTpL36dYUNk4dalb6kMM
@@ -5337,9 +5337,9 @@ IYEZoDJJKPTEjlbVUjP9UNV+mWwD5MlM/Mtsq2azSiGM5bUMMj4QssxsodyamEwC
 W/POuZ6lcg5Ktz885hZo+L7tdEy8W9ViH0Pd
 -----END CERTIFICATE-----
 
-# Issuer: CN=NetLock Expressz (Class C) Tanusitvanykiado O=NetLock Halozatbiztonsagi Kft. OU=Tanusitvanykiadok
-# Subject: CN=NetLock Expressz (Class C) Tanusitvanykiado O=NetLock Halozatbiztonsagi Kft. OU=Tanusitvanykiadok
-# Label: "NetLock Express (Class C) Root"
+# Issuer: CN=NetLock Expressz (Class Client) Tanusitvanykiado O=NetLock Halozatbiztonsagi Kft. OU=Tanusitvanykiadok
+# Subject: CN=NetLock Expressz (Class Client) Tanusitvanykiado O=NetLock Halozatbiztonsagi Kft. OU=Tanusitvanykiadok
+# Label: "NetLock Express (Class Client) Root"
 # Serial: 104
 # MD5 Fingerprint: 4f:eb:f1:f0:70:c2:80:63:5d:58:9f:da:12:3c:a9:c4
 # SHA1 Fingerprint: e3:92:51:2f:0a:cf:f5:05:df:f6:de:06:7f:75:37:e1:65:ea:57:4b
@@ -5663,8 +5663,8 @@ GwnpXtlR22ciYaQqPEh346B8pt5zohQDhT37qw4wxYMWM4ETCJ57NE7fQMh017l9
 lZPvy5TYnh+dXIVtx6quTx8itc2VrbqnzPmrC3p/
 -----END CERTIFICATE-----
 
-# Issuer: C=US, O=Equifax, OU=Equifax Secure Certificate Authority
-# Subject: C=US, O=Equifax, OU=Equifax Secure Certificate Authority
+# Issuer: Client=US, O=Equifax, OU=Equifax Secure Certificate Authority
+# Subject: Client=US, O=Equifax, OU=Equifax Secure Certificate Authority
 # Label: "Equifax Secure Certificate Authority"
 # Serial: 903804111
 # MD5 Fingerprint: 67:cb:9d:c0:13:24:8a:82:9b:b2:17:1e:d1:1b:ec:d4

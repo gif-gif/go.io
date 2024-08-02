@@ -17,7 +17,7 @@ type Config struct {
 	defaultHandler *mqtt.MessageHandler
 }
 
-type GoMqtt struct {
+type GoMqttClient struct {
 	Client mqtt.Client
 }
 
@@ -43,44 +43,44 @@ func New(config Config) error {
 }
 
 func NewConfig(opts *mqtt.ClientOptions) error {
-	gomqtt := GoMqtt{}
+	gomqtt := GoMqttClient{}
 	c := mqtt.NewClient(opts)
 	gomqtt.Client = c
 	return nil
 }
 
-func (g *GoMqtt) Connect() error {
+func (g *GoMqttClient) Connect() error {
 	if token := g.Client.Connect(); token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
 	return nil
 }
 
-func (g *GoMqtt) Disconnect(quiesce uint) {
+func (g *GoMqttClient) Disconnect(quiesce uint) {
 	g.Client.Disconnect(quiesce)
 }
 
-func (g *GoMqtt) Subscribe(topic string, qos byte, callback mqtt.MessageHandler) error {
+func (g *GoMqttClient) Subscribe(topic string, qos byte, callback mqtt.MessageHandler) error {
 	if token := g.Client.Subscribe(topic, qos, callback); token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
 	return nil
 }
 
-func (g *GoMqtt) Publish(topic string, qos byte, retained bool, payload interface{}) error {
+func (g *GoMqttClient) Publish(topic string, qos byte, retained bool, payload interface{}) error {
 	if token := g.Client.Publish(topic, qos, retained, payload); token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
 	return nil
 }
 
-func (g *GoMqtt) Unsubscribe(topics ...string) error {
+func (g *GoMqttClient) Unsubscribe(topics ...string) error {
 	if token := g.Client.Unsubscribe(topics...); token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
 	return nil
 }
 
-func (g *GoMqtt) isConnected() bool {
+func (g *GoMqttClient) isConnected() bool {
 	return g.Client.IsConnected()
 }
