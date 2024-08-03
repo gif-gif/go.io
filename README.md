@@ -158,7 +158,12 @@ func testDynamicSize() {
 }
 ```
 ### godb 模块
-- 支持 sqllite3 mysql clickhouse 等；
+- mysql
+- sqlite3
+- clickhouse
+- postgresql
+- sqlserver
+- tidb
 ```go
 func mysqlTest() {
 	db, err := gogorm.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", godb.GoDbConfig{})
