@@ -10,9 +10,9 @@ import (
 
 func TestInit(t *testing.T) {
 	Init(Config{
-		Endpoints: []string{"127.0.0.1:2379"},
-		Username:  "root",
-		Password:  "123456",
+		Endpoints: []string{"127.0.0.1:23790"},
+		//Username:  "root",
+		//Password:  "123456",
 	})
 
 	if _, err := Set("/xz/dsp/http-api/192.168.1.101:15001", "192.168.1.101:15001"); err != nil {
@@ -37,9 +37,9 @@ func TestInit(t *testing.T) {
 
 func TestRegisterService(t *testing.T) {
 	Init(Config{
-		Endpoints: []string{"127.0.0.1:2379"},
-		Username:  "root",
-		Password:  "123456",
+		Endpoints: []string{"127.0.0.1:23790"},
+		//Username:  "root",
+		//Password:  "123456",
 	})
 
 	err := RegisterService("/xz/dsp/http-api/node-1", "192.168.1.101:15002")
@@ -50,9 +50,9 @@ func TestRegisterService(t *testing.T) {
 
 func TestWatch(t *testing.T) {
 	Init(Config{
-		Endpoints: []string{"127.0.0.1:2379"},
-		Username:  "root",
-		Password:  "123456",
+		Endpoints: []string{"127.0.0.1:23790"},
+		//Username:  "root",
+		//Password:  "123456",
 	})
 
 	go func() {

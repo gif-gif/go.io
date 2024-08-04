@@ -20,3 +20,9 @@ https://github.com/gowechat/example
 ```
 https://github.com/eatmoreapple/openwechat
 ```
+
+
+### 其他人封装库
+- https://github.com/wizjin/weixin
+- https://github.com/chanxuehong/wechat
+- https://github.com/silenceper/wechat -- star 多
