@@ -1,29 +1,41 @@
 package gomqtt
 
 import (
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"time"
 )
 
 type Config struct {
-	Server         string `yaml:"Server" json:"server"`
-	ClientId       string `yaml:"ClientId" json:"clientId"`
-	User           string `yaml:"User" json:"user"`
-	Secret         string `yaml:"Secret" json:"secret"`
-	KeepAlive      int64  `yaml:"KeepAlive" json:"keepAlive"` //s
-	AutoReconnect  bool   `yaml:"AutoReconnect" json:"autoReconnect"`
-	ConnectRetry   bool   `yaml:"ConnectRetry" json:"connectRetry"`
-	ConnectTimeout int64  `yaml:"ConnectTimeout" json:"connectTimeout"`
-	defaultHandler *mqtt.MessageHandler
+	Server           string `yaml:"Server" json:"server"`
+	Port             int    `yaml:"Port" json:"port"`
+	ClientId         string `yaml:"ClientId" json:"clientId"`
+	User             string `yaml:"User" json:"user"`
+	Secret           string `yaml:"Secret" json:"secret"`
+	KeepAlive        int64  `yaml:"KeepAlive" json:"keepAlive"` //s
+	AutoReconnect    bool   `yaml:"AutoReconnect" json:"autoReconnect"`
+	ConnectRetry     bool   `yaml:"ConnectRetry" json:"connectRetry"`
+	ConnectTimeout   int64  `yaml:"ConnectTimeout" json:"connectTimeout"`
+	DefaultHandler   *mqtt.MessageHandler
+	OnConnect        *mqtt.OnConnectHandler
+	OnConnectionLost *mqtt.ConnectionLostHandler
 }
 
 type GoMqttClient struct {
 	Client mqtt.Client
 }
 
-func New(config Config) error {
+func New(config Config) (*GoMqttClient, error) {
+	if config.ConnectTimeout <= 0 {
+		config.ConnectTimeout = 10
+	}
+
+	if config.KeepAlive <= 0 {
+		config.KeepAlive = 60 * 2
+	}
+
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(config.Server)
+	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", config.Server, config.Port))
 	opts.SetClientID(config.ClientId)
 	opts.SetUsername(config.User)
 	opts.SetPassword(config.Secret)
@@ -31,22 +43,34 @@ func New(config Config) error {
 	opts.SetConnectRetry(config.ConnectRetry)
 	opts.SetKeepAlive(time.Duration(config.KeepAlive) * time.Second)
 	opts.SetConnectTimeout(time.Duration(config.ConnectTimeout) * time.Second)
-	if config.defaultHandler != nil {
-		opts.SetDefaultPublishHandler(*config.defaultHandler)
+
+	if config.DefaultHandler != nil {
+		opts.SetDefaultPublishHandler(*config.DefaultHandler)
 	}
 
-	err := NewConfig(opts)
-	if err != nil {
-		return err
+	if config.OnConnectionLost != nil {
+		opts.SetConnectionLostHandler(*config.OnConnectionLost)
 	}
-	return nil
+	if config.OnConnect != nil {
+		opts.SetOnConnectHandler(*config.OnConnect)
+	}
+
+	gc, err := NewConfig(opts)
+	if err != nil {
+		return nil, err
+	}
+	return gc, nil
 }
 
-func NewConfig(opts *mqtt.ClientOptions) error {
-	gomqtt := GoMqttClient{}
-	c := mqtt.NewClient(opts)
-	gomqtt.Client = c
-	return nil
+func NewConfig(opts *mqtt.ClientOptions) (*GoMqttClient, error) {
+	gomqtt := &GoMqttClient{}
+	client := mqtt.NewClient(opts)
+	if token := client.Connect(); token.Wait() && token.Error() != nil {
+		return nil, token.Error()
+	}
+
+	gomqtt.Client = client
+	return gomqtt, nil
 }
 
 func (g *GoMqttClient) Connect() error {
