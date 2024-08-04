@@ -43,3 +43,5 @@ func UploadFile(assetsDir string, file *multipart.FileHeader) (*FileUploadResult
 
 	return res, nil
 }
+
+//TODO: 大文件上传逻辑

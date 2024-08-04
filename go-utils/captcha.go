@@ -4,8 +4,8 @@ import (
 	gocaptcha "github.com/gif-gif/go.io/go-captcha"
 )
 
-//TODO: https://github.com/mojocn/base64Captcha
-//https://github.com/wenlng/go-captcha (高级)
+//https://github.com/mojocn/base64Captcha
+//TODO: https://github.com/wenlng/go-captcha (高级)
 
 var defaultCaptcha = gocaptcha.NewDefault()
 
