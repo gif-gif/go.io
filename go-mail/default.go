@@ -1,4 +1,4 @@
-package goo_mail
+package gomail
 
 var (
 	__mail iMail
