@@ -59,10 +59,10 @@ func (ev *GoEvent) UnSubscribe(topic string) {
 
 	if chs, ok := ev.subscribes[topic]; ok {
 		channels := append([]MessageChan{}, chs...)
-		goutils.AsyncFunc(func() {
-			for _, ch := range channels {
-				close(ch)
-			}
-		})
+		for _, ch := range channels {
+			close(ch)
+		}
+
+		delete(ev.subscribes, topic)
 	}
 }
