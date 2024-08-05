@@ -1,9 +1,9 @@
 package gokafka
 
 type Config struct {
-	User     string   `json:"user" yaml:"User"`
-	Name     string   `json:"name" yaml:"Name"`
-	Password string   `json:"password" yaml:"Password"`
-	Addrs    []string `json:"addrs" yaml:"Addrs"`
-	Timeout  int      `json:"timeout" yaml:"Timeout"`
+	User     string   `json:"user,optional" yaml:"User,optional"`
+	Name     string   `json:"name,optional" yaml:"Name,optional"`
+	Password string   `json:"password,optional" yaml:"Password,optional"`
+	Addrs    []string `json:"addrs,optional" yaml:"Addrs,optional"`
+	Timeout  int      `json:"timeout,optional" yaml:"Timeout,optional"`
 }
