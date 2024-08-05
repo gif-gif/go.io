@@ -1,11 +1,11 @@
 package gominio
 
 type Config struct {
-	AccessKeyId     string `json:",optional" yaml:"AccessKeyId"`
-	AccessKeySecret string `json:",optional" yaml:"AccessKeySecret"`
-	Endpoint        string `json:",optional" yaml:"Endpoint"`
-	Bucket          string `json:",optional" yaml:"Bucket"`
-	Dir             string `json:",optional" yaml:"Dir"`
-	Domain          string `json:",optional" yaml:"Domain,optional"`
-	UseSSL          bool   `json:",optional" yaml:"UseSSL"`
+	AccessKeyId     string `json:"accessKeyId,optional" yaml:"AccessKeyId,optional"`
+	AccessKeySecret string `json:"accessKeySecret,optional" yaml:"AccessKeySecret,optional"`
+	Endpoint        string `json:"endpoint,optional" yaml:"Endpoint,optional"`
+	Bucket          string `json:"bucket,optional" yaml:"Bucket,optional"`
+	Dir             string `json:"dir,optional" yaml:"Dir,optional"`
+	Domain          string `json:"domain,optional" yaml:"Domain,optional,optional"`
+	UseSSL          bool   `json:"useSSL,optional" yaml:"UseSSL,optional"`
 }

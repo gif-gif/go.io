@@ -37,7 +37,7 @@ func New(conf Config) (cli *GoClickHouse, err error) {
 		InsecureSkipVerify: conf.InsecureSkipVerify,
 	}
 
-	if !conf.Tls {
+	if !conf.TLS {
 		getTls = nil
 	}
 

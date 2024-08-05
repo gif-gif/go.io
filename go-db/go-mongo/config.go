@@ -1,11 +1,11 @@
 package gomongo
 
 type Config struct {
-	Name           string `yaml:"Name" json:"name"`
-	Addr           string `yaml:"Addr" json:"addr"`
-	User           string `yaml:"User" json:"user"`
-	Password       string `yaml:"Password" json:"password"`
-	EnablePassword bool   `yaml:"EnablePassword" json:"enable_password"`
-	Database       string `yaml:"Database" json:"database"`
-	AutoPing       bool   `yaml:"AutoPing" json:"autoPing"`
+	Name           string `yaml:"Name,optional" json:"name,optional"`
+	Addr           string `yaml:"Addr,optional" json:"addr,optional"`
+	User           string `yaml:"User,optional" json:"user,optional"`
+	Password       string `yaml:"Password,optional" json:"password,optional"`
+	EnablePassword bool   `yaml:"EnablePassword,optional" json:"enablePassword,optional"`
+	Database       string `yaml:"Database,optional" json:"database,optional"`
+	AutoPing       bool   `yaml:"AutoPing,optional" json:"autoPing,optional"`
 }

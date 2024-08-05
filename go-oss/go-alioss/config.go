@@ -1,9 +1,9 @@
 package goalioss
 
 type Config struct {
-	AccessKeyId     string `json:"access_key_id" yaml:"access_key_id"`
-	AccessKeySecret string `json:"access_key_secret" yaml:"access_key_secret"`
-	Endpoint        string `json:"endpoint" yaml:"endpoint"`
-	Bucket          string `json:"bucket" yaml:"bucket"`
-	Domain          string `json:"domain" yaml:"domain"`
+	AccessKeyId     string `json:"accessKeyId,optional" yaml:"AccessKeyId,optional"`
+	AccessKeySecret string `json:"accessKeySecret,optional" yaml:"AccessKeySecret,optional"`
+	Endpoint        string `json:"endpoint,optional" yaml:"Endpoint,optional"`
+	Bucket          string `json:"bucket,optional" yaml:"Bucket,optional"`
+	Domain          string `json:"domain,optional" yaml:"Domain,optional"`
 }

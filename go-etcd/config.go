@@ -1,15 +1,15 @@
 package goetcd
 
 type Config struct {
-	Endpoints []string `json:"endpoints" yaml:"Endpoints"`
-	Name      string   `json:"name" yaml:"Name"`
-	Username  string   `json:"username" yaml:"Username"`
-	Password  string   `json:"password" yaml:"Password"`
-	TLS       *TLS     `json:"tls" yaml:"TLS"`
+	Endpoints []string `json:"endpoints,optional" yaml:"Endpoints,optional"`
+	Name      string   `json:"name,optional" yaml:"Name,optional"`
+	Username  string   `json:"username,optional" yaml:"Username,optional"`
+	Password  string   `json:"password,optional" yaml:"Password,optional"`
+	TLS       *TLS     `json:"tls,optional" yaml:"TLS,optional"`
 }
 
 type TLS struct {
-	CertFile string `json:"cert_file" yaml:"CertFile"`
-	KeyFile  string `json:"key_file" yaml:"KeyFile"`
-	CAFile   string `json:"ca_file" yaml:"CAFile"`
+	CertFile string `json:"certFile,optional" yaml:"CertFile,optional"`
+	KeyFile  string `json:"keyFile,optional" yaml:"KeyFile,optional"`
+	CAFile   string `json:"caFile,optional" yaml:"CAFile,optional"`
 }

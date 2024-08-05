@@ -37,12 +37,12 @@ func main() {
 		return
 	}
 
-	gokafka.Consumer().Consume("biu_account", func(msg *gokafka.ConsumerMessage, consumerErr *gokafka.ConsumerError) error {
+	gokafka.GetClient().Consumer().Consume("biu_account", func(msg *gokafka.ConsumerMessage, consumerErr *gokafka.ConsumerError) error {
 		golog.WithTag("gokafka").Info(msg.Topic)
 		return nil
 	})
 
-	_, _, err = gokafka.Producer().SendMessage("biu_account", b)
+	_, _, err = gokafka.GetClient().Producer().SendMessage("biu_account", b)
 	if err != nil {
 		golog.WithTag("gokafka").Error(err.Error())
 		return

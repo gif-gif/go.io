@@ -27,7 +27,7 @@ func GetTimeNow() time.Time {
 	//		Host: "122.228.113.235:17006",
 	//		Type: "",
 	//		Pass: "xiaozi527sport",
-	//		Tls:  false,
+	//		TLS:  false,
 	//	},
 	//}
 	//redisClient := redisConf.NewRedis()

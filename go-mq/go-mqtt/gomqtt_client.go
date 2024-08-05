@@ -19,17 +19,17 @@ const (
 )
 
 type Config struct {
-	Protocol         string `yaml:"Protocol" json:"protocol"`
-	CaFilePath       string `yaml:"CaFilePath" json:"caFilePath"` //tls(ssl wss) 证书位置
-	Server           string `yaml:"Server" json:"server"`
-	Port             int    `yaml:"Port" json:"port"`
-	ClientId         string `yaml:"ClientId" json:"clientId"`
-	User             string `yaml:"User" json:"user"`
-	Secret           string `yaml:"Secret" json:"secret"`
-	KeepAlive        int64  `yaml:"KeepAlive" json:"keepAlive"` //s
-	AutoReconnect    bool   `yaml:"AutoReconnect" json:"autoReconnect"`
-	ConnectRetry     bool   `yaml:"ConnectRetry" json:"connectRetry"`
-	ConnectTimeout   int64  `yaml:"ConnectTimeout" json:"connectTimeout"`
+	Protocol         string `yaml:"Protocol,optional" json:"protocol,optional"`
+	CaFilePath       string `yaml:"CaFilePath,optional" json:"caFilePath,optional"` //tls(ssl wss) 证书位置
+	Server           string `yaml:"Server,optional" json:"server,optional"`
+	Port             int    `yaml:"Port,optional" json:"port,optional"`
+	ClientId         string `yaml:"ClientId,optional" json:"clientId,optional"`
+	User             string `yaml:"User,optional" json:"user,optional"`
+	Secret           string `yaml:"Secret,optional" json:"secret,optional"`
+	KeepAlive        int64  `yaml:"KeepAlive,optional" json:"keepAlive,optional"` //s
+	AutoReconnect    bool   `yaml:"AutoReconnect,optional" json:"autoReconnect,optional"`
+	ConnectRetry     bool   `yaml:"ConnectRetry,optional" json:"connectRetry,optional"`
+	ConnectTimeout   int64  `yaml:"ConnectTimeout,optional" json:"connectTimeout,optional"`
 	DefaultHandler   *mqtt.MessageHandler
 	OnConnect        *mqtt.OnConnectHandler
 	OnConnectionLost *mqtt.ConnectionLostHandler

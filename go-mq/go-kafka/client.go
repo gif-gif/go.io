@@ -54,3 +54,11 @@ func (cli *client) Close() {
 		cli.Client.Close()
 	}
 }
+
+func (cli *client) Producer() iProducer {
+	return &producer{client: cli, msg: &sarama.ProducerMessage{}}
+}
+
+func (cli *client) Consumer() iConsumer {
+	return &consumer{client: cli}
+}
