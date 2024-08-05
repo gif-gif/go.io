@@ -40,7 +40,7 @@ type iConsumer interface {
 	// 从头开始
 	WithOffsetOldest() iConsumer
 
-	// 消费
+	// 阻塞消费
 	Consume(topic string, handler ConsumerHandler)
 
 	// 分组topic

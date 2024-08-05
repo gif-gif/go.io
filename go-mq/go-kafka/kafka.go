@@ -1,6 +1,7 @@
 package gokafka
 
 import (
+	"github.com/IBM/sarama"
 	gocontext "github.com/gif-gif/go.io/go-context"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
@@ -71,4 +72,12 @@ func Client() *client {
 	golog.WithTag("gokafka").Error("no default kafka client")
 
 	return nil
+}
+
+func Producer() iProducer {
+	return &producer{client: Client(), msg: &sarama.ProducerMessage{}}
+}
+
+func Consumer() iConsumer {
+	return &consumer{client: Client()}
 }

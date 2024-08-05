@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	golog "github.com/gif-gif/go.io/go-log"
 	gokafka "github.com/gif-gif/go.io/go-mq/go-kafka"
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"gorm.io/gorm"
 	"time"
 )
@@ -20,9 +21,10 @@ type Account struct {
 
 func main() {
 	err := gokafka.Init(gokafka.Config{
-		Addrs:    []string{"212.129.60.103:30092"},
+		Addrs:    []string{"122.228.113.238:30094"},
 		User:     "admin",
-		Password: "payda6b4eb0f3",
+		Password: "b36da6b4eb0f3",
+		Timeout:  10,
 	})
 
 	if err != nil {
@@ -37,12 +39,21 @@ func main() {
 		return
 	}
 
-	gokafka.GetClient().Consumer().Consume("biu_account", func(msg *gokafka.ConsumerMessage, consumerErr *gokafka.ConsumerError) error {
-		golog.WithTag("gokafka").Info(msg.Topic)
-		return nil
+	topic := "biu_account"
+	//err = gokafka.Client().CreateTopicsRequest(topic, -1, -1)
+	//if err != nil {
+	//	golog.WithTag("CreateTopicsRequest").Error(err.Error())
+	//	return
+	//}
+
+	goutils.AsyncFunc(func() {
+		gokafka.Client().Consumer().Consume(topic, func(msg *gokafka.ConsumerMessage, consumerErr *gokafka.ConsumerError) error {
+			golog.WithTag("gokafka").Info("Consumer:" + msg.Topic)
+			return nil
+		})
 	})
 
-	_, _, err = gokafka.GetClient().Producer().SendMessage("biu_account", b)
+	_, _, err = gokafka.Client().Producer().WithPartition(0).SendMessage(topic, b)
 	if err != nil {
 		golog.WithTag("gokafka").Error(err.Error())
 		return
@@ -50,5 +61,5 @@ func main() {
 
 	golog.WithTag("gokafka").InfoF("send successfully")
 
-	time.Sleep(time.Second * 10000)
+	time.Sleep(time.Second * 4)
 }
