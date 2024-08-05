@@ -8,6 +8,9 @@ import (
 	"time"
 )
 
+var globalHeaders map[string]string = make(map[string]string)
+var baseURL = ""
+
 const (
 	TAG = "gohttpx"
 

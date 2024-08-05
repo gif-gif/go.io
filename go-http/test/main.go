@@ -14,12 +14,14 @@ func main() {
 }
 
 func testRequest() {
+	gohttpx.SetBaseUrl("http://localhost")
+	gohttpx.AddGlobalHeader("User-Id", "123")
 	req := gohttpx.Request{
-		Url: "http://localhost:100",
+		Url: "/main",
 		Urls: []string{
-			"http://localhost:200",
-			"http://localhost:300",
-			"http://localhost:400",
+			"/main1",
+			"/main2",
+			"/main3",
 		},
 		QueryParams: map[string]string{"name": "jk"},
 		Timeout:     time.Second * 2,

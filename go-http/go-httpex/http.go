@@ -8,20 +8,47 @@ import (
 	"strings"
 )
 
+func SetBaseUrl(base string) {
+	baseURL = base
+}
+
+func GetBaseUrl() string {
+	return baseURL
+}
+
+func AddGlobalHeader(k, v string) {
+	globalHeaders[k] = v
+}
+
+func GetGlobalHeaders() map[string]string {
+	return globalHeaders
+}
+
 // Headers["Accept"] = "application/json" for default
+// 真正的请求逻辑
 func doHttpRequest[T any](req *Request, t *T) *HttpError {
+	if req.Url == "" || !strings.HasPrefix(req.Url, "http") {
+		req.Url = GetBaseUrl()
+	}
+
 	if req.Url == "" || !strings.HasPrefix(req.Url, "http") {
 		return &HttpError{
 			HttpStatusCode: HttpParamsError,
 			Msg:            "url is invalid",
 		}
 	}
+
 	var (
 		restyClient = resty.New().
 			SetTimeout(req.Timeout).
 			SetRetryCount(req.RetryCount).
 			SetRetryWaitTime(req.RetryWaitTime)
 	)
+
+	for k, v := range GetGlobalHeaders() {
+		req.Headers[k] = v
+	}
+
 	if req.Headers == nil {
 		req.Headers = make(map[string]string)
 		req.Headers["Accept"] = CONTENT_TYPE_JSON
