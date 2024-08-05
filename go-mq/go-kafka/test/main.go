@@ -21,7 +21,7 @@ type Account struct {
 
 func main() {
 	err := gokafka.Init(gokafka.Config{
-		Addrs:    []string{"122.228.113.238:30094"},
+		Addrs:    []string{"127.0.0.1:30094"},
 		User:     "admin",
 		Password: "b36da6b4eb0f3",
 		Timeout:  10,
