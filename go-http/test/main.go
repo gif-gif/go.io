@@ -10,7 +10,7 @@ import (
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-	testRaceSpeed()
+	testRequest()
 }
 
 func testRequest() {

@@ -28,7 +28,7 @@ func GetGlobalHeaders() map[string]string {
 // 真正的请求逻辑
 func doHttpRequest[T any](req *Request, t *T) *HttpError {
 	if req.Url == "" || !strings.HasPrefix(req.Url, "http") {
-		req.Url = GetBaseUrl()
+		req.Url = GetBaseUrl() + req.Url
 	}
 
 	if req.Url == "" || !strings.HasPrefix(req.Url, "http") {
