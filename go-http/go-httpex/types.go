@@ -20,8 +20,10 @@ const (
 )
 
 const (
-	POST = "post"
-	GET  = "get"
+	POST   = "post"
+	GET    = "get"
+	PUT    = "put"
+	DELETE = "delete"
 )
 
 const (

@@ -66,12 +66,26 @@ func doHttpRequest[T any](req *Request, t *T) *HttpError {
 			SetResult(t).
 			SetHeaders(req.Headers).
 			Post(req.Url)
-	} else {
+	} else if req.Method == GET {
 		resp, err = request.
 			SetResult(t).
 			SetQueryParams(req.QueryParams).
 			SetHeaders(req.Headers).
 			Get(req.Url)
+	} else if req.Method == PUT {
+		resp, err = request.
+			SetResult(t).
+			SetBody(req.Body).
+			SetQueryParams(req.QueryParams).
+			SetHeaders(req.Headers).
+			Put(req.Url)
+	} else {
+		resp, err = request.
+			SetResult(t).
+			SetBody(req.Body).
+			SetQueryParams(req.QueryParams).
+			SetHeaders(req.Headers).
+			Delete(req.Url)
 	}
 
 	if err != nil {
