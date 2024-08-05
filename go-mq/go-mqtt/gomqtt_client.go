@@ -1,12 +1,26 @@
 package gomqtt
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"io/ioutil"
+	"log"
+	"math/rand"
 	"time"
 )
 
+const (
+	PROTOCOL_TCP = "tcp"
+	PROTOCOL_SSL = "ssl"
+	PROTOCOL_WS  = "ws"
+	PROTOCOL_WSS = "wss"
+)
+
 type Config struct {
+	Protocol         string `yaml:"Protocol" json:"protocol"`
+	CaFilePath       string `yaml:"CaFilePath" json:"caFilePath"` //tls(ssl wss) 证书位置
 	Server           string `yaml:"Server" json:"server"`
 	Port             int    `yaml:"Port" json:"port"`
 	ClientId         string `yaml:"ClientId" json:"clientId"`
@@ -34,8 +48,18 @@ func New(config Config) (*GoMqttClient, error) {
 		config.KeepAlive = 60 * 2
 	}
 
+	if config.Protocol == "" {
+		config.Protocol = "tcp"
+	}
+
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", config.Server, config.Port))
+	opts.AddBroker(fmt.Sprintf("%s://%s:%d/mqtt", config.Protocol, config.Server, config.Port))
+
+	if config.ClientId == "" {
+		rand.Seed(time.Now().UnixNano())
+		config.ClientId = fmt.Sprintf("go-client-%d", rand.Int())
+	}
+
 	opts.SetClientID(config.ClientId)
 	opts.SetUsername(config.User)
 	opts.SetPassword(config.Secret)
@@ -43,6 +67,11 @@ func New(config Config) (*GoMqttClient, error) {
 	opts.SetConnectRetry(config.ConnectRetry)
 	opts.SetKeepAlive(time.Duration(config.KeepAlive) * time.Second)
 	opts.SetConnectTimeout(time.Duration(config.ConnectTimeout) * time.Second)
+
+	// Optional: 设置CA证书
+	if config.CaFilePath != "" {
+		opts.SetTLSConfig(loadTLSConfig(config.CaFilePath))
+	}
 
 	if config.DefaultHandler != nil {
 		opts.SetDefaultPublishHandler(*config.DefaultHandler)
@@ -71,6 +100,22 @@ func NewConfig(opts *mqtt.ClientOptions) (*GoMqttClient, error) {
 
 	gomqtt.Client = client
 	return gomqtt, nil
+}
+
+func loadTLSConfig(caFile string) *tls.Config {
+	// load tls config
+	var tlsConfig tls.Config
+	tlsConfig.InsecureSkipVerify = false
+	if caFile != "" {
+		certpool := x509.NewCertPool()
+		ca, err := ioutil.ReadFile(caFile)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		certpool.AppendCertsFromPEM(ca)
+		tlsConfig.RootCAs = certpool
+	}
+	return &tlsConfig
 }
 
 func (g *GoMqttClient) Connect() error {

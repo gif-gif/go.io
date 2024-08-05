@@ -22,7 +22,7 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 
 func main() {
 	conf := gomqtt.Config{
-		Server:           "122.228.113.238",
+		Server:           "127.0.0.1",
 		Port:             1883,
 		ClientId:         "go_mqtt_client_test",
 		User:             "",
