@@ -110,3 +110,10 @@ func testRaceSpeed() {
 
 	AsyncFuncGroupOneSuccess(fns...)
 }
+
+// 返回函数执行时间
+func MeasureExecutionTime(fn func()) time.Duration {
+	start := time.Now()
+	fn()
+	return time.Since(start)
+}
