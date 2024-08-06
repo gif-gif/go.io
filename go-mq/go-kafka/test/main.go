@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	gocontext "github.com/gif-gif/go.io/go-context"
 	golog "github.com/gif-gif/go.io/go-log"
 	gokafka "github.com/gif-gif/go.io/go-mq/go-kafka"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"gorm.io/gorm"
-	"time"
 )
 
 type Product struct {
@@ -47,13 +47,13 @@ func main() {
 	//}
 
 	goutils.AsyncFunc(func() {
-		gokafka.Client().Consumer().Consume(topic, func(msg *gokafka.ConsumerMessage, consumerErr *gokafka.ConsumerError) error {
+		gokafka.Consumer().Consume(topic, func(msg *gokafka.ConsumerMessage, consumerErr *gokafka.ConsumerError) error {
 			golog.WithTag("gokafka").Info("Consumer:" + msg.Topic)
 			return nil
 		})
 	})
 
-	_, _, err = gokafka.Client().Producer().WithPartition(0).SendMessage(topic, b)
+	_, _, err = gokafka.Producer().WithPartition(0).SendMessage(topic, b)
 	if err != nil {
 		golog.WithTag("gokafka").Error(err.Error())
 		return
@@ -61,5 +61,5 @@ func main() {
 
 	golog.WithTag("gokafka").InfoF("send successfully")
 
-	time.Sleep(time.Second * 4)
+	<-gocontext.Cancel().Done()
 }
