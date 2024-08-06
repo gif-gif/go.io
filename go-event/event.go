@@ -6,12 +6,18 @@ import (
 )
 
 type GoEvent struct {
-	subscribes map[string][]MessageChan
-	mu         sync.RWMutex
+	subscribes   map[string][]MessageChan
+	channelSize  int // 消息通道同时处理大小，默认没有限制
+	mu           sync.RWMutex
+	DefaultTopic string
 }
 
-func New() *GoEvent {
-	return &GoEvent{subscribes: map[string][]MessageChan{}}
+func New(channelSize ...int) *GoEvent {
+	if len(channelSize) == 0 {
+		return &GoEvent{subscribes: map[string][]MessageChan{}, channelSize: 0}
+	} else {
+		return &GoEvent{subscribes: map[string][]MessageChan{}, channelSize: channelSize[0]}
+	}
 }
 
 // 发布 执行当前topic 对应的所有订阅者
@@ -37,14 +43,25 @@ func (ev *GoEvent) Subscribe(topic string, fn SubscribeFunc) {
 	if _, ok := ev.subscribes[topic]; !ok {
 		ev.subscribes[topic] = []MessageChan{}
 	}
+	var ch chan Message
 
-	ch := make(chan Message)
+	if ev.channelSize == 0 {
+		ch = make(chan Message)
+	} else {
+		ch = make(chan Message, ev.channelSize)
+	}
+	if ev.DefaultTopic == "" {
+		ev.DefaultTopic = topic
+	}
 	ev.subscribes[topic] = append(ev.subscribes[topic], ch)
 
 	goutils.AsyncFunc(func() {
 		for {
 			select {
 			case msg := <-ch:
+				if msg.Topic == "" { //closed channel
+					return
+				}
 				goutils.AsyncFunc(func() {
 					fn(msg)
 				})
@@ -60,9 +77,26 @@ func (ev *GoEvent) UnSubscribe(topic string) {
 	if chs, ok := ev.subscribes[topic]; ok {
 		channels := append([]MessageChan{}, chs...)
 		for _, ch := range channels {
-			close(ch)
+			goutils.AsyncFunc(func() {
+				close(ch)
+			})
 		}
 
 		delete(ev.subscribes, topic)
+	}
+}
+
+func (ev *GoEvent) UnSubscribeDefault() {
+	ev.mu.Lock()
+	defer ev.mu.Unlock()
+	if chs, ok := ev.subscribes[ev.DefaultTopic]; ok {
+		channels := append([]MessageChan{}, chs...)
+		for _, ch := range channels {
+			goutils.AsyncFunc(func() {
+				close(ch)
+			})
+		}
+
+		delete(ev.subscribes, ev.DefaultTopic)
 	}
 }
