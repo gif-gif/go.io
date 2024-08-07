@@ -15,17 +15,6 @@ import (
 	"path/filepath"
 )
 
-// fmt.Sprintf("%s.part%d", fileName, i)
-// mapreduce big file
-// 大文件逻辑 for 把大文件并发分片处理，为了防止OOM超大文件边分片边处理的策略
-type FileChunk struct {
-	Data          []byte //分片数据
-	Hash          string //分片Hash
-	Index         int64  //分片顺序号
-	FileMd5       string //
-	ChunkFileName string //
-}
-
 type BigFile struct {
 	ChunkSize         int64            // 分片大小 M
 	MaxWorkers        int              // 同时处理最大分块数量，合理用防止超大文件内存益处
@@ -171,10 +160,11 @@ func (b *BigFile) createChunk(file *os.File, index int64) (*FileChunk, error) {
 
 	hash := goutils.Md5(buffer)
 	return &FileChunk{
-		Data:          buffer,
-		Hash:          hash,
-		Index:         index,
-		FileMd5:       b.FileMd5,
-		ChunkFileName: fmt.Sprintf("%s.part%d", b.FileMd5+filepath.Ext(fileInfo.Name()), index),
+		Data:             buffer,
+		Hash:             hash,
+		Index:            index,
+		OriginalFileMd5:  b.FileMd5,
+		OriginalFileName: fileInfo.Name(),
+		FileName:         fmt.Sprintf("%s.part%d", b.FileMd5+filepath.Ext(fileInfo.Name()), index),
 	}, nil
 }

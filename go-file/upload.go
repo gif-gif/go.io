@@ -13,20 +13,8 @@ import (
 	"strings"
 )
 
-const (
-	UPLOAD_TYPE_LOCAL = 1
-	UPLOAD_TYPE_OSS   = 2
-	UPLOAD_TYPE_CHUNK = 3
-)
-
-type FileUploadResult struct {
-	OriginalFile string
-	FileName     string
-	ChunkCount   int64
-}
-
 // 服务器接受file文件到assetsDir目录下，assetsDir 目录不存在则自动创建,返回存储位置
-func ReceiveFile(assetsDir string, file *multipart.FileHeader) (*FileUploadResult, error) {
+func ReceiveFile(assetsDir string, file *multipart.FileHeader) (*FileReceiveResult, error) {
 	if ok, _ := Exist(assetsDir); !ok {
 		err := CreateSavePath(assetsDir, os.ModePerm)
 		if err != nil {
@@ -50,7 +38,7 @@ func ReceiveFile(assetsDir string, file *multipart.FileHeader) (*FileUploadResul
 		}
 	}
 
-	res := &FileUploadResult{}
+	res := &FileReceiveResult{}
 	res.OriginalFile = originalPath
 	res.FileName = fullName
 
@@ -58,7 +46,7 @@ func ReceiveFile(assetsDir string, file *multipart.FileHeader) (*FileUploadResul
 }
 
 // 服务器接受文件分片
-func ReceiveChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fileMd5 string, file *multipart.FileHeader) (*FileUploadResult, error) {
+func ReceiveChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fileMd5 string, file *multipart.FileHeader) (*FileReceiveResult, error) {
 	if ok, _ := Exist(assetsDir); !ok {
 		err := CreateSavePath(assetsDir, os.ModePerm)
 		if err != nil {
@@ -87,14 +75,14 @@ func ReceiveChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fi
 		}
 	}
 
-	res := &FileUploadResult{}
+	res := &FileReceiveResult{}
 	res.OriginalFile = chunkFilePath
 	res.FileName = fullName
 	return res, nil
 }
 
 // 服务器合并所有文件分片，并验证md5, isNotRemoveChunk =true 合并后时不会删除分片
-func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int64, isNotRemoveChunk bool) (*FileUploadResult, error) {
+func MergeFileForChunks(filePath string, fileName string, fileMd5 string, totalChunks int64, isNotRemoveChunk bool) (*FileReceiveResult, error) {
 	fileName = fileMd5 + filepath.Ext(fileName)
 	finalFilePath := filepath.Join(filePath, fileName)
 	finalFile, err := os.Create(finalFilePath)
@@ -117,10 +105,12 @@ func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int
 			return nil, err
 		}
 
-		// 删除分片文件
-		err = os.Remove(chunkFilePath)
-		if err != nil {
-			return nil, err
+		if !isNotRemoveChunk {
+			// 删除分片文件
+			err = os.Remove(chunkFilePath)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -133,7 +123,7 @@ func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int
 		return nil, fmt.Errorf("fileMd5 mismatch")
 	}
 
-	res := &FileUploadResult{
+	res := &FileReceiveResult{
 		ChunkCount:   totalChunks,
 		OriginalFile: finalFilePath,
 		FileName:     fileName,
@@ -143,18 +133,22 @@ func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int
 	return res, nil
 }
 
-// 上传一个文件分片
-func UploadChunk(url string, fileName string, fileMd5 string, chunkIndex int, chunkData []byte) (*gohttpx.Response, error) {
+// ////////////////////////////////////////////////////////////// http server upload and merge 供参考
+// 上传一个文件分片，（作为客户端请求时验证非法请求认证逻辑需要加，如authToken sign 等等）
+func UploadChunk(url string, chunk *FileChunk) (*gohttpx.Response, error) {
 	req := &gohttpx.Request{
-		Url:    url,
-		Method: gohttpx.POST,
-		Body:   chunkData,
-		FormData: map[string]string{
+		Url:       url,
+		Method:    gohttpx.POST,
+		FileBytes: chunk.Data,
+		MultipartFormData: map[string]string{
 			"type":       gconv.String(UPLOAD_TYPE_CHUNK),
-			"fileName":   fileName,
-			"fileMd5":    fileMd5,
-			"chunkIndex": gconv.String(chunkIndex),
+			"fileName":   chunk.FileName,
+			"fileMd5":    chunk.OriginalFileMd5,
+			"chunkMd5":   chunk.Hash,
+			"chunkIndex": gconv.String(chunk.Index),
 		},
+		FileName: chunk.OriginalFileName,
+		Headers:  map[string]string{"User-Agent": "github.com/gif-gif/go.io"},
 	}
 
 	res := &gohttpx.Response{}
@@ -163,4 +157,32 @@ func UploadChunk(url string, fileName string, fileMd5 string, chunkIndex int, ch
 		return nil, errors.New(err.ErrorInfo())
 	}
 	return res, nil
+}
+
+// 分片全部上传完毕后，再请求文件分片合并请求（作为客户端请求时验证非法请求认证逻辑需要加，如authToken sign 等等）
+func MergeChunk(url string, fileMergeReq *FileMergeReq) (*gohttpx.Response, error) {
+	req := &gohttpx.Request{
+		Url:     url,
+		Method:  gohttpx.POST,
+		Headers: map[string]string{"User-Agent": "github.com/gif-gif/go.io"},
+		Body:    fileMergeReq,
+	}
+
+	res := &gohttpx.Response{}
+	err := gohttpx.HttpPost[gohttpx.Response](req, res)
+	if err != nil {
+		return nil, errors.New(err.ErrorInfo())
+	}
+	return res, nil
+}
+
+// //////////////////////////////////////////////////////////////local save and merge
+// 把分片存在指定目录
+func SaveToLocal(savePath string, chunk *FileChunk) error {
+	chunkFile := filepath.Join(savePath, chunk.FileName)
+	err := WriteToFile(chunkFile, chunk.Data)
+	if err != nil {
+		return err
+	}
+	return nil
 }

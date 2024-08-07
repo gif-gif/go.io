@@ -33,14 +33,19 @@ const (
 )
 
 type Request struct {
-	Url           string
-	Urls          []string // 如果有值，当url 请求失败时继续用这里的接口尝试，直到成功返回或者全部失败
-	Method        string
-	Body          interface{}       //post body 参数
-	QueryParams   map[string]string //get 参数
-	FormData      map[string]string //formdata 参数
-	Headers       map[string]string
-	Files         map[string]string //上传文件列表
+	Url         string
+	Urls        []string // 如果有值，当url 请求失败时继续用这里的接口尝试，直到成功返回或者全部失败
+	Method      string
+	Body        interface{}       //post body 参数
+	QueryParams map[string]string //get 参数
+	FormData    map[string]string //formdata 参数
+	Headers     map[string]string
+
+	Files             map[string]string //上传文件列表
+	FileName          string            //文件名称
+	MultipartFormData map[string]string
+	FileBytes         []byte
+
 	Timeout       time.Duration
 	RetryCount    int
 	RetryWaitTime time.Duration

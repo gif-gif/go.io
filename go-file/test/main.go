@@ -35,13 +35,17 @@ func cutFile() {
 		req.FileChunkCallback = func(chunk *gofile.FileChunk) {
 			golog.WithTag("chunkCount").Info(gconv.String(chunk.Index) + ":" + gconv.String(len(chunk.Data)) + ":" + gconv.String(chunk.Hash))
 			//存储文件或者上传文件
-			chunkFile := filepath.Join(uploadPath, chunk.ChunkFileName)
-			err := gofile.WriteToFile(chunkFile, chunk.Data)
+			rst, err := gofile.UploadChunk("http://localhost:20085/bot/api/file-uploader", chunk)
 			if err != nil {
 				req.Stop()
 				return
 			}
 
+			if rst.Code != 0 {
+				req.Stop()
+				golog.WithTag("gofile").Error(rst.Code)
+				return
+			}
 			if !req.IsFinish() { //还有没处理完的继续处理
 				req.NextChunk()
 			}
@@ -52,14 +56,41 @@ func cutFile() {
 		if err != nil {
 			golog.Fatal(err)
 		}
+
 		req.WaitForFinish()
 
+		rst, err := gofile.MergeChunk("http://localhost:20085/bot/api/file-merge-uploader", &gofile.FileMergeReq{
+			FileMd5:     fileMd5,
+			TotalChunks: req.ChunkCount,
+			FileName:    fileName,
+		})
+
+		if err != nil {
+			golog.WithTag("gofile").Error(err.Error())
+			return
+		}
+
+		if rst.Code != 0 {
+			golog.WithTag("gofile").Error(rst.Code)
+			return
+		}
+
 		// 调用合并接口
-		err = gofile.MergeFile(uploadPath, fileName, fileMd5, req.ChunkCount)
+		//_, err = gofile.MergeFileForChunks(uploadPath, fileName, fileMd5, req.ChunkCount)
 		if err != nil {
 			golog.WithTag("gofile").Error(err)
 		}
 	})
 
 	golog.WithTag("cutFile").Info("执行时间:" + gconv.String(ts))
+}
+
+func saveToLocal(chunk *gofile.FileChunk, req *gofile.BigFile) bool {
+	chunkFile := filepath.Join(uploadPath, chunk.FileName)
+	err := gofile.WriteToFile(chunkFile, chunk.Data)
+	if err != nil {
+		req.Stop()
+		return true
+	}
+	return false
 }

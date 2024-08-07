@@ -1,6 +1,7 @@
 package gohttpx
 
 import (
+	"bytes"
 	"errors"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-resty/resty/v2"
@@ -66,13 +67,27 @@ func doHttpRequest[T any](req *Request, t *T) *HttpError {
 	request := restyClient.R()
 	if req.Method == POST {
 		request.
-			SetBody(req.Body).
-			SetQueryParams(req.QueryParams).
 			SetResult(t).
 			SetHeaders(req.Headers)
 
+		if req.QueryParams != nil {
+			request.SetQueryParams(req.QueryParams)
+		}
+
+		if req.Body != nil {
+			request.SetBody(req.Body)
+		}
+
 		if len(req.FormData) > 0 {
 			request.SetFormData(req.FormData)
+		}
+
+		if len(req.MultipartFormData) > 0 {
+			request.SetMultipartFormData(req.MultipartFormData)
+		}
+
+		if len(req.FileBytes) > 0 {
+			request.SetFileReader("file", req.FileName, bytes.NewReader(req.FileBytes))
 		}
 
 		if len(req.Files) > 0 {
