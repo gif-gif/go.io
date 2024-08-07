@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	golock "github.com/gif-gif/go.io/go-lock"
-	golog "github.com/gif-gif/go.io/go-log"
 	gomq "github.com/gif-gif/go.io/go-mq"
 	gopool "github.com/gif-gif/go.io/go-pool"
 	goutils "github.com/gif-gif/go.io/go-utils"
@@ -104,9 +103,8 @@ func (b *BigFile) Start() error {
 	return nil
 }
 
-func (b *BigFile) DoneOneChunk() {
+func (b *BigFile) CheckAllDone() {
 	if b.IsFinish() {
-		golog.WithTag("DoneOneChunk").Info("Chunk count is already finished")
 		return
 	}
 
@@ -118,7 +116,6 @@ func (b *BigFile) DoneOneChunk() {
 		if b.isFinish == true {
 			return
 		}
-		golog.WithTag("DoneOneChunk").Info("cancel")
 		b.cancel() //全部处理完成
 		b.lock.WLockFunc(func(parameters ...any) {
 			b.isFinish = true
@@ -128,7 +125,6 @@ func (b *BigFile) DoneOneChunk() {
 
 func (b *BigFile) NextChunk() {
 	if b.IsFinish() { //全部处理完成
-		golog.WithTag("NextChunk").Info("Chunk count is already finished")
 		return
 	}
 

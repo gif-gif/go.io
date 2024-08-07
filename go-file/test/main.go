@@ -49,7 +49,7 @@ func cutFile() {
 			if !req.IsFinish() { //还有没处理完的继续处理
 				req.NextChunk()
 			}
-			req.DoneOneChunk()
+			req.CheckAllDone()
 		}
 
 		err = req.Start()
