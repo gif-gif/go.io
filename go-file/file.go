@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gif-gif/go.io/go-utils"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"os"
 	"path"
@@ -131,12 +130,12 @@ func GetFileHeaderMd5Name(fileHeader *multipart.FileHeader) (string, error) {
 		return "", err
 	}
 
-	body, err := ioutil.ReadAll(file)
+	body, err := io.ReadAll(file)
 	if err != nil {
 		return "", err
 	}
 
-	name := goutils.MD5(body)
+	name := goutils.Md5(body)
 
 	return name, nil //+ filepath.Ext(fileHeader.Filename)
 }
@@ -157,7 +156,7 @@ func CopyFile(src, dst string) error {
 // 获取当前目录下所有文件
 func GetFileList(path string) []string {
 	var fileList []string
-	files, _ := ioutil.ReadDir(path)
+	files, _ := os.ReadDir(path)
 	for _, f := range files {
 		if !f.IsDir() {
 			fileList = append(fileList, f.Name())

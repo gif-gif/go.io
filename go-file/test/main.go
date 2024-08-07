@@ -1,31 +1,44 @@
 package main
 
 import (
+	"fmt"
 	gocontext "github.com/gif-gif/go.io/go-context"
 	gofile "github.com/gif-gif/go.io/go-file"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gogf/gf/util/gconv"
-	"time"
+	"path/filepath"
 )
 
+var uploadPath = "/Users/Jerry/Downloads/chrome/fileparts"
+var fileName = "test.apk"
+
 func main() {
-	test()
+	cutFile()
+	gofile.MergeFile(uploadPath, fileName, 9)
 	<-gocontext.Cancel().Done()
 }
 
-func test() {
+func cutFile() {
 	ts := goutils.MeasureExecutionTime(func() {
-		req := &gofile.BigFileRequest{
+		req := &gofile.BigFile{
 			File:       "/Users/Jerry/Downloads/chrome/dy12.9.0.apk",
-			MaxWorkers: 10,
-			ChunkSize:  10,
+			MaxWorkers: 1,
+			ChunkSize:  1,
 		}
 
 		req.FileChunkCallback = func(chunk *gofile.FileChunk) {
 			golog.WithTag("chunkCount").Info(gconv.String(chunk.Index) + ":" + gconv.String(chunk.ByteLength) + ":" + gconv.String(chunk.Hash))
-			time.Sleep(1 * time.Second) //模拟分片处理耗时
-			if !req.IsFinish() {        //还有没处理完的继续处理
+
+			//存储文件或者上传文件
+			chunkFile := filepath.Join(uploadPath, fmt.Sprintf("%s.part%d", fileName, chunk.Index))
+			err := gofile.WriteToFile(chunkFile, chunk.Data)
+			if err != nil {
+				req.Stop()
+				return
+			}
+
+			if !req.IsFinish() { //还有没处理完的继续处理
 				req.NextChunk()
 			}
 			req.DoneOneChunk()
@@ -36,8 +49,9 @@ func test() {
 			golog.Fatal(err)
 		}
 		req.WaitForFinish()
-		req.Release()
+
+		// 调用合并接口
 	})
 
-	golog.WithTag("file").Info("执行时间:" + gconv.String(ts))
+	golog.WithTag("cutFile").Info("执行时间:" + gconv.String(ts))
 }

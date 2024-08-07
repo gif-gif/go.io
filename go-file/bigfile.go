@@ -3,7 +3,6 @@ package gofile
 import (
 	"context"
 	"errors"
-	goevent "github.com/gif-gif/go.io/go-event"
 	golock "github.com/gif-gif/go.io/go-lock"
 	golog "github.com/gif-gif/go.io/go-log"
 	gomq "github.com/gif-gif/go.io/go-mq"
@@ -14,6 +13,8 @@ import (
 	"os"
 )
 
+// fmt.Sprintf("%s.part%d", fileName, i)
+// mapreduce big file
 // 大文件逻辑 for 把大文件并发分片处理，为了防止OOM超大文件边分片边处理的策略
 type FileChunk struct {
 	Data       []byte //分片数据
@@ -22,7 +23,7 @@ type FileChunk struct {
 	ByteLength int64  //分片大小 len(Data)
 }
 
-type BigFileRequest struct {
+type BigFile struct {
 	ChunkSize         int64            // 分片大小 M
 	MaxWorkers        int              // 同时处理最大分块数量，合理用防止超大文件内存益处
 	File              string           // 文件路径
@@ -41,25 +42,26 @@ type BigFileRequest struct {
 	cancel context.CancelFunc
 }
 
-type BigFileResponse struct {
-	Event *goevent.GoEvent
-}
-
-func (b *BigFileRequest) Release() {
+func (b *BigFile) Release() {
 	b.pool.StopAndWait()
 }
 
-func (b *BigFileRequest) WaitForFinish() {
+func (b *BigFile) WaitForFinish() {
 	<-b.__ctx.Done()
+	b.Release()
 }
 
-func (b *BigFileRequest) IsFinish() bool {
+func (b *BigFile) IsFinish() bool {
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 	return b.HandledChunkCount == b.ChunkCount
 }
 
-func (b *BigFileRequest) Start() error {
+func (b *BigFile) Stop() {
+	b.cancel()
+}
+
+func (b *BigFile) Start() error {
 	if b.FileChunkCallback == nil {
 		return errors.New("FileChunkCallback is nil")
 	}
@@ -110,7 +112,7 @@ func (b *BigFileRequest) Start() error {
 	return nil
 }
 
-func (b *BigFileRequest) DoneOneChunk() {
+func (b *BigFile) DoneOneChunk() {
 	if b.IsFinish() {
 		golog.WithTag("DoneOneChunk").Info("Chunk count is already finished")
 		return
@@ -132,7 +134,7 @@ func (b *BigFileRequest) DoneOneChunk() {
 	}
 }
 
-func (b *BigFileRequest) NextChunk() {
+func (b *BigFile) NextChunk() {
 	if b.IsFinish() { //全部处理完成
 		golog.WithTag("NextChunk").Info("Chunk count is already finished")
 		return

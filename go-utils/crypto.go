@@ -15,11 +15,48 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
 	"math/big"
 	"net/url"
+	"os"
 	"strings"
 )
+
+// 计算文件md5
+func CalculateFileMD5(filePath string) (string, error) {
+	// 打开文件
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	// 创建MD5哈希对象
+	hash := md5.New()
+
+	// 创建一个缓冲区，逐块读取文件内容
+	buffer := make([]byte, 1024*1024) // 1MB 缓冲区
+	for {
+		n, err := file.Read(buffer)
+		if err != nil && err != io.EOF {
+			return "", err
+		}
+		if n == 0 {
+			break
+		}
+		// 更新哈希值
+		if _, err := hash.Write(buffer[:n]); err != nil {
+			return "", err
+		}
+	}
+
+	// 计算最终的哈希值
+	hashInBytes := hash.Sum(nil)
+	hashInString := fmt.Sprintf("%x", hashInBytes)
+
+	return hashInString, nil
+}
 
 // MD5 大写
 func MD5(buf []byte) string {
