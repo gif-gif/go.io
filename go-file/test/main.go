@@ -6,7 +6,6 @@ import (
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gogf/gf/util/gconv"
-	"path/filepath"
 )
 
 var uploadPath = "/Users/Jerry/Downloads/chrome/fileparts"
@@ -83,14 +82,4 @@ func cutFile() {
 	})
 
 	golog.WithTag("cutFile").Info("执行时间:" + gconv.String(ts))
-}
-
-func saveToLocal(chunk *gofile.FileChunk, req *gofile.BigFile) bool {
-	chunkFile := filepath.Join(uploadPath, chunk.FileName)
-	err := gofile.WriteToFile(chunkFile, chunk.Data)
-	if err != nil {
-		req.Stop()
-		return true
-	}
-	return false
 }
