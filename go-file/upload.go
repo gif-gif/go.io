@@ -22,6 +22,7 @@ const (
 type FileUploadResult struct {
 	OriginalFile string
 	FileName     string
+	ChunkCount   int64
 }
 
 // 服务器接受file文件到assetsDir目录下，assetsDir 目录不存在则自动创建,返回存储位置
@@ -92,13 +93,13 @@ func ReceiveChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fi
 	return res, nil
 }
 
-// 服务器合并所有文件分片，并验证md5
-func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int64) error {
+// 服务器合并所有文件分片，并验证md5, isNotRemoveChunk =true 合并后时不会删除分片
+func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int64, isNotRemoveChunk bool) (*FileUploadResult, error) {
 	fileName = fileMd5 + filepath.Ext(fileName)
 	finalFilePath := filepath.Join(filePath, fileName)
 	finalFile, err := os.Create(finalFilePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer finalFile.Close()
 
@@ -107,33 +108,39 @@ func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int
 		chunkFilePath := filepath.Join(filePath, fmt.Sprintf("%s.part%d", fileMd5+filepath.Ext(fileName), i))
 		chunkFile, err := os.Open(chunkFilePath)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		defer chunkFile.Close()
 
 		_, err = io.Copy(finalFile, chunkFile)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		// 删除分片文件
 		err = os.Remove(chunkFilePath)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	finalFileMd5, err := goutils.CalculateFileMD5(finalFilePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if fileMd5 != finalFileMd5 { //最终文件md5验证
-		return fmt.Errorf("fileMd5 mismatch")
+		return nil, fmt.Errorf("fileMd5 mismatch")
+	}
+
+	res := &FileUploadResult{
+		ChunkCount:   totalChunks,
+		OriginalFile: finalFilePath,
+		FileName:     fileName,
 	}
 
 	//golog.WithTag("mergeFile").Info("执行时间:" + gconv.String(ts))
-	return nil
+	return res, nil
 }
 
 // 上传一个文件分片
