@@ -48,7 +48,7 @@ func UploadFile(assetsDir string, file *multipart.FileHeader) (*FileUploadResult
 }
 
 // 上传文件分片
-func UploadChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, file *multipart.FileHeader) (*FileUploadResult, error) {
+func UploadChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fileMd5 string, file *multipart.FileHeader) (*FileUploadResult, error) {
 	if ok, _ := Exist(assetsDir); !ok {
 		err := CreateSavePath(assetsDir, os.ModePerm)
 		if err != nil {
@@ -56,16 +56,16 @@ func UploadChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fil
 		}
 	}
 
-	fileMd5, err := GetFileHeaderMd5Name(file)
+	chunkFileMd5, err := GetFileHeaderMd5Name(file)
 	if err != nil {
 		return nil, err
 	}
 
-	if fileMd5 != chunkMd5 { //分片md5 验证
-		return nil, fmt.Errorf("fileMd5 mismatch")
+	if chunkFileMd5 != chunkMd5 { //分片md5 验证
+		return nil, fmt.Errorf("chunkFileMd5 mismatch")
 	}
 
-	fullName := fileMd5 + filepath.Ext(file.Filename)
+	fullName := fileMd5 + filepath.Ext(file.Filename) //以原文件md5作为命名
 	fullName = strings.ToLower(fullName)
 	// 创建分片文件
 	chunkFilePath := filepath.Join(assetsDir, fmt.Sprintf("%s.part%d", fullName, chunkIndex))
@@ -80,12 +80,11 @@ func UploadChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fil
 	res := &FileUploadResult{}
 	res.OriginalFile = chunkFilePath
 	res.FileName = fullName
-
 	return res, nil
-
 }
 
-func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int) error {
+func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int64) error {
+	fileName = fileMd5 + filepath.Ext(fileName)
 	finalFilePath := filepath.Join(filePath, fileName)
 	finalFile, err := os.Create(finalFilePath)
 	if err != nil {
@@ -94,8 +93,8 @@ func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int
 	defer finalFile.Close()
 
 	// 合并所有分片
-	for i := 0; i < totalChunks; i++ {
-		chunkFilePath := filepath.Join(filePath, fmt.Sprintf("%s.part%d", fileName, i))
+	for i := 0; i < int(totalChunks); i++ {
+		chunkFilePath := filepath.Join(filePath, fmt.Sprintf("%s.part%d", fileMd5+filepath.Ext(fileName), i))
 		chunkFile, err := os.Open(chunkFilePath)
 		if err != nil {
 			return err

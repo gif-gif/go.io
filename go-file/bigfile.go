@@ -3,6 +3,7 @@ package gofile
 import (
 	"context"
 	"errors"
+	"fmt"
 	golock "github.com/gif-gif/go.io/go-lock"
 	golog "github.com/gif-gif/go.io/go-log"
 	gomq "github.com/gif-gif/go.io/go-mq"
@@ -11,22 +12,25 @@ import (
 	"github.com/gogf/gf/util/gconv"
 	"math"
 	"os"
+	"path/filepath"
 )
 
 // fmt.Sprintf("%s.part%d", fileName, i)
 // mapreduce big file
 // 大文件逻辑 for 把大文件并发分片处理，为了防止OOM超大文件边分片边处理的策略
 type FileChunk struct {
-	Data       []byte //分片数据
-	Hash       string //分片Hash
-	Index      int64  //分片顺序号
-	ByteLength int64  //分片大小 len(Data)
+	Data          []byte //分片数据
+	Hash          string //分片Hash
+	Index         int64  //分片顺序号
+	FileMd5       string //
+	ChunkFileName string //
 }
 
 type BigFile struct {
 	ChunkSize         int64            // 分片大小 M
 	MaxWorkers        int              // 同时处理最大分块数量，合理用防止超大文件内存益处
 	File              string           // 文件路径
+	FileMd5           string           // 文件Md5
 	ChunkCount        int64            // 分片数量
 	HandledChunkCount int64            // 已处理分片数量
 	FileChunkCallback func(*FileChunk) // 分片处理消息
@@ -88,7 +92,6 @@ func (b *BigFile) Start() error {
 	__ctx, __cancel := context.WithCancel(context.TODO())
 	b.__ctx = __ctx
 	b.cancel = __cancel
-
 	cSize := float64(fileInfo.Size()) / float64(b.ChunkSize*1024*1024)
 	chunkCount := gconv.Int(math.Ceil(cSize))
 	b.ChunkCount = int64(chunkCount)
@@ -143,7 +146,7 @@ func (b *BigFile) NextChunk() {
 	goutils.AsyncFunc(func() {
 		item := b.queue.Dequeue()
 		b.pool.Submit(func() {
-			chunk, err := createChunk(b.fileReader, item.(int64), b.ChunkSize, b.ChunkCount)
+			chunk, err := b.createChunk(b.fileReader, item.(int64))
 			if err != nil {
 				return
 			}
@@ -152,24 +155,26 @@ func (b *BigFile) NextChunk() {
 	})
 }
 
-func createChunk(file *os.File, index int64, chunkSize int64, chunkCount int64) (*FileChunk, error) {
-	bufferSize := chunkSize * 1024 * 1024 // 每次读取MB
+func (b *BigFile) createChunk(file *os.File, index int64) (*FileChunk, error) {
+	bufferSize := b.ChunkSize * 1024 * 1024 // 每次读取MB
 	startPos := index * bufferSize
 	buffer := make([]byte, bufferSize)
-	if index == chunkCount-1 { //剩下不足一个整个bufferSize ，具体的大小计算出来
-		fileInfo, _ := file.Stat()
+	fileInfo, _ := file.Stat() //剩下不足一个整个bufferSize ，具体的大小计算出来
+	if index == b.ChunkCount-1 {
 		buffer = make([]byte, fileInfo.Size()-startPos)
 	}
 
-	n, err := file.ReadAt(buffer, startPos) //TODO: 字节读取验证
+	_, err := file.ReadAt(buffer, startPos) //TODO: 字节读取验证
 	if err != nil {
 		return nil, err
 	}
 
+	hash := goutils.Md5(buffer)
 	return &FileChunk{
-		Data:       buffer,
-		Hash:       goutils.Md5(buffer),
-		Index:      index,
-		ByteLength: int64(n),
+		Data:          buffer,
+		Hash:          hash,
+		Index:         index,
+		FileMd5:       b.FileMd5,
+		ChunkFileName: fmt.Sprintf("%s.part%d", b.FileMd5+filepath.Ext(fileInfo.Name()), index),
 	}, nil
 }
