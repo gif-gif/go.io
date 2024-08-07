@@ -38,7 +38,9 @@ type Request struct {
 	Method        string
 	Body          interface{}       //post body 参数
 	QueryParams   map[string]string //get 参数
+	FormData      map[string]string //formdata 参数
 	Headers       map[string]string
+	Files         map[string]string //上传文件列表
 	Timeout       time.Duration
 	RetryCount    int
 	RetryWaitTime time.Duration

@@ -1,8 +1,11 @@
 package gofile
 
 import (
+	"errors"
 	"fmt"
+	gohttpx "github.com/gif-gif/go.io/go-http/go-httpex"
 	goutils "github.com/gif-gif/go.io/go-utils"
+	"github.com/gogf/gf/util/gconv"
 	"io"
 	"mime/multipart"
 	"os"
@@ -10,13 +13,19 @@ import (
 	"strings"
 )
 
+const (
+	UPLOAD_TYPE_LOCAL = 1
+	UPLOAD_TYPE_OSS   = 2
+	UPLOAD_TYPE_CHUNK = 3
+)
+
 type FileUploadResult struct {
 	OriginalFile string
 	FileName     string
 }
 
-// 上传file文件到assetsDir目录下，assetsDir 目录不存在则自动创建,返回存储位置
-func UploadFile(assetsDir string, file *multipart.FileHeader) (*FileUploadResult, error) {
+// 服务器接受file文件到assetsDir目录下，assetsDir 目录不存在则自动创建,返回存储位置
+func ReceiveFile(assetsDir string, file *multipart.FileHeader) (*FileUploadResult, error) {
 	if ok, _ := Exist(assetsDir); !ok {
 		err := CreateSavePath(assetsDir, os.ModePerm)
 		if err != nil {
@@ -47,8 +56,8 @@ func UploadFile(assetsDir string, file *multipart.FileHeader) (*FileUploadResult
 	return res, nil
 }
 
-// 上传文件分片
-func UploadChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fileMd5 string, file *multipart.FileHeader) (*FileUploadResult, error) {
+// 服务器接受文件分片
+func ReceiveChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fileMd5 string, file *multipart.FileHeader) (*FileUploadResult, error) {
 	if ok, _ := Exist(assetsDir); !ok {
 		err := CreateSavePath(assetsDir, os.ModePerm)
 		if err != nil {
@@ -83,6 +92,7 @@ func UploadChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fil
 	return res, nil
 }
 
+// 服务器合并所有文件分片，并验证md5
 func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int64) error {
 	fileName = fileMd5 + filepath.Ext(fileName)
 	finalFilePath := filepath.Join(filePath, fileName)
@@ -124,4 +134,26 @@ func MergeFile(filePath string, fileName string, fileMd5 string, totalChunks int
 
 	//golog.WithTag("mergeFile").Info("执行时间:" + gconv.String(ts))
 	return nil
+}
+
+// 上传一个文件分片
+func UploadChunk(url string, fileName string, fileMd5 string, chunkIndex int, chunkData []byte) (*gohttpx.Response, error) {
+	req := &gohttpx.Request{
+		Url:    url,
+		Method: gohttpx.POST,
+		Body:   chunkData,
+		FormData: map[string]string{
+			"type":       gconv.String(UPLOAD_TYPE_CHUNK),
+			"fileName":   fileName,
+			"fileMd5":    fileMd5,
+			"chunkIndex": gconv.String(chunkIndex),
+		},
+	}
+
+	res := &gohttpx.Response{}
+	err := gohttpx.HttpPost[gohttpx.Response](req, res)
+	if err != nil {
+		return nil, errors.New(err.ErrorInfo())
+	}
+	return res, nil
 }

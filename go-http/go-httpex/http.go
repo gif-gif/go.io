@@ -6,6 +6,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func SetBaseUrl(base string) {
@@ -38,6 +39,10 @@ func doHttpRequest[T any](req *Request, t *T) *HttpError {
 		}
 	}
 
+	if req.Timeout <= 0 {
+		req.Timeout = time.Second * 10
+	}
+
 	var (
 		restyClient = resty.New().
 			SetTimeout(req.Timeout).
@@ -60,12 +65,20 @@ func doHttpRequest[T any](req *Request, t *T) *HttpError {
 	var err error
 	request := restyClient.R()
 	if req.Method == POST {
-		resp, err = request.
+		request.
 			SetBody(req.Body).
 			SetQueryParams(req.QueryParams).
 			SetResult(t).
-			SetHeaders(req.Headers).
-			Post(req.Url)
+			SetHeaders(req.Headers)
+
+		if len(req.FormData) > 0 {
+			request.SetFormData(req.FormData)
+		}
+
+		if len(req.Files) > 0 {
+			request.SetFiles(req.Files)
+		}
+		resp, err = request.Post(req.Url)
 	} else if req.Method == GET {
 		resp, err = request.
 			SetResult(t).
@@ -174,7 +187,7 @@ func HttpRequest[T any](req *Request, t *T) *HttpError {
 				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
 			}
 		}
-		return errs
+		return errs // 所有连接重试失败
 	}
 }
 
