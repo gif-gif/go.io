@@ -17,31 +17,6 @@ type Uploader struct {
 	options []oss.Option
 }
 
-func New(conf Config) (*Uploader, error) {
-	o := &Uploader{
-		conf:    conf,
-		options: []oss.Option{},
-	}
-
-	client, err := o.getClient()
-	if err != nil {
-		golog.Error(err.Error())
-		return nil, err
-	}
-
-	o.client = client
-
-	bucket, err := o.getBucket()
-	if err != nil {
-		golog.Error(err.Error())
-		return nil, err
-	}
-
-	o.bucket = bucket
-
-	return o, nil
-}
-
 func (o *Uploader) ContentType(value string) *Uploader {
 	o.options = append(o.options, oss.ContentType(value))
 	return o

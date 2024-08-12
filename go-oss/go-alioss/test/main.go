@@ -49,7 +49,10 @@ func main() {
 		conf.Bucket = ""
 	}
 
-	up := goalioss.Init(conf)
+	err := goalioss.Init(conf)
+	if err != nil {
+		return
+	}
 
 	for n, i := range args {
 		if n == 0 {
@@ -74,7 +77,7 @@ func main() {
 		md5 := goutils.MD5(b)
 		filename = fmt.Sprintf("%s/%s/%s", md5[0:2], md5[2:4], filename)
 
-		url, err := up.Upload(strings.ToLower(filename), b)
+		url, err := goalioss.Default().Upload(strings.ToLower(filename), b)
 		if err != nil {
 			fmt.Println(err.Error())
 			continue

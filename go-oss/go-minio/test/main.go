@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	gominio2 "github.com/gif-gif/go.io/go-oss/go-minio"
+	gominio "github.com/gif-gif/go.io/go-oss/go-minio"
 	"github.com/minio/minio-go/v7"
 	"net/url"
 	"os"
@@ -21,7 +21,7 @@ var (
 )
 
 func createBucketTest() {
-	conf := gominio2.Config{
+	conf := gominio.Config{
 		AccessKeyId:     *AccessKeyId,
 		AccessKeySecret: *AccessKeySecret,
 		Endpoint:        *Endpoint,
@@ -30,7 +30,7 @@ func createBucketTest() {
 		UseSSL:          false,
 	}
 
-	oss := gominio2.New(conf)
+	oss, _ := gominio.Create(conf)
 	bucketName := "testbucket"
 	location := "us-east-1"
 
@@ -50,7 +50,7 @@ func uploadTest() {
 		return
 	}
 
-	conf := gominio2.Config{
+	conf := gominio.Config{
 		AccessKeyId:     *AccessKeyId,
 		AccessKeySecret: *AccessKeySecret,
 		Endpoint:        *Endpoint,
@@ -59,7 +59,7 @@ func uploadTest() {
 		UseSSL:          false,
 	}
 
-	oss := gominio2.New(conf)
+	oss, _ := gominio.Create(conf)
 
 	for n, i := range args {
 		if n == 0 {
@@ -87,7 +87,7 @@ func uploadTest() {
 
 func getTest() {
 
-	conf := gominio2.Config{
+	conf := gominio.Config{
 		AccessKeyId:     *AccessKeyId,
 		AccessKeySecret: *AccessKeySecret,
 		Endpoint:        *Endpoint,
@@ -96,16 +96,21 @@ func getTest() {
 		UseSSL:          false,
 	}
 
-	oss := gominio2.New(conf)
-
-	err := oss.FGetObject(context.Background(), "/test/2024/05/422744271b108960a4818cc91a1822d9.log", "/Users/Jerry/Desktop/bak202405/422744271b108960a4818cc91a1822d9.log", nil)
+	err := gominio.Init(conf)
 	if err != nil {
 		fmt.Println(err.Error())
+		return
+	}
+
+	err = gominio.Default().Client().FGetObject(context.Background(), "/test/2024/05/422744271b108960a4818cc91a1822d9.log", "/Users/Jerry/Desktop/bak202405/422744271b108960a4818cc91a1822d9.log", nil)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
 	} else {
 		fmt.Println("get object succeeded")
 	}
 
-	for object := range oss.ListObjects("test", nil) {
+	for object := range gominio.Default().Client().ListObjects("test", nil) {
 		if object.Err != nil {
 			fmt.Println(object.Err)
 			return
@@ -118,7 +123,7 @@ func getTest() {
 	reqParams.Set("response-content-disposition", "attachment; filename=\"your-filename.txt\"")
 
 	// Generates a presigned url which expires in a day.
-	presignedURL, err := oss.PresignedGetObject("test", "test.apk", time.Second*24*60*60, reqParams)
+	presignedURL, err := gominio.Default().Client().PresignedGetObject("test", "test.apk", time.Second*24*60*60, reqParams)
 	if err != nil {
 		fmt.Println(err)
 		return
