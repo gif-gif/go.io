@@ -9,4 +9,5 @@ type Config struct {
 	Dir             string `json:"dir,optional" yaml:"Dir,optional"`
 	Domain          string `json:"domain,optional" yaml:"Domain,optional,optional"`
 	UseSSL          bool   `json:"useSSL,optional" yaml:"UseSSL,optional"`
+	Open            bool   `json:"open,optional" yaml:"Open,optional"`
 }
