@@ -159,6 +159,26 @@ func main() {
 }
 
 ```
+### 验证码(支持分布式验证,基于redis)
+```
+config := goredis.Config{
+    Name:     "gocaptcha-goredis",
+    Addr:     "127.0.0.1:6379",
+    Password: "",
+    DB:       0,
+    Prefix:   "gocaptcha",
+    AutoPing: true,
+}
+
+a, err := gocaptcha.NewRedis(config)
+if err != nil {
+    golog.Error(err.Error())
+    return
+}
+goutils.InitCaptcha(a) //不初始化默认 memorycache
+goutils.CaptchaGet(200,40)
+```
+
 ### gojob 模块
 
 ```go
