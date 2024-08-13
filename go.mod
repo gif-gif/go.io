@@ -1,6 +1,6 @@
 module github.com/gif-gif/go.io
 
-go 1.22
+go 1.22.4
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
@@ -33,7 +33,6 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.13
 	go.mongodb.org/mongo-driver v1.16.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/mod v0.18.0
 	golang.org/x/text v0.16.0
 	google.golang.org/grpc v1.63.2
 	gopkg.in/telebot.v3 v3.3.6
