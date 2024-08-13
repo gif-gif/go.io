@@ -58,8 +58,8 @@ func (ev *GoEvent) Subscribe(topic string, fn SubscribeFunc) {
 	goutils.AsyncFunc(func() {
 		for {
 			select {
-			case msg := <-ch:
-				if msg.Topic == "" { //closed channel
+			case msg, ok := <-ch:
+				if !ok {
 					return
 				}
 				goutils.AsyncFunc(func() {
@@ -67,6 +67,11 @@ func (ev *GoEvent) Subscribe(topic string, fn SubscribeFunc) {
 				})
 			}
 		}
+		//for msg := range ch {
+		//	goutils.AsyncFunc(func() {
+		//		fn(msg)
+		//	})
+		//}
 	})
 }
 

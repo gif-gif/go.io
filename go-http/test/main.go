@@ -1,16 +1,21 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	gocontext "github.com/gif-gif/go.io/go-context"
 	gohttpx "github.com/gif-gif/go.io/go-http/go-httpex"
 	golog "github.com/gif-gif/go.io/go-log"
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gif-gif/go.io/goio"
 	"time"
 )
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-	testRequest()
+	testChan()
+
+	<-gocontext.Cancel().Done()
 }
 
 func testRequest() {
@@ -35,10 +40,9 @@ func testRequest() {
 	}
 
 	res := &gohttpx.Response{}
-	err := gohttpx.HttpPostJson[gohttpx.Response](&req, res)
+	err := gohttpx.HttpPostJson[gohttpx.Response](context.Background(), &req, res)
 	if err != nil {
-		//golog.ErrorF("Error: \n", err.ErrorInfo())
-		fmt.Println(err.ErrorInfo())
+		golog.WithTag("http").Error(err.ErrorInfo())
 	} else {
 		fmt.Println(res)
 	}
@@ -48,10 +52,7 @@ func testRequest() {
 
 func testRaceSpeed() {
 	req := gohttpx.Request{
-		IsConcurrency: true,
-		IsAll:         true,
-		Method:        gohttpx.POST,
-		Url:           "http://localhost:100",
+		Method: gohttpx.POST,
 		Urls: []string{
 			"http://localhost:20122/api/jump/account/check",
 			"https://jumpjump.io/api/jump/account/check",
@@ -70,7 +71,7 @@ func testRaceSpeed() {
 	}
 
 	res := &gohttpx.Response{}
-	err := gohttpx.HttpPostJson[gohttpx.Response](&req, res)
+	err := gohttpx.HttpConcurrencyRequest[gohttpx.Response](&req, res)
 	if err != nil {
 		golog.ErrorF("Error: \n", err.ErrorInfo())
 	} else {
@@ -78,4 +79,27 @@ func testRaceSpeed() {
 	}
 
 	time.Sleep(10 * time.Second)
+}
+
+func testChan() {
+	c := make(chan int)
+
+	goutils.AsyncFunc(func() {
+		for {
+			select {
+			case _, ok := <-c:
+				if !ok {
+					fmt.Println("test")
+				}
+			}
+		}
+
+		for v := range c {
+			fmt.Println("value:", v)
+		}
+	})
+
+	close(c)
+
+	fmt.Println("done")
 }

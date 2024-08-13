@@ -46,7 +46,7 @@ func testDynamicSize() {
 }
 
 func testFixedSize() {
-	gp := gopool.NewFixedSizePool(100, 10)
+	gp := gopool.NewFixedSizePool(100, 100)
 	defer gp.StopAndWait()
 
 	cron, _ := gojob.New()
@@ -93,7 +93,7 @@ func testContext() {
 }
 
 func testTaskGroup() {
-	gp := gopool.NewDynamicSizePool(100, 1000)
+	gp := gopool.NewDynamicSizePool(100, 100)
 	defer gp.StopAndWait()
 
 	cron, _ := gojob.New()
