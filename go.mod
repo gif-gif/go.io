@@ -1,6 +1,6 @@
 module github.com/gif-gif/go.io
 
-go 1.22.4
+go 1.22
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
