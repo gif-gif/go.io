@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	golock "github.com/gif-gif/go.io/go-lock"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-resty/resty/v2"
 	"net/http"
@@ -224,6 +225,7 @@ func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	isSuccess := false
+	lock := golock.GoLock{}
 	fns := []func(){}
 	for _, url := range req.Urls {
 		reqNew := *req
@@ -236,7 +238,9 @@ func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
 			if err != nil {
 				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
 			} else {
-				isSuccess = true
+				lock.WLockFunc(func(parameters ...any) {
+					isSuccess = true
+				})
 				cancel() //有一个成功的取消所有请求
 				//请求成功了应该直接返回，剩下的请求结果忽略
 			}
