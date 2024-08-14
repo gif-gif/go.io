@@ -2,9 +2,9 @@ package gofile
 
 import (
 	"fmt"
+	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/go-utils"
 	"io"
-	"log"
 	"mime/multipart"
 	"os"
 	"path"
@@ -144,7 +144,8 @@ func GetFileHeaderMd5Name(fileHeader *multipart.FileHeader) (string, error) {
 func GetFileContent(filePath string) ([]byte, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Fatal(err)
+		golog.WithTag("file").Error(err)
+		return nil, err
 	}
 
 	defer file.Close()
@@ -154,7 +155,16 @@ func GetFileContent(filePath string) ([]byte, error) {
 		return nil, err
 	}
 
-	return body, nil //+ filepath.Ext(fileHeader.Filename)
+	return body, nil
+}
+
+func GetFileContentString(filePath string) (string, error) {
+	body, err := GetFileContent(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
 }
 
 // 复制文件
