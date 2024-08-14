@@ -24,7 +24,7 @@ type PayPlanItemConfig struct {
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-	testFileMd5()
+	testRaceSpeed()
 	<-gocontext.Cancel().Done()
 }
 
@@ -75,4 +75,22 @@ func testFileMd5() {
 	golog.WithTag("md5").Info(md5)
 
 	//cea3b6aa0c114de15ba2741e679e91d3
+}
+
+func testRaceSpeed() {
+	var fns []func()
+	fns = append(fns, func() {
+		time.Sleep(5 * time.Second)
+		fmt.Println("Hello 5")
+	})
+
+	fns = append(fns, func() {
+		time.Sleep(10 * time.Second)
+		fmt.Println("Hello 1")
+	})
+
+	fns = append(fns, func() {
+		time.Sleep(3 * time.Second)
+		fmt.Println("Hello 3")
+	})
 }
