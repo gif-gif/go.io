@@ -53,6 +53,10 @@ func doHttpRequest[T any](context context.Context, req *Request, t *T) *HttpErro
 			SetRetryWaitTime(req.RetryWaitTime)
 	)
 
+	if req.proxyURL != "" {
+		restyClient.SetProxy(req.proxyURL)
+	}
+
 	for k, v := range GetGlobalHeaders() {
 		req.Headers[k] = v
 	}
@@ -68,6 +72,7 @@ func doHttpRequest[T any](context context.Context, req *Request, t *T) *HttpErro
 	var err error
 	request := restyClient.R()
 	request.SetContext(context)
+
 	if req.Method == POST {
 		request.
 			SetResult(t).
