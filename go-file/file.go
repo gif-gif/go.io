@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gif-gif/go.io/go-utils"
 	"io"
+	"log"
 	"mime/multipart"
 	"os"
 	"path"
@@ -138,6 +139,22 @@ func GetFileHeaderMd5Name(fileHeader *multipart.FileHeader) (string, error) {
 	name := goutils.Md5(body)
 
 	return name, nil //+ filepath.Ext(fileHeader.Filename)
+}
+
+func GetFileContent(filePath string) ([]byte, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer file.Close()
+
+	body, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil //+ filepath.Ext(fileHeader.Filename)
 }
 
 // 复制文件

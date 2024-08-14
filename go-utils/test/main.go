@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	gocontext "github.com/gif-gif/go.io/go-context"
+	gofile "github.com/gif-gif/go.io/go-file"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gif-gif/go.io/goio"
@@ -22,6 +24,11 @@ type PayPlanItemConfig struct {
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
+	testFileMd5()
+	<-gocontext.Cancel().Done()
+}
+
+func testGetFieldValue() {
 	config := PayPlanItemConfig{
 		Id:     "123",
 		Title:  "Sample Plan",
@@ -41,11 +48,31 @@ func main() {
 	}
 
 	fmt.Printf("The value of field '%s' is: %v\n", fieldName, value)
-	time.Sleep(30 * time.Second)
 }
 
 func testSign() {
 	ts := time.Now().Unix()
 	sign := goutils.Md5([]byte(gconv.String(ts) + "123456"))
 	golog.WithTag("sign").Info(ts, sign)
+}
+
+func testFileMd5() {
+	filePath := "/Users/Jerry/Downloads/chrome/dy16.5.0.apk"
+	md5, err := goutils.CalculateFileMD5("/Users/Jerry/Downloads/chrome/dy16.5.0.apk")
+	if err != nil {
+		golog.WithTag("md5").Error(err)
+	} else {
+		golog.WithTag("md5").Info(md5)
+	}
+
+	body, err := gofile.GetFileContent(filePath)
+	if err != nil {
+		golog.WithTag("md5").Error(err)
+		return
+	}
+
+	md5 = goutils.Md5(body)
+	golog.WithTag("md5").Info(md5)
+
+	//cea3b6aa0c114de15ba2741e679e91d3
 }
