@@ -102,7 +102,7 @@ func getTest() {
 		return
 	}
 
-	err = gominio.Default().Client().FGetObject(context.Background(), "/test/2024/05/422744271b108960a4818cc91a1822d9.log", "/Users/Jerry/Desktop/bak202405/422744271b108960a4818cc91a1822d9.log", nil)
+	err = gominio.Default().FGetObject(context.Background(), "/test/2024/05/422744271b108960a4818cc91a1822d9.log", "/Users/Jerry/Desktop/bak202405/422744271b108960a4818cc91a1822d9.log", nil)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -110,7 +110,7 @@ func getTest() {
 		fmt.Println("get object succeeded")
 	}
 
-	for object := range gominio.Default().Client().ListObjects("test", nil) {
+	for object := range gominio.Default().ListObjects("test", nil) {
 		if object.Err != nil {
 			fmt.Println(object.Err)
 			return
@@ -123,7 +123,7 @@ func getTest() {
 	reqParams.Set("response-content-disposition", "attachment; filename=\"your-filename.txt\"")
 
 	// Generates a presigned url which expires in a day.
-	presignedURL, err := gominio.Default().Client().PresignedGetObject("test", "test.apk", time.Second*24*60*60, reqParams)
+	presignedURL, err := gominio.Default().PresignedGetObject("test", "test.apk", time.Second*24*60*60, reqParams)
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -19,6 +19,7 @@ const (
 )
 
 type Config struct {
+	Name             string `yaml:"Name,optional" json:"name,optional"`
 	Protocol         string `yaml:"Protocol,optional" json:"protocol,optional"`
 	CaFilePath       string `yaml:"CaFilePath,optional" json:"caFilePath,optional"` //tls(ssl wss) 证书位置
 	Server           string `yaml:"Server,optional" json:"server,optional"`
@@ -39,7 +40,7 @@ type GoMqttClient struct {
 	Client mqtt.Client
 }
 
-func New(config Config) (*GoMqttClient, error) {
+func NewClient(config Config) (*GoMqttClient, error) {
 	if config.ConnectTimeout <= 0 {
 		config.ConnectTimeout = 10
 	}

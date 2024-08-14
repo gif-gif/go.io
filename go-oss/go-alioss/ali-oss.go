@@ -5,11 +5,7 @@ import (
 	golog "github.com/gif-gif/go.io/go-log"
 )
 
-var __clients = map[string]*GoAliOss{}
-
-type GoAliOss struct {
-	oss *Uploader
-}
+var __clients = map[string]*Uploader{}
 
 func Init(configs ...Config) (err error) {
 	for _, conf := range configs {
@@ -27,7 +23,7 @@ func Init(configs ...Config) (err error) {
 	return
 }
 
-func create(conf Config) (*GoAliOss, error) {
+func create(conf Config) (*Uploader, error) {
 	o := &Uploader{
 		conf:    conf,
 		options: []oss.Option{},
@@ -48,10 +44,10 @@ func create(conf Config) (*GoAliOss, error) {
 	}
 
 	o.bucket = bucket
-	return &GoAliOss{oss: o}, nil
+	return o, nil
 }
 
-func New(conf Config) (*GoAliOss, error) {
+func New(conf Config) (*Uploader, error) {
 	err := Init(conf)
 	if err != nil {
 		return nil, err
@@ -59,7 +55,7 @@ func New(conf Config) (*GoAliOss, error) {
 	return GetClient(conf.Name), nil
 }
 
-func GetClient(names ...string) *GoAliOss {
+func GetClient(names ...string) *Uploader {
 	name := "default"
 	if l := len(names); l > 0 {
 		name = names[0]
@@ -80,7 +76,7 @@ func GetClient(names ...string) *GoAliOss {
 	return nil
 }
 
-func Default() *GoAliOss {
+func Default() *Uploader {
 	if cli, ok := __clients["default"]; ok {
 		return cli
 	}
@@ -96,22 +92,6 @@ func Default() *GoAliOss {
 	return nil
 }
 
-func (g *GoAliOss) AliClient() *oss.Client {
-	return g.oss.client
-}
-
-func (g *GoAliOss) Client() *Uploader {
-	return g.oss
-}
-
-func (g *GoAliOss) ContentType(value string) *Uploader {
-	return g.oss.ContentType(value)
-}
-
-func (g *GoAliOss) Options(opts ...oss.Option) *Uploader {
-	return g.oss.Options(opts...)
-}
-
-func (g *GoAliOss) Upload(filename string, body []byte) (string, error) {
-	return g.oss.Upload(filename, body)
+func (g *Uploader) AliClient() *oss.Client {
+	return g.client
 }

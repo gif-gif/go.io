@@ -1,38 +1,27 @@
-package gominio
+package gomqtt
 
 import (
 	golog "github.com/gif-gif/go.io/go-log"
-	"github.com/minio/minio-go/v7"
 )
 
-var __clients = map[string]*Uploader{}
+var __clients = map[string]*GoMqttClient{}
 
 func Init(configs ...Config) (err error) {
 	for _, conf := range configs {
 		name := conf.Name
-		if name == "" {
-			name = "default"
+		if name == "" || name == "default" {
+			conf.Name = "default"
 		}
-
-		o, err := Create(conf)
+		__clients[name], err = NewClient(conf)
 		if err != nil {
 			return err
 		}
-		__clients[name] = o
 	}
 
-	return
+	return nil
 }
 
-func New(conf Config) (*Uploader, error) {
-	err := Init(conf)
-	if err != nil {
-		return nil, err
-	}
-	return GetClient(conf.Name), nil
-}
-
-func GetClient(names ...string) *Uploader {
+func GetClient(names ...string) *GoMqttClient {
 	name := "default"
 	if l := len(names); l > 0 {
 		name = names[0]
@@ -48,12 +37,12 @@ func GetClient(names ...string) *Uploader {
 		}
 	}
 
-	golog.WithTag("gominio").Error("no default minio client")
+	golog.WithTag("gokafka").Error("no default kafka client")
 
 	return nil
 }
 
-func Default() *Uploader {
+func Client() *GoMqttClient {
 	if cli, ok := __clients["default"]; ok {
 		return cli
 	}
@@ -64,11 +53,7 @@ func Default() *Uploader {
 		}
 	}
 
-	golog.WithTag("gominio").Error("no default minio client")
+	golog.WithTag("gokafka").Error("no default kafka client")
 
 	return nil
-}
-
-func (g *Uploader) MinioClient() *minio.Client {
-	return g.client
 }

@@ -32,20 +32,20 @@ func main() {
 		OnConnectionLost: &connectLostHandler,
 	}
 
-	gc, err := gomqtt.New(conf)
+	err := gomqtt.Init(conf)
 	if err != nil {
 		golog.Error(err.Error())
 		return
 	}
 
-	err = gc.Subscribe("topic/test", 1, nil)
+	err = gomqtt.GetClient().Subscribe("topic/test", 1, nil)
 	if err != nil {
 		golog.Error(err.Error())
 		return
 	}
 
-	publish(gc)
-	gc.Disconnect(250)
+	publish(gomqtt.GetClient())
+	gomqtt.GetClient().Disconnect(250)
 }
 
 func publish(client *gomqtt.GoMqttClient) {
