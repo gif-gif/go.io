@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	golock "github.com/gif-gif/go.io/go-lock"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-resty/resty/v2"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -101,23 +101,21 @@ func doHttpRequest[T any](context context.Context, req *Request, t *T) *HttpErro
 		if len(req.Files) > 0 {
 			request.SetFiles(req.Files)
 		}
+
 		resp, err = request.Post(req.Url)
 	} else if req.Method == GET {
 		resp, err = request.
-			SetResult(t).
 			SetQueryParams(req.QueryParams).
 			SetHeaders(req.Headers).
 			Get(req.Url)
 	} else if req.Method == PUT {
 		resp, err = request.
-			SetResult(t).
 			SetBody(req.Body).
 			SetQueryParams(req.QueryParams).
 			SetHeaders(req.Headers).
 			Put(req.Url)
 	} else {
 		resp, err = request.
-			SetResult(t).
 			SetBody(req.Body).
 			SetQueryParams(req.QueryParams).
 			SetHeaders(req.Headers).
@@ -227,34 +225,32 @@ func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
 		Error:          errors.New("HttpRetryError error"),
 	}
 
+	var one sync.Once
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	isSuccess := false
-	lock := golock.GoLock{}
 	fns := []func(){}
 	for _, url := range req.Urls {
 		reqNew := *req
 		reqNew.Url = url
 		fns = append(fns, func() {
-			if isSuccess {
+			if goutils.IsContextDone(ctx) {
 				return
 			}
-			err = doHttpRequest[T](ctx, &reqNew, t)
+			var tmp *T
+			err = doHttpRequest[T](ctx, &reqNew, tmp)
 			if err != nil {
 				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
-			} else {
-				lock.WLockFunc(func(parameters ...any) {
-					isSuccess = true
+			} else { //请求成功了应该直接返回，剩下的请求结果忽略
+				one.Do(func() {
+					t = tmp
 				})
 				cancel() //有一个成功的取消所有请求
-				//请求成功了应该直接返回，剩下的请求结果忽略
 			}
 		})
 	}
 
 	goutils.AsyncFuncGroup(fns...)
-
-	if isSuccess {
+	if goutils.IsContextDone(ctx) {
 		return nil
 	}
 

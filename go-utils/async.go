@@ -1,6 +1,7 @@
 package goutils
 
 import (
+	"context"
 	golog "github.com/gif-gif/go.io/go-log"
 	"sync"
 	"time"
@@ -71,4 +72,13 @@ func MeasureExecutionTime(fn func()) time.Duration {
 	start := time.Now()
 	fn()
 	return time.Since(start)
+}
+
+func IsContextDone(ctx context.Context) bool {
+	select {
+	case <-ctx.Done():
+		return true
+	default:
+	}
+	return false
 }
