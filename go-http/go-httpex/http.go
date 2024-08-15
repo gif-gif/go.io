@@ -228,7 +228,7 @@ func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-
+	defer cancel()
 	isSuccess := false
 	lock := golock.GoLock{}
 	fns := []func(){}
@@ -253,7 +253,6 @@ func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
 	}
 
 	goutils.AsyncFuncGroup(fns...)
-	cancel() //防止OOM
 
 	if isSuccess {
 		return nil
