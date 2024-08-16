@@ -13,7 +13,7 @@ import (
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-	testRequest()
+	testRaceSpeed()
 
 	<-gocontext.Cancel().Done()
 }

@@ -7,6 +7,7 @@ import (
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-resty/resty/v2"
 	"net/http"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -154,6 +155,8 @@ func doHttpRequest[T any](context context.Context, req *Request, t *T) *HttpErro
 		}
 	}
 
+	t = respData
+
 	req.ResponseProto = resp.Proto()
 	req.ResponseTime = resp.Time()
 	req.Response = resp
@@ -235,13 +238,22 @@ func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
 			if goutils.IsContextDone(ctx) {
 				return
 			}
-			var tmp *T
-			err = doHttpRequest[T](ctx, &reqNew, tmp)
+
+			var instance T
+			typ := reflect.TypeOf(instance)
+			var tmp T
+			// 检查类型是否为指针类型
+			if typ.Kind() == reflect.Ptr {
+				// 如果是指针类型，创建一个新的实例并返回
+				tmp = reflect.New(typ.Elem()).Interface().(T)
+			}
+
+			err = doHttpRequest[T](ctx, &reqNew, &tmp)
 			if err != nil {
 				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
 			} else { //请求成功了应该直接返回，剩下的请求结果忽略
 				one.Do(func() {
-					t = tmp
+					t = &tmp
 				})
 				cancel() //有一个成功的取消所有请求
 			}
