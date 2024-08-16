@@ -42,7 +42,7 @@ func testRequest() {
 	res := &gohttpx.Response{}
 	err := gohttpx.HttpPostJson[gohttpx.Response](context.Background(), &req, res)
 	if err != nil {
-		golog.WithTag("http").Error(err.ErrorInfo())
+		golog.WithTag("http").Error(err.Error())
 	} else {
 		fmt.Println(res)
 	}
@@ -73,7 +73,7 @@ func testRaceSpeed() {
 	res := &gohttpx.Response{}
 	err := gohttpx.HttpConcurrencyRequest[gohttpx.Response](&req, res)
 	if err != nil {
-		golog.ErrorF("Error: \n", err.ErrorInfo())
+		golog.ErrorF("Error: \n", err.Error())
 	} else {
 		golog.InfoF("res: \n", res)
 	}

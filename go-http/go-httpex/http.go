@@ -6,6 +6,7 @@ import (
 	"errors"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-resty/resty/v2"
+	"github.com/gogf/gf/util/gconv"
 	"net/http"
 	"strings"
 	"sync"
@@ -30,16 +31,13 @@ func GetGlobalHeaders() map[string]string {
 
 // Headers["Accept"] = "application/json" for default
 // 真正的请求逻辑
-func doHttpRequest[T any](context context.Context, req *Request, t *T) *HttpError {
+func doHttpRequest[T any](context context.Context, req *Request, t *T) error {
 	if req.Url == "" || !strings.HasPrefix(req.Url, "http") {
 		req.Url = GetBaseUrl() + req.Url
 	}
 
 	if req.Url == "" || !strings.HasPrefix(req.Url, "http") {
-		return &HttpError{
-			HttpStatusCode: HttpParamsError,
-			Msg:            "url is invalid",
-		}
+		return errors.New("[" + gconv.String(HttpParamsError) + "]" + "url is invalid")
 	}
 
 	if req.Timeout <= 0 {
@@ -122,36 +120,20 @@ func doHttpRequest[T any](context context.Context, req *Request, t *T) *HttpErro
 	}
 
 	if err != nil {
-		return &HttpError{
-			Error:          err,
-			HttpStatusCode: HttpUnknownError,
-			Msg:            "request timeout or unknown error",
-		}
+		return err
 	}
 
 	if resp.StatusCode() != http.StatusOK {
-		return &HttpError{
-			Error:          err,
-			HttpStatusCode: resp.StatusCode(),
-			Msg:            "request timeout or unknown error",
-		}
+		return errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "request timeout or unknown error")
 	}
 	req.TraceInfo = resp.Request.TraceInfo() //调试信息
 	respData, ok := resp.Result().(*T)
 	if !ok {
-		return &HttpError{
-			Error:          err,
-			HttpStatusCode: resp.StatusCode(),
-			Msg:            "Response T is invalid",
-		}
+		return errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "Response T is invalid")
 	}
 
 	if respData == nil {
-		return &HttpError{
-			Error:          err,
-			HttpStatusCode: resp.StatusCode(),
-			Msg:            "Response data is empty",
-		}
+		return errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "Response data is empty")
 	}
 
 	t = respData
@@ -162,7 +144,7 @@ func doHttpRequest[T any](context context.Context, req *Request, t *T) *HttpErro
 	return nil
 }
 
-func HttpPostJson[T any](context context.Context, req *Request, t *T) *HttpError {
+func HttpPostJson[T any](context context.Context, req *Request, t *T) error {
 	if req.Headers == nil {
 		req.Headers = make(map[string]string)
 	}
@@ -172,18 +154,18 @@ func HttpPostJson[T any](context context.Context, req *Request, t *T) *HttpError
 	return HttpRequest[T](context, req, t)
 }
 
-func HttpPost[T any](context context.Context, req *Request, t *T) *HttpError {
+func HttpPost[T any](context context.Context, req *Request, t *T) error {
 	req.Method = POST
 	return HttpRequest[T](context, req, t)
 }
 
-func HttpGet[T any](context context.Context, req *Request, t *T) *HttpError {
+func HttpGet[T any](context context.Context, req *Request, t *T) error {
 	req.Method = GET
 	return HttpRequest[T](context, req, t)
 }
 
 // 带多个Urls重试逻辑
-func HttpRequest[T any](context context.Context, req *Request, t *T) *HttpError {
+func HttpRequest[T any](context context.Context, req *Request, t *T) error {
 	err := doHttpRequest[T](context, req, t)
 	if err == nil {
 		return nil
@@ -192,18 +174,15 @@ func HttpRequest[T any](context context.Context, req *Request, t *T) *HttpError 
 			return err
 		}
 
-		errs := &HttpError{
-			HttpStatusCode: HttpRetryError,
-			Error:          errors.New("HttpRetryError error"),
-		}
-		errs.Errors = append(errs.Errors, err)
+		errs := errors.New("HttpRetryError error")
+		errs = errors.Join(errs, err)
 		for _, url := range req.Urls {
 			req.Url = url
 			err = doHttpRequest[T](context, req, t)
 			if err == nil { //请求成功了直接返回
 				return nil
 			} else {
-				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
+				errs = errors.Join(errs, err)
 			}
 		}
 		return errs // 所有连接重试失败
@@ -211,8 +190,8 @@ func HttpRequest[T any](context context.Context, req *Request, t *T) *HttpError 
 }
 
 // 带多个Urls重试逻辑,并发请求,速度快先到达后 直接返回，其他请求取消
-func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
-	var err *HttpError
+func HttpConcurrencyRequest[T any](req *Request, t *T) error {
+	var err error
 	if req.Url != "" { //把当前加进来起并发
 		req.Urls = append(req.Urls, req.Url)
 	}
@@ -221,10 +200,7 @@ func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
 		return err
 	}
 
-	errs := &HttpError{
-		HttpStatusCode: HttpRetryError,
-		Error:          errors.New("HttpRetryError error"),
-	}
+	errs := errors.New("Concurrency error")
 
 	var one sync.Once
 	ctx, cancel := context.WithCancel(context.Background())
@@ -241,7 +217,7 @@ func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
 			var tmp T
 			err = doHttpRequest[T](ctx, &reqNew, &tmp)
 			if err != nil {
-				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
+				errs = errors.Join(errs, err)
 			} else { //请求成功了应该直接返回，剩下的请求结果忽略
 				one.Do(func() {
 					t = &tmp

@@ -136,31 +136,34 @@ import (
 func main() {
 	goio.Init(goio.DEVELOPMENT)
 
-	req := gohttpx.Request{
-		Url: "http://localhost:100",
-		Urls: []string{
-			"http://localhost:200",
-			"http://localhost:300",
-			"http://localhost:400",
-		},
-		QueryParams: map[string]string{"name": "jk"},
-		Timeout:     time.Second * 2,
-	}
-	type httpRequest struct {
-		Email string `json:"email"`
-	}
+    req := gohttpx.Request{
+        Method: gohttpx.POST,
+        Urls: []string{
+            "http://localhost:20122/api/jump/account/check",
+            "https://jumpjump.io/api/jump/account/check",
+            "http://localhost:400",
+        },
+        QueryParams: map[string]string{"name": "jk"},
+        Timeout:     time.Second * 2,
+    }
 
-	req.Body = &httpRequest{
-		Email: "test@gmail.com",
-	}
+    type httpRequest struct {
+        Email string `json:"email"`
+    }
 
-	res := &gohttpx.Response{}
-	err := gohttpx.HttpPostJson[gohttpx.Response](&req, res)
-	if err != nil {
-		golog.ErrorF("Error: %+v\n", err)
-	} else {
-		fmt.Println(res)
-	}
+    req.Body = &httpRequest{
+        Email: "test@gmail.com",
+    }
+
+    res := &gohttpx.Response{}
+    err := gohttpx.HttpConcurrencyRequest[gohttpx.Response](&req, res)
+    if err != nil {
+        golog.ErrorF("Error: \n", err.Error())
+    } else {
+        golog.InfoF("res: \n", res)
+    }
+
+    time.Sleep(10 * time.Second)
 
 	time.Sleep(10 * time.Second)
 }

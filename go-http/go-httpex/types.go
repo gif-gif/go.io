@@ -3,8 +3,6 @@ package gohttpx
 import (
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-resty/resty/v2"
-	"github.com/gogf/gf/util/gconv"
-	"strings"
 	"time"
 )
 
@@ -61,12 +59,12 @@ type Request struct {
 	Response      *resty.Response
 }
 
-type HttpError struct {
-	HttpStatusCode int
-	Msg            string
-	Error          error
-	Errors         []*HttpError //重试逻辑的错误列表
-}
+//type HttpError struct {
+//	HttpStatusCode int
+//	Msg            string
+//	Error          error
+//	Errors         []*HttpError //重试逻辑的错误列表
+//}
 
 type res struct{}
 
@@ -74,26 +72,6 @@ type Response struct {
 	Code int64       `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data,omitempty"`
-}
-
-func (r *HttpError) ErrorInfo() string {
-	msgs := []string{}
-	msgs = append(msgs, gconv.String(r.HttpStatusCode))
-	if r.Error != nil {
-		msgs = append(msgs, r.Error.Error())
-	}
-
-	if len(r.Errors) > 0 {
-		for _, httpError := range r.Errors {
-			msgs = append(msgs, httpError.ErrorInfo())
-		}
-	}
-
-	if r.Msg != "" {
-		msgs = append(msgs, r.Msg)
-	}
-
-	return strings.Join(msgs, "\n")
 }
 
 func (r *Request) SetMethod(method string) {
