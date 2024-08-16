@@ -7,7 +7,6 @@ import (
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-resty/resty/v2"
 	"net/http"
-	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -239,15 +238,7 @@ func HttpConcurrencyRequest[T any](req *Request, t *T) *HttpError {
 				return
 			}
 
-			var instance T
-			typ := reflect.TypeOf(instance)
 			var tmp T
-			// 检查类型是否为指针类型
-			if typ.Kind() == reflect.Ptr {
-				// 如果是指针类型，创建一个新的实例并返回
-				tmp = reflect.New(typ.Elem()).Interface().(T)
-			}
-
 			err = doHttpRequest[T](ctx, &reqNew, &tmp)
 			if err != nil {
 				errs.Errors = append(errs.Errors, err) //请求失败继续,错误叠加记录
