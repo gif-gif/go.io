@@ -72,10 +72,9 @@ func doHttpRequest[T any](context context.Context, req *Request, t *T) *HttpErro
 	var err error
 	request := restyClient.R()
 	request.SetContext(context)
-
+	request.SetResult(t)
 	if req.Method == POST {
 		request.
-			SetResult(t).
 			SetHeaders(req.Headers)
 
 		if req.QueryParams != nil {
