@@ -4,53 +4,31 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	golock "github.com/gif-gif/go.io/go-lock"
-	gomq "github.com/gif-gif/go.io/go-mq"
-	gopool "github.com/gif-gif/go.io/go-pool"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gogf/gf/util/gconv"
+	"golang.org/x/sync/errgroup"
 	"math"
 	"os"
 	"path/filepath"
 )
 
 type BigFile struct {
-	ChunkSize         int64            // 分片大小 M
-	MaxWorkers        int              // 同时处理最大分块数量，合理用防止超大文件内存益处
-	File              string           // 文件路径
-	FileMd5           string           // 文件Md5
-	ChunkCount        int64            // 分片数量
-	HandledChunkCount int64            // 已处理分片数量
-	FileChunkCallback func(*FileChunk) // 分片处理消息
+	ChunkSize           int64                        // 分片大小 M
+	MaxWorkers          int                          // 同时处理最大分块数量，合理用防止超大文件内存益处
+	File                string                       // 文件路径
+	FileMd5             string                       // 文件Md5
+	ChunkCount          int64                        // 分片数量
+	FileChunkCallback   func(chunk *FileChunk) error // 分片处理消息
+	SuccessChunkIndexes []int64                      //处理成功的碎片index
 
-	queue      *gomq.BlockingQueue //等待队列
-	pool       *gopool.GoPool      //并发池子
 	fileReader *os.File
 	fileSize   int64
-	isFinish   bool
-
-	lock   *golock.GoLock
-	__ctx  context.Context
-	cancel context.CancelFunc
+	__ctx      context.Context
+	pool       *errgroup.Group
 }
 
-func (b *BigFile) Release() {
-	b.pool.StopAndWait()
-}
-
-func (b *BigFile) WaitForFinish() {
-	<-b.__ctx.Done()
-	b.Release()
-}
-
-func (b *BigFile) IsFinish() bool {
-	b.lock.RLock()
-	defer b.lock.RUnlock()
-	return b.HandledChunkCount == b.ChunkCount
-}
-
-func (b *BigFile) Stop() {
-	b.cancel()
+func (b *BigFile) IsSuccess() bool {
+	return len(b.SuccessChunkIndexes) == int(b.ChunkCount)
 }
 
 func (b *BigFile) Start() error {
@@ -77,67 +55,36 @@ func (b *BigFile) Start() error {
 		return err
 	}
 
-	__ctx, __cancel := context.WithCancel(context.TODO())
-	b.__ctx = __ctx
-	b.cancel = __cancel
+	g, ctx := errgroup.WithContext(context.Background())
+	b.__ctx = ctx
+	b.pool = g
+	b.pool.SetLimit(b.MaxWorkers)
+
 	cSize := float64(fileInfo.Size()) / float64(b.ChunkSize*1024*1024)
 	chunkCount := gconv.Int(math.Ceil(cSize))
 	b.ChunkCount = int64(chunkCount)
-	b.pool = gopool.NewFixedSizePool(b.MaxWorkers, b.MaxWorkers)
-	b.queue = gomq.NewBlockingQueue(b.MaxWorkers)
 	b.fileSize = fileInfo.Size()
 	b.fileReader = file
-	b.lock = golock.New()
 
-	goutils.AsyncFunc(func() {
-		for i := 0; i < chunkCount; i++ { //把将要处理分片index 压入队列
-			b.queue.Enqueue(int64(i))
-		}
-	})
-
-	//开始处理
-	for i := 0; i < b.MaxWorkers; i++ {
-		b.NextChunk()
-	}
-
-	return nil
-}
-
-func (b *BigFile) CheckAllDone() {
-	if b.IsFinish() {
-		return
-	}
-
-	b.lock.WLockFunc(func(parameters ...any) {
-		b.HandledChunkCount++
-	})
-
-	if b.IsFinish() {
-		if b.isFinish == true {
-			return
-		}
-		b.cancel() //全部处理完成
-		b.lock.WLockFunc(func(parameters ...any) {
-			b.isFinish = true
-		})
-	}
-}
-
-func (b *BigFile) NextChunk() {
-	if b.IsFinish() { //全部处理完成
-		return
-	}
-
-	goutils.AsyncFunc(func() {
-		item := b.queue.Dequeue()
-		b.pool.Submit(func() {
-			chunk, err := b.createChunk(b.fileReader, item.(int64))
-			if err != nil {
-				return
+	for i := 0; i < chunkCount; i++ {
+		chunkIndex := gconv.Int64(i)
+		b.pool.Go(func() error {
+			if goutils.IsContextDone(b.__ctx) {
+				return nil
 			}
-			b.FileChunkCallback(chunk)
+			chunk, err := b.createChunk(b.fileReader, chunkIndex)
+			if err != nil {
+				return err
+			}
+			err = b.FileChunkCallback(chunk)
+			if err != nil {
+				return err
+			}
+			b.SuccessChunkIndexes = append(b.SuccessChunkIndexes, chunkIndex)
+			return nil
 		})
-	})
+	}
+	return b.pool.Wait()
 }
 
 func (b *BigFile) createChunk(file *os.File, index int64) (*FileChunk, error) {

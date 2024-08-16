@@ -176,7 +176,7 @@ func MergeChunk(url string, fileMergeReq *FileMergeReq) (*gohttpx.Response, erro
 	return res, nil
 }
 
-// //////////////////////////////////////////////////////////////local save and merge
+// //////////////////////////////////////////////////////////////local save
 // 把分片存在指定目录
 func SaveToLocal(savePath string, chunk *FileChunk) error {
 	chunkFile := filepath.Join(savePath, chunk.FileName)
