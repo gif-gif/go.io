@@ -2,7 +2,6 @@ package gofile
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	gohttpx "github.com/gif-gif/go.io/go-http/go-httpex"
 	goutils "github.com/gif-gif/go.io/go-utils"
@@ -155,7 +154,7 @@ func UploadChunk(url string, chunk *FileChunk) (*gohttpx.Response, error) {
 	res := &gohttpx.Response{}
 	err := gohttpx.HttpPost[gohttpx.Response](context.Background(), req, res)
 	if err != nil {
-		return nil, errors.New(err.ErrorInfo())
+		return nil, err
 	}
 	return res, nil
 }
@@ -172,7 +171,7 @@ func MergeChunk(url string, fileMergeReq *FileMergeReq) (*gohttpx.Response, erro
 	res := &gohttpx.Response{}
 	err := gohttpx.HttpPost[gohttpx.Response](context.Background(), req, res)
 	if err != nil {
-		return nil, errors.New(err.ErrorInfo())
+		return nil, err
 	}
 	return res, nil
 }
