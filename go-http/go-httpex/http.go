@@ -25,6 +25,10 @@ func AddGlobalHeader(k, v string) {
 	globalHeaders[k] = v
 }
 
+func RemoveGlobalHeader(k string) {
+	delete(globalHeaders, k)
+}
+
 func GetGlobalHeaders() map[string]string {
 	return globalHeaders
 }
