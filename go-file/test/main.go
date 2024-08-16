@@ -54,6 +54,13 @@ func cutHttpFile() {
 			golog.WithTag("gofile").Fatal(err)
 		}
 
+		if req.IsSuccess() {
+			golog.WithTag("gofile").Info("已处理分片:", len(req.SuccessChunkIndexes))
+		} else {
+			golog.WithTag("gofile").Error("分片上传失败")
+			return
+		}
+
 		rst, err := gofile.MergeChunk("http://localhost:20085/bot/api/file-merge-uploader", &gofile.FileMergeReq{
 			FileMd5:     fileMd5,
 			TotalChunks: req.ChunkCount,
@@ -104,6 +111,13 @@ func cutLocalFile() {
 		err = req.Start()
 		if err != nil {
 			golog.WithTag("gofile").Fatal(err)
+		}
+
+		if req.IsSuccess() {
+			golog.WithTag("gofile").Info("已处理分片:", len(req.SuccessChunkIndexes))
+		} else {
+			golog.WithTag("gofile").Error("分片上传失败")
+			return
 		}
 
 		// 调用合并接口
