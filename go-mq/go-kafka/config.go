@@ -1,7 +1,7 @@
 package gokafka
 
 type Config struct {
-	User     string   `json:"user,optional" yaml:"User,optional"`
+	User     string   `json:"user,optional" yaml:"User,omitempty"`
 	Name     string   `json:"name,optional" yaml:"Name,optional"`
 	Password string   `json:"password,optional" yaml:"Password,optional"`
 	Addrs    []string `json:"addrs,optional" yaml:"Addrs,optional"`

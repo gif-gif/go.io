@@ -19,7 +19,7 @@ const (
 )
 
 type Config struct {
-	Name             string `yaml:"Name,optional" json:"name,optional"`
+	Name             string `yaml:"Name,omitempty" json:"name,optional"`
 	Protocol         string `yaml:"Protocol,optional" json:"protocol,optional"`
 	CaFilePath       string `yaml:"CaFilePath,optional" json:"caFilePath,optional"` //tls(ssl wss) 证书位置
 	Server           string `yaml:"Server,optional" json:"server,optional"`

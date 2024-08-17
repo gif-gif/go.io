@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"flag"
+	golog "github.com/gif-gif/go.io/go-log"
+	"github.com/gif-gif/go.io/go-utils/prometheusx"
 	"github.com/gif-gif/go.io/goio"
 	"github.com/gif-gif/go.io/goio/server-case/router"
 	"github.com/gin-gonic/gin"
@@ -12,12 +15,41 @@ import (
 	"time"
 )
 
+var (
+	yamlFile = flag.String("yaml", ".yaml", "yaml file")
+)
+
 func main() {
 	startSever()
 }
 
 func startSever() {
-	goio.Init(goio.DEVELOPMENT)
+	// 初始化命令行参数
+	goio.FlagInit()
+
+	// yaml文件必须
+	if *yamlFile == "" {
+		flag.PrintDefaults()
+		golog.Fatal("yaml file not exist.")
+	}
+
+	// 加载配置文件
+	conf := &goio.Config{}
+	err := goio.LoadYamlConfig(*yamlFile, conf)
+	if err != nil {
+		golog.WithTag("main").Error(err)
+		return
+	}
+
+	// 日志输出到文件
+	if conf.Env == goio.TEST || conf.Env == goio.PRODUCTION {
+		golog.SetAdapter(golog.NewFileAdapter())
+	}
+
+	goio.Init(conf.Env)
+	prometheusx.Init(conf.Prometheus)
+	prometheusx.AlertErr(conf.Server.Name, "main start")
+
 	s := goio.NewServer(
 		goio.ServerNameOption("serverName"),
 		goio.EnvOption(goio.Env),

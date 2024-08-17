@@ -1,0 +1,27 @@
+env: "dev"
+
+server:
+    addr: ":10152"
+    name: "/app/http-web"
+    app_key: "542a4c9d65fc8f9f"
+    app_secret: "7abe12ea64d015eb8f3f812fa1ea5508"
+
+prometheus:
+    host: "0.0.0.0"
+    port: 10255
+#    path: "/metrics"
+    path1: "/metrics"
+
+redis:
+    addr: "127.0.0.1:6379"
+    password: ""
+    db: 0
+    prefix: "goio:"
+
+etcd:
+    endpoints:
+        - "127.0.0.1:23790"
+    username: ""
+    password: ""
+
+feishu: "https://open.feishu.cn/open-apis/bot/v2/hook/810d552b-8146-47c3-ae01-13d63007b47d"
