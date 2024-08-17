@@ -24,7 +24,7 @@ func init() {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				golog.Error(r)
+				golog.WithTag("gocontext").Error(r)
 			}
 		}()
 

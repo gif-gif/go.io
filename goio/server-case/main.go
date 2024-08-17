@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/gif-gif/go.io/goio"
-	"github.com/gif-gif/go.io/goio/test/router"
+	"github.com/gif-gif/go.io/goio/server-case/router"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
