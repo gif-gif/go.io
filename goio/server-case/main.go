@@ -21,7 +21,7 @@ func startSever() {
 	s := goio.NewServer(
 		goio.ServerNameOption("serverName"),
 		goio.EnvOption(goio.Env),
-		//goio.EnableEncryptionOption(),
+		goio.EnableEncryptionOption("1a3295a2408d553a8458085e7435898e", "119f54388848cb4306f6d2067a4713fce4193504ca368d648196c840ba87da65"),
 		goio.PProfEnableOption(false),
 		goio.NoLogPathsOption("/captcha/get"),
 	)

@@ -23,7 +23,37 @@ import (
 	"strings"
 )
 
-// 计算文件md5
+// 生成 AES 密钥
+func GenerateAESKey() (string, error) {
+	// 生成32字节（256位）的密钥
+	key := make([]byte, 32)
+	_, err := rand.Read(key)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(key), nil
+}
+
+// 生成 AES 密钥和 IV
+func GenerateAESKeyAndIV() (string, string, error) {
+	// 生成 16 字节（128 位）的 Key
+	key := make([]byte, 16)
+	_, err := rand.Read(key)
+	if err != nil {
+		return "", "", err
+	}
+
+	// 生成 16 字节（128 位）的 IV
+	iv := make([]byte, 32)
+	_, err = rand.Read(iv)
+	if err != nil {
+		return "", "", err
+	}
+
+	return hex.EncodeToString(key), hex.EncodeToString(iv), nil
+}
+
+// 计算文件md5(支持超大文件)
 func CalculateFileMD5(filePath string) (string, error) {
 	// 打开文件
 	file, err := os.Open(filePath)

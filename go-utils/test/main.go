@@ -24,7 +24,7 @@ type PayPlanItemConfig struct {
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-	testRaceSpeed()
+	testGenerateAesKeys()
 	<-gocontext.Cancel().Done()
 }
 
@@ -93,4 +93,21 @@ func testRaceSpeed() {
 		time.Sleep(3 * time.Second)
 		fmt.Println("Hello 3")
 	})
+}
+
+func testGenerateAesKeys() {
+	// 加密
+	key, iv, err := goutils.GenerateAESKeyAndIV()
+	if err != nil {
+		golog.WithTag("aes").Error(err)
+		return
+	}
+	golog.WithTag("aesKey").Info(key)
+	golog.WithTag("aesIv").Info(iv)
+	key, err = goutils.GenerateAESKey()
+	if err != nil {
+		golog.WithTag("aes").Error(err)
+		return
+	}
+	golog.WithTag("aesKey").Info(key)
 }
