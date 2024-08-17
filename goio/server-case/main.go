@@ -6,6 +6,7 @@ import (
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/go-utils/prometheusx"
 	"github.com/gif-gif/go.io/goio"
+	conf "github.com/gif-gif/go.io/goio/server-case/config"
 	"github.com/gif-gif/go.io/goio/server-case/router"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -16,7 +17,7 @@ import (
 )
 
 var (
-	yamlFile = flag.String("yaml", ".yaml", "yaml file")
+	yamlFile = flag.String("yaml", "etc/api-local.yaml", "yaml file")
 )
 
 func main() {
@@ -34,21 +35,21 @@ func startSever() {
 	}
 
 	// 加载配置文件
-	conf := &goio.Config{}
-	err := goio.LoadYamlConfig(*yamlFile, conf)
+	confs := &conf.Config{}
+	err := goio.LoadYamlConfig(*yamlFile, confs)
 	if err != nil {
 		golog.WithTag("main").Error(err)
 		return
 	}
 
 	// 日志输出到文件
-	if conf.Env == goio.TEST || conf.Env == goio.PRODUCTION {
+	if confs.Env == goio.TEST || confs.Env == goio.PRODUCTION {
 		golog.SetAdapter(golog.NewFileAdapter())
 	}
 
-	goio.Init(conf.Env)
-	prometheusx.Init(conf.Prometheus)
-	prometheusx.AlertErr(conf.Server.Name, "main start")
+	goio.Init(confs.Env)
+	prometheusx.Init(confs.Prometheus)
+	prometheusx.AlertErr(confs.Server.Name, "main start")
 
 	s := goio.NewServer(
 		goio.ServerNameOption("serverName"),

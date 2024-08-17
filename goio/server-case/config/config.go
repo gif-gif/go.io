@@ -1,4 +1,4 @@
-package goio
+package conf
 
 import (
 	"encoding/json"
@@ -11,12 +11,13 @@ import (
 	golog "github.com/gif-gif/go.io/go-log"
 	gokafka "github.com/gif-gif/go.io/go-mq/go-kafka"
 	"github.com/gif-gif/go.io/go-utils/prometheusx"
+	"github.com/gif-gif/go.io/goio"
 	"gopkg.in/yaml.v3"
 	"os"
 )
 
 type Config struct {
-	Env Environment `yaml:"env"`
+	Env goio.Environment `yaml:"env"`
 
 	Server struct {
 		Addr string `yaml:"addr"`
@@ -61,7 +62,7 @@ func LoadYamlConfig(yamlFile string, conf interface{}) (err error) {
 
 func LoadJsonConfig(jsonFile string, conf interface{}) (err error) {
 	if jsonFile == "" {
-		jsonFile = "api-local.json"
+		jsonFile = ".json"
 	}
 	var buf []byte
 
