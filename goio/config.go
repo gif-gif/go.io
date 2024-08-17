@@ -24,17 +24,17 @@ type Config struct {
 	} `yaml:"server"`
 
 	Prometheus  prometheusx.Config  `yaml:"prometheus"`
-	MongoDB     gomongo.Config      `yaml:"mongodb,omitempty"`
-	Mysql       gogorm.Config       `yaml:"mysql,omitempty"`
-	Postgres    gogorm.Config       `yaml:"postgres,omitempty"`
-	Sqlite      gogorm.Config       `yaml:"sqlite,omitempty"`
-	Clickhouse1 gogorm.Config       `yaml:"clickhouse1,omitempty"`
-	Redis       goredis.Config      `yaml:"redis,omitempty"`
-	Kafka       gokafka.Config      `yaml:"kafka,omitempty"`
-	Clickhouse  goclickhouse.Config `yaml:"clickhouse,omitempty"`
-	Es          goes.Config         `yaml:"es,omitempty"`
+	MongoDB     gomongo.Config      `yaml:"mongodb"`
+	Mysql       gogorm.Config       `yaml:"mysql"`
+	Postgres    gogorm.Config       `yaml:"postgres"`
+	Sqlite      gogorm.Config       `yaml:"sqlite"`
+	Clickhouse1 gogorm.Config       `yaml:"clickhouse1"`
+	Redis       goredis.Config      `yaml:"redis"`
+	Kafka       gokafka.Config      `yaml:"kafka"`
+	Clickhouse  goclickhouse.Config `yaml:"clickhouse"`
+	Es          goes.Config         `yaml:"es"`
 	////EsIndex EsIndex          `yaml:"es_index"`
-	//
+
 	Etcd goetcd.Config `yaml:"etcd"`
 
 	FeiShu string `yaml:"feishu"`

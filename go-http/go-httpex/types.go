@@ -71,7 +71,7 @@ type res struct{}
 type Response struct {
 	Code int64       `json:"code"`
 	Msg  string      `json:"msg"`
-	Data interface{} `json:"data,omitempty"`
+	Data interface{} `json:"data"`
 }
 
 func (r *Request) SetMethod(method string) {
