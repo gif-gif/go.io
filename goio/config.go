@@ -2,8 +2,14 @@ package goio
 
 import (
 	"encoding/json"
+	goclickhouse "github.com/gif-gif/go.io/go-db/go-clickhouse"
+	goes "github.com/gif-gif/go.io/go-db/go-es"
 	gomongo "github.com/gif-gif/go.io/go-db/go-mongo"
+	goredis "github.com/gif-gif/go.io/go-db/go-redis"
+	"github.com/gif-gif/go.io/go-db/gogorm"
+	goetcd "github.com/gif-gif/go.io/go-etcd"
 	golog "github.com/gif-gif/go.io/go-log"
+	gokafka "github.com/gif-gif/go.io/go-mq/go-kafka"
 	"github.com/gif-gif/go.io/go-utils/prometheusx"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -17,19 +23,19 @@ type Config struct {
 		Name string `yaml:"name"`
 	} `yaml:"server"`
 
-	Prometheus prometheusx.Config `yaml:"prometheus"`
-	MongoDB    gomongo.Config     `yaml:"mongodb,omitempty"`
-	//Mysql       gogorm.Config  `yaml:"mysql,omitempty"`
-	//Postgres    gogorm.Config  `yaml:"postgres,omitempty"`
-	//Sqlite      gogorm.Config  `yaml:"sqlite,omitempty"`
-	//Clickhouse1 gogorm.Config  `yaml:"clickhouse1,omitempty"`
-	//Redis       goredis.Config      `yaml:"redis,omitempty"`
-	//Kafka       gokafka.Config      `yaml:"kafka,omitempty"`
-	//Clickhouse  goclickhouse.Config `yaml:"clickhouse,omitempty"`
-	//Es          goes.Config         `yaml:"es,omitempty"`
+	Prometheus  prometheusx.Config  `yaml:"prometheus"`
+	MongoDB     gomongo.Config      `yaml:"mongodb,omitempty"`
+	Mysql       gogorm.Config       `yaml:"mysql,omitempty"`
+	Postgres    gogorm.Config       `yaml:"postgres,omitempty"`
+	Sqlite      gogorm.Config       `yaml:"sqlite,omitempty"`
+	Clickhouse1 gogorm.Config       `yaml:"clickhouse1,omitempty"`
+	Redis       goredis.Config      `yaml:"redis,omitempty"`
+	Kafka       gokafka.Config      `yaml:"kafka,omitempty"`
+	Clickhouse  goclickhouse.Config `yaml:"clickhouse,omitempty"`
+	Es          goes.Config         `yaml:"es,omitempty"`
 	////EsIndex EsIndex          `yaml:"es_index"`
 	//
-	//Etcd goetcd.Config `yaml:"etcd"`
+	Etcd goetcd.Config `yaml:"etcd"`
 
 	FeiShu string `yaml:"feishu"`
 }
