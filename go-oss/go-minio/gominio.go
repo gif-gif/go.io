@@ -33,24 +33,20 @@ func New(conf Config) (*Uploader, error) {
 }
 
 func GetClient(names ...string) *Uploader {
-	name := "default"
 	if l := len(names); l > 0 {
-		name = names[0]
-	}
-
-	if cli, ok := __clients[name]; ok {
-		return cli
-	}
-
-	if l := len(__clients); l == 1 {
-		for _, cli := range __clients {
+		name := names[0]
+		if cli, ok := __clients[name]; ok {
 			return cli
 		}
+		return nil
+	} else {
+		if l := len(__clients); l == 1 {
+			for _, cli := range __clients {
+				return cli
+			}
+		}
+		return nil
 	}
-
-	golog.WithTag("gominio").Error("no default minio client")
-
-	return nil
 }
 
 func Default() *Uploader {
