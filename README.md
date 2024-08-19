@@ -120,14 +120,13 @@ func main() {
 
 ```
 
-
 ### GoHttp 模块
 ```go
 package main
 
 import (
 	"fmt"
-	gohttpx "github.com/gif-gif/go.io/go-http/go-httpex"
+	gohttp "github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/goio"
 	"time"
@@ -135,40 +134,37 @@ import (
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
+	gh := &gohttp.GoHttp[gohttp.Response]{}
+	req := gohttp.Request{
+		Url: "http://localhost:100",
+		Urls: []string{
+			"http://localhost:200",
+			"http://localhost:300",
+			"http://localhost:400",
+		},
+		QueryParams: map[string]string{"name": "jk"},
+		Timeout:     time.Second * 2,
+	}
+	type httpRequest struct {
+		Email string `json:"email"`
+	}
 
-    req := gohttpx.Request{
-        Method: gohttpx.POST,
-        Urls: []string{
-            "http://localhost:20122/api/jump/account/check",
-            "https://jumpjump.io/api/jump/account/check",
-            "http://localhost:400",
-        },
-        QueryParams: map[string]string{"name": "jk"},
-        Timeout:     time.Second * 2,
-    }
+	req.Body = &httpRequest{
+		Email: "test@gmail.com",
+	}
 
-    type httpRequest struct {
-        Email string `json:"email"`
-    }
-
-    req.Body = &httpRequest{
-        Email: "test@gmail.com",
-    }
-
-    res := &gohttpx.Response{}
-    err := gohttpx.HttpConcurrencyRequest[gohttpx.Response](&req, res)
-    if err != nil {
-        golog.ErrorF("Error: \n", err.Error())
-    } else {
-        golog.InfoF("res: \n", res)
-    }
-
-    time.Sleep(10 * time.Second)
+	res,err := gh.HttpPostJson(&req)
+	if err != nil {
+		golog.ErrorF("Error: %+v\n", err)
+	} else {
+		fmt.Println(res)
+	}
 
 	time.Sleep(10 * time.Second)
 }
 
 ```
+
 ### 验证码(支持分布式验证,基于redis)
 ```
 config := goredis.Config{

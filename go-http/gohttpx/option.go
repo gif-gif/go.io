@@ -1,4 +1,4 @@
-package gohttp
+package gohttpx
 
 type Option struct {
 	Name  string

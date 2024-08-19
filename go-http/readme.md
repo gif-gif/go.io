@@ -1,12 +1,11 @@
 # Http 请求封装
 
-- 并发请求逻辑在开发中
 ```go
 package main
 
 import (
 	"fmt"
-	gohttpx "github.com/gif-gif/go.io/go-http/go-httpex"
+	gohttp "github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/goio"
 	"time"
@@ -14,8 +13,8 @@ import (
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-
-	req := gohttpx.Request{
+	gh := &gohttp.GoHttp[gohttp.Response]{}
+	req := gohttp.Request{
 		Url: "http://localhost:100",
 		Urls: []string{
 			"http://localhost:200",
@@ -33,8 +32,7 @@ func main() {
 		Email: "test@gmail.com",
 	}
 
-	res := &gohttpx.Response{}
-	err := gohttpx.HttpPostJson[gohttpx.Response](&req, res)
+	res,err := gh.HttpPostJson(&req)
 	if err != nil {
 		golog.ErrorF("Error: %+v\n", err)
 	} else {
@@ -45,3 +43,7 @@ func main() {
 }
 
 ```
+
+- Custom Root Certificates and Client Certificates
+- Custom Root Certificates and Client Certificates from string
+- Save HTTP Response into File

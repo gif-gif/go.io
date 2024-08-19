@@ -1,4 +1,4 @@
-package gohttp
+package gohttpx
 
 var caCert = []byte(`
 # Issuer: CN=GlobalSign Root CA O=GlobalSign nv-sa OU=Root CA

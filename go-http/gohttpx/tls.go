@@ -1,4 +1,4 @@
-package gohttp
+package gohttpx
 
 import (
 	"crypto/tls"

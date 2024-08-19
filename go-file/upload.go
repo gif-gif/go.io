@@ -3,7 +3,7 @@ package gofile
 import (
 	"context"
 	"fmt"
-	gohttpx "github.com/gif-gif/go.io/go-http/go-httpex"
+	"github.com/gif-gif/go.io/go-http"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gogf/gf/util/gconv"
 	"io"
@@ -135,10 +135,10 @@ func MergeFileForChunks(filePath string, fileName string, fileMd5 string, totalC
 
 // ////////////////////////////////////////////////////////////// http server upload and merge 供参考
 // 上传一个文件分片，（作为客户端请求时验证非法请求认证逻辑需要加，如authToken sign 等等）
-func UploadChunk(url string, chunk *FileChunk) (*gohttpx.Response, error) {
-	req := &gohttpx.Request{
+func UploadChunk(url string, chunk *FileChunk) (*gohttp.Response, error) {
+	req := &gohttp.Request{
 		Url:       url,
-		Method:    gohttpx.POST,
+		Method:    gohttp.POST,
 		FileBytes: chunk.Data,
 		MultipartFormData: map[string]string{
 			"type":       gconv.String(UPLOAD_TYPE_CHUNK),
@@ -150,9 +150,8 @@ func UploadChunk(url string, chunk *FileChunk) (*gohttpx.Response, error) {
 		FileName: chunk.OriginalFileName,
 		Headers:  map[string]string{"User-Agent": "github.com/gif-gif/go.io"},
 	}
-
-	res := &gohttpx.Response{}
-	err := gohttpx.HttpPost[gohttpx.Response](context.Background(), req, res)
+	gh := gohttp.GoHttp[gohttp.Response]{}
+	res, err := gh.HttpPost(context.Background(), req)
 	if err != nil {
 		return nil, err
 	}
@@ -160,16 +159,16 @@ func UploadChunk(url string, chunk *FileChunk) (*gohttpx.Response, error) {
 }
 
 // 分片全部上传完毕后，再请求文件分片合并请求（作为客户端请求时验证非法请求认证逻辑需要加，如authToken sign 等等）
-func MergeChunk(url string, fileMergeReq *FileMergeReq) (*gohttpx.Response, error) {
-	req := &gohttpx.Request{
+func MergeChunk(url string, fileMergeReq *FileMergeReq) (*gohttp.Response, error) {
+	req := &gohttp.Request{
 		Url:     url,
-		Method:  gohttpx.POST,
+		Method:  gohttp.POST,
 		Headers: map[string]string{"User-Agent": "github.com/gif-gif/go.io"},
 		Body:    fileMergeReq,
 	}
 
-	res := &gohttpx.Response{}
-	err := gohttpx.HttpPost[gohttpx.Response](context.Background(), req, res)
+	gh := gohttp.GoHttp[gohttp.Response]{}
+	res, err := gh.HttpPost(context.Background(), req)
 	if err != nil {
 		return nil, err
 	}

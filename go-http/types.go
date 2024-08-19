@@ -1,16 +1,14 @@
-package gohttpx
+package gohttp
 
 import (
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-resty/resty/v2"
+	"net/url"
 	"time"
 )
 
-var globalHeaders map[string]string = make(map[string]string)
-var baseURL = ""
-
 const (
-	TAG = "gohttpx"
+	TAG = "gohttp"
 
 	CONTENT_TYPE_XML  = "application/xml"
 	CONTENT_TYPE_JSON = "application/json"
@@ -31,13 +29,14 @@ const (
 )
 
 type Request struct {
-	Url         string
-	Urls        []string // 如果有值，当url 请求失败时继续用这里的接口尝试，直到成功返回或者全部失败
-	Method      string
-	Body        interface{}       //post body 参数
-	QueryParams map[string]string //get 参数
-	FormData    map[string]string //formdata 参数
-	Headers     map[string]string
+	Url          string
+	Urls         []string // 如果有值，当url 请求失败时继续用这里的接口尝试，直到成功返回或者全部失败
+	Method       string
+	Body         interface{}       //post body 参数
+	QueryParams  map[string]string //get 参数
+	ParamsValues url.Values        //get 参数
+	FormData     map[string]string //formdata 参数
+	Headers      map[string]string
 
 	Files             map[string]string //上传文件列表
 	FileName          string            //文件名称

@@ -1,7 +1,8 @@
 package gometa
 
 import (
-	gohttpex "github.com/gif-gif/go.io/go-http/go-httpex"
+	"context"
+	gohttp "github.com/gif-gif/go.io/go-http"
 	"github.com/google/go-querystring/query"
 )
 
@@ -72,8 +73,12 @@ func (m *Market) RefreshToken(clientId string, clientSecret string) (*TokenRespo
 	}
 	api := m.BaseApi + ApiRefreshToken
 	params, _ := query.Values(req)
-	res := TokenResponse{}
-	result, err := gohttpex.HttpGetValues[TokenResponse](api, params, nil, &res, 1)
+	gh := gohttp.GoHttp[TokenResponse]{}
+	request := &gohttp.Request{
+		Url:          api,
+		ParamsValues: params,
+	}
+	result, err := gh.HttpGet(context.Background(), request)
 	if err != nil {
 		return nil, err
 	}

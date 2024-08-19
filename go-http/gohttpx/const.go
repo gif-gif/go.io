@@ -1,4 +1,4 @@
-package gohttp
+package gohttpx
 
 const (
 	TAG = "gohttp"

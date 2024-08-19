@@ -1,18 +1,23 @@
 package gometa
 
 import (
+	"context"
 	"fmt"
-	gohttpex "github.com/gif-gif/go.io/go-http/go-httpex"
+	gohttp "github.com/gif-gif/go.io/go-http"
 	"github.com/google/go-querystring/query"
 )
 
 func (m *Market) getAccountsByBusinessId(req *RequestData, businessId string) (*AccountResponse, error) {
 	api := m.BaseApi + ApiAccount
 	api = fmt.Sprintf(api, businessId)
-	res := AccountResponse{}
 	params, _ := query.Values(req)
 
-	result, err := gohttpex.HttpGetValues[AccountResponse](api, params, nil, &res, 1)
+	gh := gohttp.GoHttp[AccountResponse]{}
+	request := &gohttp.Request{
+		Url:          api,
+		ParamsValues: params,
+	}
+	result, err := gh.HttpGet(context.Background(), request)
 	if err != nil {
 		return nil, err
 	}
@@ -23,10 +28,15 @@ func (m *Market) getAccountsByBusinessId(req *RequestData, businessId string) (*
 func (m *Market) getAllDataByAccountId(req *RequestData, accountId string, dataTypeUri string) (*AllDataResponse, error) {
 	api := m.BaseApi + dataTypeUri
 	api = fmt.Sprintf(api, accountId)
-	res := AllDataResponse{}
 	params, _ := query.Values(req)
 
-	result, err := gohttpex.HttpGetValues[AllDataResponse](api, params, nil, &res, 1)
+	gh := gohttp.GoHttp[AllDataResponse]{}
+	request := &gohttp.Request{
+		Url:          api,
+		ParamsValues: params,
+	}
+	result, err := gh.HttpGet(context.Background(), request)
+
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +47,6 @@ func (m *Market) getAllDataByAccountId(req *RequestData, accountId string, dataT
 func (m *Market) getDetailByDataId(req *DetailsDataRequest, dataId string, dataTypeUri string) (*DataDetailResponse, error) {
 	api := m.BaseApi + dataTypeUri
 	api = fmt.Sprintf(api, dataId)
-	res := DataDetailResponse{}
 	req.TimeRange = "{'since':'" + req.DateStart + "','until':'" + req.DateStop + "'}"
 
 	req.DateStart = ""
@@ -52,7 +61,12 @@ func (m *Market) getDetailByDataId(req *DetailsDataRequest, dataId string, dataT
 	}
 
 	params, _ := query.Values(req)
-	result, err := gohttpex.HttpGetValues[DataDetailResponse](api, params, nil, &res, 1)
+	gh := gohttp.GoHttp[DataDetailResponse]{}
+	request := &gohttp.Request{
+		Url:          api,
+		ParamsValues: params,
+	}
+	result, err := gh.HttpGet(context.Background(), request)
 	if err != nil {
 		return nil, err
 	}

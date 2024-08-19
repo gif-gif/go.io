@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	gocontext "github.com/gif-gif/go.io/go-context"
-	gohttpx "github.com/gif-gif/go.io/go-http/go-httpex"
+	"github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gif-gif/go.io/goio"
@@ -14,14 +14,14 @@ import (
 func main() {
 	goio.Init(goio.DEVELOPMENT)
 	testRaceSpeed()
-
 	<-gocontext.Cancel().Done()
 }
 
 func testRequest() {
-	gohttpx.SetBaseUrl("http://localhost")
-	gohttpx.AddGlobalHeader("User-Id", "123")
-	req := gohttpx.Request{
+	gh := &gohttp.GoHttp[gohttp.Response]{}
+	gh.SetBaseUrl("http://localhost")
+	gh.AddGlobalHeader("User-Id", "123")
+	req := gohttp.Request{
 		Url: "/main",
 		Urls: []string{
 			"/main1",
@@ -39,22 +39,22 @@ func testRequest() {
 		Email: "test@gmail.com",
 	}
 
-	res := &gohttpx.Response{}
-	err := gohttpx.HttpPostJson[gohttpx.Response](context.Background(), &req, res)
+	rst, err := gh.HttpPostJson(context.Background(), &req)
 	if err != nil {
 		golog.WithTag("http").Error(err.Error())
 	} else {
-		fmt.Println(res)
+		fmt.Println(rst)
 	}
 
 	time.Sleep(10 * time.Second)
 }
 
 func testRaceSpeed() {
-	req := gohttpx.Request{
-		Method: gohttpx.POST,
+	gh := &gohttp.GoHttp[gohttp.Response]{}
+
+	req := gohttp.Request{
+		Method: gohttp.POST,
 		Urls: []string{
-			"http://localhost:20122/api/jump/account/check",
 			"https://jumpjump.io/api/jump/account/check",
 			"http://localhost:400",
 		},
@@ -67,15 +67,14 @@ func testRaceSpeed() {
 	}
 
 	req.Body = &httpRequest{
-		Email: "test@gmail.com",
+		Email: "test111@gmail.com",
 	}
 
-	res := &gohttpx.Response{}
-	err := gohttpx.HttpConcurrencyRequest[gohttpx.Response](&req, res)
+	rst, err := gh.HttpConcurrencyRequest(&req)
 	if err != nil {
 		golog.ErrorF("Error: \n", err.Error())
 	} else {
-		golog.InfoF("res: \n", res)
+		golog.InfoF("res: \n", rst.Code, rst.Msg)
 	}
 
 	time.Sleep(10 * time.Second)

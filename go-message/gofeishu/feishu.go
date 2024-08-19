@@ -2,7 +2,7 @@ package gofeishu
 
 import (
 	"errors"
-	gohttp "github.com/gif-gif/go.io/go-http"
+	"github.com/gif-gif/go.io/go-http/gohttpx"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"runtime"
 	"sync"
@@ -27,7 +27,7 @@ func FeiShu(hookUrl string, text string) error {
 		Set("msg_type", "text").
 		Set("content", content.Data())
 
-	buf, err := gohttp.PostJson(hookUrl, params.JSON())
+	buf, err := gohttpx.PostJson(hookUrl, params.JSON())
 	if err != nil {
 		return err
 	}
