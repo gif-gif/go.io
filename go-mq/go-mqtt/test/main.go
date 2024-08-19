@@ -36,7 +36,7 @@ func testSubscribe() {
 	}
 
 	var conf = gomqtt.Config{
-		Server:           "122.228.113.238",
+		Server:           "127.0.0.1",
 		Port:             18830,
 		ClientId:         "go_mqtt_client_test",
 		User:             "mqtt",
@@ -76,7 +76,7 @@ func testPublish() {
 	}
 
 	var conf = gomqtt.Config{
-		Server:           "122.228.113.238",
+		Server:           "127.0.0.1",
 		Port:             18830,
 		ClientId:         "go_mqtt_client_test1",
 		User:             "mqtt",
