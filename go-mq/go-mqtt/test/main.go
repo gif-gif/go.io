@@ -36,7 +36,7 @@ func testSubscribe() {
 	}
 
 	var conf = gomqtt.Config{
-		Server:           "182.92.216.214",
+		Server:           "122.228.113.238",
 		Port:             18830,
 		ClientId:         "go_mqtt_client_test",
 		User:             "mqtt",
@@ -76,9 +76,9 @@ func testPublish() {
 	}
 
 	var conf = gomqtt.Config{
-		Server:           "182.92.216.214",
+		Server:           "122.228.113.238",
 		Port:             18830,
-		ClientId:         "go_mqtt_client_test",
+		ClientId:         "go_mqtt_client_test1",
 		User:             "mqtt",
 		Secret:           "223238",
 		DefaultHandler:   &messagePubHandler,
@@ -104,17 +104,4 @@ func publish(client *gomqtt.GoMqttClient) {
 		return
 	}
 	golog.WithTag("mqtt-publish").WithField(topic, topic).Info("publish-text")
-
-	//num := 10
-	//for i := 0; i < num; i++ {
-	//	text := fmt.Sprintf("Message1111 %d", i)
-	//	err := client.Publish(topic, 0, true, text)
-	//	if err != nil {
-	//		golog.Error(err.Error())
-	//		return
-	//	}
-	//	time.Sleep(time.Second)
-	//	golog.WithTag("mqtt-publish").WithField(topic, topic).Info(text)
-	//}
-
 }
