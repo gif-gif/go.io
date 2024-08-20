@@ -13,10 +13,12 @@ type Config struct {
 	DB       int    `yaml:"DB" json:"db,optional"`
 	Prefix   string `yaml:"Prefix" json:"prefix,optional"`
 	AutoPing bool   `yaml:"AutoPing" json:"autoPing,optional"`
+	TLS      bool   `yaml:"TLS" json:"tls,optional"`
 }
 
 type ClusterConf []Config
 
+// 兼容go-zore
 func (c ClusterConf) GetCacheConf() cache.CacheConf {
 	cacheConf := make([]cache.NodeConf, 0, len(c))
 	for _, conf := range c {
@@ -24,6 +26,7 @@ func (c ClusterConf) GetCacheConf() cache.CacheConf {
 			RedisConf: redis.RedisConf{
 				Host: conf.Addr,
 				Pass: conf.Password,
+				Tls:  conf.TLS,
 			},
 		})
 	}
