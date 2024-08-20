@@ -1,10 +1,8 @@
 package main
 
 import (
-	"context"
 	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	golog "github.com/gif-gif/go.io/go-log"
-	"time"
 )
 
 func main() {
@@ -22,10 +20,10 @@ func main() {
 		golog.WithTag("goredis").Error(err)
 	}
 
-	cmd := goredis.Default().Set(context.Background(), "goredis", "goredis", time.Duration(10)*time.Second)
+	cmd := goredis.Default().Set("goredis", "goredis")
 	if cmd.Err() != nil {
 		golog.WithTag("goredis").Error(cmd.Err())
 	}
-	v := goredis.Default().Get(context.Background(), "goredis").Val()
+	v := goredis.Default().Get("goredis").Val()
 	golog.WithTag("goredis").InfoF(v)
 }
