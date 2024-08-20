@@ -14,7 +14,9 @@ type Config struct {
 	Prefix   string `yaml:"Prefix" json:"prefix,optional"`
 	AutoPing bool   `yaml:"AutoPing" json:"autoPing,optional"`
 	TLS      bool   `yaml:"TLS" json:"tls,optional"`
-	Type     string `json:",default=node,options=node|cluster"`
+
+	Type   string `yaml:"Type" json:",default=node,options=node|cluster"`
+	Weight int    `yaml:"Weight" json:",default=100"` //for gozero
 }
 
 type ClusterConf []Config
@@ -30,6 +32,7 @@ func (c ClusterConf) GetCacheConf() cache.CacheConf {
 				Tls:  conf.TLS,
 				Type: conf.Type,
 			},
+			Weight: conf.Weight,
 		})
 	}
 	return cacheConf
