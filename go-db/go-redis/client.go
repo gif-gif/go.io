@@ -16,6 +16,10 @@ type GoRedis struct {
 }
 
 func New(conf Config) (cli *GoRedis, err error) {
+	if conf.Type == "" {
+		conf.Type = "node"
+	}
+
 	cli = &GoRedis{
 		Ctx:    context.Background(),
 		Config: conf,
