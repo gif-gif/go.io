@@ -350,8 +350,8 @@ func (s *GoRedis) Set(key, value string) *redis.StatusCmd {
 }
 
 // Setex is the implementation of redis setex command.
-func (s *GoRedis) SetEx(key, value string, seconds int) *redis.StatusCmd {
-	return s.Redis.SetEx(s.Ctx, s.WrapKey(key), value, time.Duration(seconds)*time.Second)
+func (s *GoRedis) SetEx(key, value string, expiration time.Duration) *redis.StatusCmd {
+	return s.Redis.SetEx(s.Ctx, s.WrapKey(key), value, expiration)
 }
 
 // Sismember is the implementation of redis sismember command.

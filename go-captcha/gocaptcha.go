@@ -28,14 +28,14 @@ type RedisStore struct {
 }
 
 func (r *RedisStore) Set(id string, value string) error {
-	r.redis.SetEx(r.Context, id, value, 10*time.Minute)
+	r.redis.SetEx(id, value, 10*time.Minute)
 	return nil
 }
 
 func (r *RedisStore) Get(id string, clear bool) string {
-	rst := r.redis.Get(r.Context, id).Val()
+	rst := r.redis.Get(id).Val()
 	if clear {
-		r.redis.Del(r.Context, id)
+		r.redis.Del(id)
 	}
 	return rst
 }
