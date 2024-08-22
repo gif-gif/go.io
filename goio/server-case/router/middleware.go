@@ -19,3 +19,11 @@ func verifySign(c *gin.Context) {
 
 	c.Next()
 }
+
+func verifyCaptcha(c *gin.Context) {
+	if 1 == 1 {
+		c.AbortWithStatusJSON(403, goio.Error(40301, "验证码错误"))
+		return
+	}
+	c.Next()
+}
