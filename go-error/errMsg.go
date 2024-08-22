@@ -18,6 +18,7 @@ var (
 	ErrUserNoExists      = NewErrCodeMsg(TOKEN_EXPIRE_ERROR, "user not found")
 	ErrUserForbidden     = NewErrCode(FORBIDDEN_ERROR)
 	ErrUnauthorized      = NewErrCodeMsg(TOKEN_EXPIRE_ERROR, "unauthorized")
+	ErrCaptcha           = NewErrCodeMsg(CAPTCHA_ERROR, "captcha error")
 	ErrRequestParamError = NewErrCode(REQUEST_PARAM_ERROR)
 	ErrServerError       = NewErrCode(SERVER_COMMON_ERROR)
 )
