@@ -10,6 +10,7 @@ var (
 		FORBIDDEN_ERROR:               "forbidden",
 		DB_ERROR:                      "db error",
 		DB_UPDATE_AFFECTED_ZERO_ERROR: "no changes",
+		CAPTCHA_ERROR:                 "captcha error",
 	}
 )
 
@@ -20,6 +21,7 @@ var (
 	ErrUnauthorized      = NewErrCodeMsg(TOKEN_EXPIRE_ERROR, "unauthorized")
 	ErrCaptcha           = NewErrCodeMsg(CAPTCHA_ERROR, "captcha error")
 	ErrRequestParamError = NewErrCode(REQUEST_PARAM_ERROR)
+	ErrDBError           = NewErrCode(DB_ERROR)
 	ErrServerError       = NewErrCode(SERVER_COMMON_ERROR)
 )
 
