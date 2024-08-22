@@ -3,12 +3,25 @@ package goutils
 import (
 	"fmt"
 	"github.com/gogf/gf/util/gconv"
+	"golang.org/x/crypto/bcrypt"
 	"math"
 	"math/rand"
 	"reflect"
 	"strings"
 	"time"
 )
+
+// BcryptHash 使用 bcrypt 对密码进行加密
+func BcryptHash(password string) string {
+	bytes, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes)
+}
+
+// BcryptCheck 对比明文密码和数据库的哈希值
+func BcryptCheck(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
 
 // 常用签名验证, sign md5 小写
 func CheckSign(secret string, linkSignTimeout int64, ts int64, sign string) bool {
