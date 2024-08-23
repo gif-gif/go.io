@@ -14,8 +14,9 @@ import (
 )
 
 type GoHttp[T any] struct {
-	BaseUrl       string
-	GlobalHeaders map[string]string
+	BaseUrl string
+	Headers map[string]string
+	Request *Request
 }
 
 func (g *GoHttp[T]) SetBaseUrl(base string) {
@@ -27,18 +28,18 @@ func (g *GoHttp[T]) GetBaseUrl() string {
 }
 
 func (g *GoHttp[T]) AddGlobalHeader(k, v string) {
-	if g.GlobalHeaders == nil {
-		g.GlobalHeaders = make(map[string]string)
+	if g.Headers == nil {
+		g.Headers = make(map[string]string)
 	}
-	g.GlobalHeaders[k] = v
+	g.Headers[k] = v
 }
 
 func (g *GoHttp[T]) RemoveGlobalHeader(k string) {
-	delete(g.GlobalHeaders, k)
+	delete(g.Headers, k)
 }
 
 func (g *GoHttp[T]) GetGlobalHeaders() map[string]string {
-	return g.GlobalHeaders
+	return g.Headers
 }
 
 // Headers["Accept"] = "application/json" for default
@@ -148,41 +149,41 @@ func (g *GoHttp[T]) doHttpRequest(context context.Context, req *Request) (*T, er
 	return respData, nil
 }
 
-func (g *GoHttp[T]) HttpPostJson(context context.Context, req *Request) (*T, error) {
-	if req.Headers == nil {
-		req.Headers = make(map[string]string)
+func (g *GoHttp[T]) HttpPostJson(context context.Context) (*T, error) {
+	if g.Request.Headers == nil {
+		g.Request.Headers = make(map[string]string)
 	}
 
-	req.Headers["Content-Type"] = CONTENT_TYPE_JSON
-	req.Method = POST
-	return g.HttpRequest(context, req)
+	g.Request.Headers["Content-Type"] = CONTENT_TYPE_JSON
+	g.Request.Method = POST
+	return g.HttpRequest(context)
 }
 
-func (g *GoHttp[T]) HttpPost(context context.Context, req *Request) (*T, error) {
-	req.Method = POST
-	return g.HttpRequest(context, req)
+func (g *GoHttp[T]) HttpPost(context context.Context) (*T, error) {
+	g.Request.Method = POST
+	return g.HttpRequest(context)
 }
 
-func (g *GoHttp[T]) HttpGet(context context.Context, req *Request) (*T, error) {
-	req.Method = GET
-	return g.HttpRequest(context, req)
+func (g *GoHttp[T]) HttpGet(context context.Context) (*T, error) {
+	g.Request.Method = GET
+	return g.HttpRequest(context)
 }
 
 // 带多个Urls重试逻辑
-func (g *GoHttp[T]) HttpRequest(context context.Context, req *Request) (*T, error) {
-	t, err := g.doHttpRequest(context, req)
+func (g *GoHttp[T]) HttpRequest(context context.Context) (*T, error) {
+	t, err := g.doHttpRequest(context, g.Request)
 	if err == nil {
 		return t, nil
 	} else {
-		if len(req.Urls) == 0 { //没有重试urls
+		if len(g.Request.Urls) == 0 { //没有重试urls
 			return t, err
 		}
 
 		errs := errors.New("HttpRetryError error")
 		errs = errors.Join(errs, err)
-		for _, url := range req.Urls {
-			req.Url = url
-			t, err = g.doHttpRequest(context, req)
+		for _, url := range g.Request.Urls {
+			g.Request.Url = url
+			t, err = g.doHttpRequest(context, g.Request)
 			if err == nil { //请求成功了直接返回
 				return t, nil
 			} else {
@@ -194,12 +195,12 @@ func (g *GoHttp[T]) HttpRequest(context context.Context, req *Request) (*T, erro
 }
 
 // 带多个Urls重试逻辑,并发请求,速度快先到达后 直接返回，其他请求取消
-func (g *GoHttp[T]) HttpConcurrencyRequest(req *Request) (*T, error) {
-	if req.Url != "" { //把当前加进来起并发
-		req.Urls = append(req.Urls, req.Url)
+func (g *GoHttp[T]) HttpConcurrencyRequest() (*T, error) {
+	if g.Request.Url != "" { //把当前加进来起并发
+		g.Request.Urls = append(g.Request.Urls, g.Request.Url)
 	}
 
-	if len(req.Urls) == 0 { //没有urls
+	if len(g.Request.Urls) == 0 { //没有urls
 		return nil, errors.New("urls is empty")
 	}
 
@@ -209,8 +210,8 @@ func (g *GoHttp[T]) HttpConcurrencyRequest(req *Request) (*T, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	fns := []func(){}
-	for _, url := range req.Urls {
-		reqNew := *req
+	for _, url := range g.Request.Urls {
+		reqNew := *g.Request
 		reqNew.Url = url
 		fns = append(fns, func() {
 			if goutils.IsContextDone(ctx) {

@@ -4,8 +4,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	gohttp "github.com/gif-gif/go.io/go-http"
+	gocontext "github.com/gif-gif/go.io/go-context"
+	"github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/goio"
 	"time"
@@ -13,33 +15,38 @@ import (
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-	gh := &gohttp.GoHttp[gohttp.Response]{}
-	req := gohttp.Request{
-		Url: "http://localhost:100",
-		Urls: []string{
-			"http://localhost:200",
-			"http://localhost:300",
-			"http://localhost:400",
-		},
-		QueryParams: map[string]string{"name": "jk"},
-		Timeout:     time.Second * 2,
-	}
 	type httpRequest struct {
 		Email string `json:"email"`
 	}
 
-	req.Body = &httpRequest{
-		Email: "test@gmail.com",
+	req := &gohttp.Request{
+		Url: "/main",
+		Urls: []string{
+			"/main1",
+			"/main2",
+			"/main3",
+		},
+		QueryParams: map[string]string{"name": "jk"},
+		Timeout:     time.Second * 2,
+		Body: &httpRequest{
+			Email: "test@gmail.com",
+		},
 	}
 
-	res,err := gh.HttpPostJson(&req)
+	gh := &gohttp.GoHttp[gohttp.Response]{
+		Request: req,
+		BaseUrl: "http://localhost",
+		Headers: map[string]string{
+			"User-Agent": "github.com/gif-gif/go.io",
+		},
+	}
+
+	rst, err := gh.HttpPostJson(context.Background())
 	if err != nil {
-		golog.ErrorF("Error: %+v\n", err)
+		golog.WithTag("http").Error(err.Error())
 	} else {
-		fmt.Println(res)
+		fmt.Println(rst)
 	}
-
-	time.Sleep(10 * time.Second)
 }
 
 ```

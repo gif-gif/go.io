@@ -150,8 +150,10 @@ func UploadChunk(url string, chunk *FileChunk) (*gohttp.Response, error) {
 		FileName: chunk.OriginalFileName,
 		Headers:  map[string]string{"User-Agent": "github.com/gif-gif/go.io"},
 	}
-	gh := gohttp.GoHttp[gohttp.Response]{}
-	res, err := gh.HttpPost(context.Background(), req)
+	gh := gohttp.GoHttp[gohttp.Response]{
+		Request: req,
+	}
+	res, err := gh.HttpPost(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -167,8 +169,10 @@ func MergeChunk(url string, fileMergeReq *FileMergeReq) (*gohttp.Response, error
 		Body:    fileMergeReq,
 	}
 
-	gh := gohttp.GoHttp[gohttp.Response]{}
-	res, err := gh.HttpPost(context.Background(), req)
+	gh := gohttp.GoHttp[gohttp.Response]{
+		Request: req,
+	}
+	res, err := gh.HttpPost(context.Background())
 	if err != nil {
 		return nil, err
 	}
