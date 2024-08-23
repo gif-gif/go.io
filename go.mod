@@ -1,6 +1,6 @@
 module github.com/gif-gif/go.io
 
-go 1.22
+go 1.23
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
@@ -36,6 +36,7 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.13
 	go.mongodb.org/mongo-driver v1.16.0
 	go.uber.org/zap v1.27.0
+	golang.org/x/crypto v0.25.0
 	golang.org/x/sync v0.7.0
 	golang.org/x/text v0.16.0
 	google.golang.org/grpc v1.63.2
@@ -173,7 +174,6 @@ require (
 	go.uber.org/automaxprocs v1.5.3 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
 	golang.org/x/image v0.18.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
