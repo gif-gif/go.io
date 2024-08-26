@@ -7,11 +7,13 @@ import (
 	"github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/goio"
+	"github.com/zeromicro/go-zero/core/logx"
 	"time"
 )
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
+	logx.DisableStat()
 	testRaceSpeed()
 	<-gocontext.Cancel().Done()
 }
