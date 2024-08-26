@@ -38,20 +38,17 @@ func New(conf Config) (*client, error) {
 }
 
 func GetClient(names ...string) *client {
+	name := "default"
 	if l := len(names); l > 0 {
-		name := names[0]
-		if cli, ok := __clients[name]; ok {
-			return cli
+		name = names[0]
+		if name == "" {
+			name = "default"
 		}
-		return nil
-	} else {
-		if l := len(__clients); l == 1 {
-			for _, cli := range __clients {
-				return cli
-			}
-		}
-		return nil
 	}
+	if cli, ok := __clients[name]; ok {
+		return cli
+	}
+	return nil
 }
 
 func Client() *client {

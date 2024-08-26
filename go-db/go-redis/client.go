@@ -49,7 +49,7 @@ func New(conf Config) (cli *GoRedis, err error) {
 		})
 	}
 
-	return
+	return cli, nil
 }
 
 func (s *GoRedis) WrapKey(key string) string {

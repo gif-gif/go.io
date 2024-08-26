@@ -64,7 +64,6 @@ type CaptchaData struct {
 
 type GoCaptcha struct {
 	store base64Captcha.Store //验证码信息自定义存储
-
 }
 
 // new other store
@@ -73,12 +72,18 @@ func NewRedis(config goredis.Config) (*GoCaptcha, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &GoCaptcha{
+
+	redis := goredis.GetClient(config.Name)
+	if redis == nil {
+		return nil, fmt.Errorf("failed to connect to redis %v", config)
+	}
+	g := &GoCaptcha{
 		store: &RedisStore{
-			redis:   goredis.GetClient(config.Name),
+			redis:   redis,
 			Context: context.Background(),
 		},
-	}, nil
+	}
+	return g, nil
 }
 func New(store base64Captcha.Store) *GoCaptcha {
 	return &GoCaptcha{
