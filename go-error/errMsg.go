@@ -4,8 +4,12 @@ var (
 	message = map[uint32]string{
 		OK:                            "ok",
 		SERVER_COMMON_ERROR:           "server error",
+		NOT_FOUND_ERROR:               "not found error",
 		REQUEST_PARAM_ERROR:           "param error",
 		TOKEN_EXPIRE_ERROR:            "token expired,please login again",
+		USER_EXISTS_ERROR:             "user exists",
+		USER_NOT_EXISTS_ERROR:         "user not exists",
+		USER_LOGIN_ERROR:              "username or password is invalid",
 		TOKEN_GENERATE_ERROR:          "token create error",
 		FORBIDDEN_ERROR:               "forbidden",
 		DB_ERROR:                      "db error",
