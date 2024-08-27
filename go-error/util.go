@@ -6,11 +6,11 @@ import (
 )
 
 func IsErrCode(err error, code uint32) bool {
-	errCode, _ := GetErrCodeMsg(err)
+	errCode, _ := GetErrCodeMsg(err, nil)
 	return uint32(code) == errCode
 }
 
-func GetErrCodeMsg(err error) (errCode uint32, errMsg string) {
+func GetErrCodeMsg(err error, errorsx map[uint32]string) (errCode uint32, errMsg string) {
 	if err == nil {
 		return 0, ""
 	}
@@ -28,7 +28,15 @@ func GetErrCodeMsg(err error) (errCode uint32, errMsg string) {
 			if IsCodeErr(grpcCode) { //区分自定义错误跟系统底层、db等错误，底层、db错误不能返回给前端
 				errCode = grpcCode
 				errMsg = gstatus.Message()
+			} else {
+				if errorsx != nil {
+					if _, ok := errorsx[grpcCode]; ok {
+						errCode = grpcCode
+						errMsg = gstatus.Message()
+					}
+				}
 			}
+
 		}
 	}
 
