@@ -15,11 +15,9 @@ func main() {
 		"aaa": 1,
 	}
 
-	gojwt := &gojwt.GoJwt{
-		Config: c,
-	}
+	gojwt.Init(c)
 
-	a, r, e, err := gojwt.GeneratedTokens(params)
+	a, r, e, err := gojwt.Default().GeneratedTokens(params)
 	if err != nil {
 		golog.Error(err.Error())
 		return
@@ -27,17 +25,17 @@ func main() {
 
 	golog.Info(a, r, e)
 
-	m, err := gojwt.ParseToken(a)
+	m, err := gojwt.Default().ParseToken(a)
 	if err != nil {
 		golog.Error(err.Error())
 		return
 	}
 	golog.Info(m)
 
-	if gojwt.IsValidToken(a) {
+	if gojwt.Default().IsValidToken(a) {
 		golog.WithTag("IsValidToken").Info("OK")
 	}
 
-	a, b, cc, err := gojwt.RefreshAccessToken(r)
+	a, b, cc, err := gojwt.Default().RefreshAccessToken(r)
 	golog.WithTag("RefreshToken").Info(a, b, cc, err)
 }

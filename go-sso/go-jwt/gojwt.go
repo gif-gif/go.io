@@ -7,13 +7,20 @@ import (
 )
 
 type Config struct {
-	AccessSecret       string
-	AccessExpire       int64
-	RefreshTokenExpire int64
+	Name               string `yaml:"Name" json:"name,optional"`
+	AccessSecret       string `yaml:"AccessSecret" json:"accessSecret,optional"`
+	AccessExpire       int64  `yaml:"AccessExpire" json:"accessExpire,optional"`
+	RefreshTokenExpire int64  `yaml:"RefreshTokenExpire" json:"refreshTokenExpire,optional"`
 }
 
 type GoJwt struct {
 	Config Config
+}
+
+func New(config Config) *GoJwt {
+	return &GoJwt{
+		Config: config,
+	}
 }
 
 func GetJwtToken(secretKey string, iat, seconds int64, params map[string]any) (string, error) {
