@@ -5,7 +5,7 @@ import golog "github.com/gif-gif/go.io/go-log"
 var __clients = map[string]*GoJwt{}
 
 // 可以一次初始化多个Redis实例或者 多次调用初始化多个实例
-func Init(configs ...Config) (err error) {
+func Init(configs ...Config) {
 	for _, conf := range configs {
 		name := conf.Name
 		if name == "" {
@@ -14,8 +14,6 @@ func Init(configs ...Config) (err error) {
 
 		__clients[name] = New(conf)
 	}
-
-	return
 }
 
 func GetClient(names ...string) *GoJwt {
