@@ -18,6 +18,7 @@ require (
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/gogf/gf v1.16.9
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/go-querystring v1.1.0
 	github.com/google/uuid v1.6.0
 	github.com/ip2location/ip2location-go/v9 v9.7.0
