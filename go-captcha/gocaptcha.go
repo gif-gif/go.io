@@ -130,6 +130,9 @@ func (g *GoCaptcha) GetCaptcha(param configJsonBody) (*CaptchaData, error) {
 
 // 验证
 func (g *GoCaptcha) CaptchaVerify(id, code string) bool {
+	if id == "" || code == "" {
+		return false
+	}
 	return g.store.Verify(id, code, true)
 }
 

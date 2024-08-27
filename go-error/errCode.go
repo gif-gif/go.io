@@ -14,6 +14,7 @@ const NOT_FOUND_ERROR uint32 = 404
 const CAPTCHA_ERROR uint32 = 700
 const USER_NOT_EXISTS_ERROR uint32 = 701
 const USER_LOGIN_ERROR uint32 = 703
+const USER_EXISTS_ERROR uint32 = 704
 
 // server
 const SERVER_COMMON_ERROR uint32 = 500

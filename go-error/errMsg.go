@@ -17,6 +17,7 @@ var (
 var (
 	ErrNotFound          = NewErrCodeMsg(NOT_FOUND_ERROR, "not found")
 	ErrUserNoExists      = NewErrCodeMsg(USER_NOT_EXISTS_ERROR, "user not found")
+	ErrUserExists        = NewErrCodeMsg(USER_EXISTS_ERROR, "user exists")
 	ErrUserForbidden     = NewErrCode(FORBIDDEN_ERROR)
 	ErrUserLogin         = NewErrCode(USER_LOGIN_ERROR)
 	ErrUnauthorized      = NewErrCodeMsg(TOKEN_EXPIRE_ERROR, "unauthorized")
