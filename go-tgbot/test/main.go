@@ -12,10 +12,10 @@ func main() {
 	var chatId int64 = 5562314141
 	pref := &gotgbot.TelegramBot{
 		Product:    "test",
-		Token:      "7107568224:AAFgdiEsDqtFvBBScIfWku9IB8jr9Dpl-dw",
+		Token:      "",
 		WebAppUrl:  "https://www.google.com",
 		StartReply: "hello",
-		ApiUrl:     "https://tgapi.goio.dev",
+		ApiUrl:     "https://api.jidianle.cc/tg",
 	}
 
 	gobot, err := gotgbot.Create(pref) // TODO离线模式测试
