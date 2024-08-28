@@ -1,6 +1,8 @@
 package gokafka
 
-import "github.com/IBM/sarama"
+import (
+	"github.com/IBM/sarama"
+)
 
 // 分组
 type group struct {

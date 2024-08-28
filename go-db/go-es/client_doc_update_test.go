@@ -91,7 +91,7 @@ func TestClient_DocBatchUpset(t *testing.T) {
 	for i := 1; i < 10; i++ {
 		ids = append(ids, fmt.Sprintf("%d", 1000+i))
 		docs = append(docs, map[string]interface{}{
-			"name": fmt.Sprintf("hnatao_%d", 1000+i),
+			"name": fmt.Sprintf("goio_%d", 1000+i),
 		})
 	}
 

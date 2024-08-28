@@ -1,20 +1,20 @@
 # kafka
-
+- https://github.com/IBM/sarama
 ```
 gokafka.Client().Topics()
 
 // 发送消息，不指定分区
-gokafka.Producer().SendMessage("test", []byte("hi hnatao"))
+gokafka.Producer().SendMessage("test", []byte("hi"))
 
 // 发送消息，指定分区
-gokafka.Producer().WithPartition(0).SendMessage("test", []byte("hi hnatao"))
+gokafka.Producer().WithPartition(0).SendMessage("test", []byte("hi goio"))
 
 // 发送异步消息，不指定分区
-gokafka.Producer().SendAsyncMessage("test", []byte("hi hnatao"), func(msg *gokafka.ProducerMessage, err error) {
+gokafka.Producer().SendAsyncMessage("test", []byte("hi goio"), func(msg *gokafka.ProducerMessage, err error) {
 })
 
 // 发送异步消息，指定分区
-gokafka.Producer().WithPartition(0).SendAsyncMessage("test", []byte("hi hnatao"), func(msg *gokafka.ProducerMessage, err error) {
+gokafka.Producer().WithPartition(0).SendAsyncMessage("test", []byte("hi goio"), func(msg *gokafka.ProducerMessage, err error) {
 })
 
 // 消费消息，指定分区，指定起始位置

@@ -12,11 +12,11 @@ func TestDefault(t *testing.T) {
 		log.Println("this is hook", msg)
 	})
 
-	Debug("hi hnatao", "aa", 100)
-	DebugF("hi %s", "hnatao")
-	WithTag("u1").Debug("hi hnatao")
-	WithTag("u1", "u-1").Debug("hi hnatao")
-	WithTag("u1").WithField("name", "hnatao").Debug("hi hnatao")
-	WithTag("u1").WithField("id", 101).Debug("hi hnatao")
-	WithTag("u1").WithField("id", 101).Debug("hi hnatao")
+	Debug("hi goio", "aa", 100)
+	DebugF("hi %s", "goio")
+	WithTag("u1").Debug("hi goio")
+	WithTag("u1", "u-1").Debug("hi goio")
+	WithTag("u1").WithField("name", "goio").Debug("hi goio")
+	WithTag("u1").WithField("id", 101).Debug("hi goio")
+	WithTag("u1").WithField("id", 101).Debug("hi goio")
 }

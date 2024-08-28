@@ -1,6 +1,8 @@
 package gokafka
 
 import (
+	"context"
+	"fmt"
 	"github.com/IBM/sarama"
 	gocontext "github.com/gif-gif/go.io/go-context"
 	golog "github.com/gif-gif/go.io/go-log"
@@ -88,10 +90,8 @@ func (c *consumer) ConsumeGroup(groupId string, topics []string, handler Consume
 	}
 
 	g := group{handler: handler}
-
 	goutils.AsyncFunc(func() {
 		defer cg.Close()
-
 		for {
 			select {
 			case <-gocontext.Cancel().Done():
@@ -99,11 +99,40 @@ func (c *consumer) ConsumeGroup(groupId string, topics []string, handler Consume
 
 			case err := <-cg.Errors():
 				golog.WithTag("gokafka-consumer-group").Error(err)
+				return
 			}
 		}
 	})
 
 	if err := cg.Consume(gocontext.Cancel(), topics, g); err != nil {
 		golog.WithTag("gokafka-consumer-group").Error(err)
+	}
+}
+
+func (c *consumer) ConsumeGroup1(groupId string, topics []string, handler ConsumerHandler) {
+	g, err := sarama.NewConsumerGroup(c.conf.Addrs, groupId, c.Client().Config())
+	if err != nil {
+		panic(err)
+	}
+	defer func() { _ = g.Close() }()
+
+	// Track errors
+	go func() {
+		for err := range g.Errors() {
+			fmt.Println("ERROR", err)
+		}
+	}()
+
+	// Iterate over consumer sessions.
+	ctx := context.Background()
+	for {
+		ghandler := group{handler: handler}
+		// `Consume` should be called inside an infinite loop, when a
+		// server-side rebalance happens, the consumer session will need to be
+		// recreated to get the new claims
+		err := g.Consume(ctx, topics, ghandler)
+		if err != nil {
+			panic(err)
+		}
 	}
 }

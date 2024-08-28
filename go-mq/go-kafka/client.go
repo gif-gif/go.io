@@ -27,7 +27,6 @@ func (cli *client) init() (err error) {
 	config.Producer.Partitioner = sarama.NewHashPartitioner
 	config.Producer.Return.Successes = true
 	config.Producer.Return.Errors = true
-
 	config.Consumer.Return.Errors = true
 	config.Consumer.Offsets.AutoCommit.Enable = true              // 自动提交
 	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second // 间隔

@@ -21,7 +21,7 @@ type Account struct {
 
 func main() {
 	err := gokafka.Init(gokafka.Config{
-		Addrs:    []string{"127.0.0.1:30094"}, //122.228.113.231
+		Addrs:    []string{"122.228.113.231:30094"}, //122.228.113.231
 		User:     "admin",
 		Password: "b36da6b4eb0f3",
 		Timeout:  10,
@@ -40,7 +40,7 @@ func main() {
 	}
 
 	topic := "biu_account"
-	err = gokafka.Client().CreateTopicsRequest(topic, -1, -1)
+	err = gokafka.Client().CreateTopicsRequest(topic, 0, -1)
 	if err != nil {
 		golog.WithTag("CreateTopicsRequest").Error(err.Error())
 		return
@@ -49,6 +49,15 @@ func main() {
 	goutils.AsyncFunc(func() {
 		gokafka.Consumer().Consume(topic, func(msg *gokafka.ConsumerMessage, consumerErr *gokafka.ConsumerError) error {
 			golog.WithTag("gokafka").Info("Consumer:" + msg.Topic)
+			golog.WithTag("gokafka").Info("Consumer:", string(msg.Value))
+			return nil
+		})
+	})
+
+	goutils.AsyncFunc(func() {
+		gokafka.Consumer().ConsumeGroup("myGroup", []string{topic}, func(msg *gokafka.ConsumerMessage, consumerErr *gokafka.ConsumerError) error {
+			golog.WithTag("gokafkaGroup").Info("Consumer:" + msg.Topic)
+			golog.WithTag("gokafkaGroup").Info("Consumer:", string(msg.Value))
 			return nil
 		})
 	})

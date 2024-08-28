@@ -4,7 +4,7 @@ import "testing"
 
 func TestMail_Send_126(t *testing.T) {
 	conf := Config{
-		Username: "hnatao@126.com",
+		Username: "goio@126.com",
 		Password: "XYQNHPYFSLHYVRGCA",
 		Host:     "smtp.126.com",
 		Port:     465,
@@ -12,11 +12,11 @@ func TestMail_Send_126(t *testing.T) {
 	}
 
 	msg := Message{
-		Sender:     "hnatao@126.com",
+		Sender:     "goio@126.com",
 		SenderName: "测试者",
-		Receivers:  []string{"hnatao@126.com"},
+		Receivers:  []string{"goio@126.com"},
 		Subject:    "hi",
-		Body:       "hi hnatao",
+		Body:       "hi goio",
 	}
 
 	New(conf).Send(msg)
@@ -34,9 +34,9 @@ func TestMail_Send_qq(t *testing.T) {
 	msg := Message{
 		Sender:     "service@shuzhuo.cn",
 		SenderName: "测试者",
-		Receivers:  []string{"hnatao@126.com"},
+		Receivers:  []string{"goio@126.com"},
 		Subject:    "hi",
-		Body:       `<h3>hi hnatao</h3><p>请点击下面的链接进行修改密码：http://www.baidu.com</p>`,
+		Body:       `<h3>hi goio</h3><p>请点击下面的链接进行修改密码：http://www.baidu.com</p>`,
 	}
 
 	New(conf).Send(msg)
@@ -44,7 +44,7 @@ func TestMail_Send_qq(t *testing.T) {
 
 func TestMail_Send_gmail(t *testing.T) {
 	conf := Config{
-		Username: "hnatao@gmail.com",
+		Username: "goio@gmail.com",
 		Password: "ljtgepqpmraiixeea",
 		Host:     "smtp.gmail.com",
 		Port:     465,
@@ -52,11 +52,11 @@ func TestMail_Send_gmail(t *testing.T) {
 	}
 
 	msg := Message{
-		Sender:     "hnatao@gmail.com",
+		Sender:     "goio@gmail.com",
 		SenderName: "测试者",
-		Receivers:  []string{"hnatao@126.com"},
+		Receivers:  []string{"goio@126.com"},
 		Subject:    "hi",
-		Body:       `<h3>hi hnatao</h3><p>请点击下面的链接进行修改密码：http://www.baidu.com</p>`,
+		Body:       `<h3>hi goio</h3><p>请点击下面的链接进行修改密码：http://www.baidu.com</p>`,
 	}
 
 	New(conf).Send(msg)

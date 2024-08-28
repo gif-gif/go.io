@@ -20,7 +20,7 @@ func TestClient_DocCreate(t *testing.T) {
 	index := "test_202209"
 
 	resp, err := __client.DocCreate(index, "1001", map[string]interface{}{
-		"name": "hnatao",
+		"name": "goio",
 	})
 	fmt.Println(resp, err)
 }

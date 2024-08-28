@@ -80,7 +80,7 @@ func TestClient_DocSearch(t *testing.T) {
 		Name string `json:"name"`
 	}
 
-	query := __client.DocSearchMatchQuery("name", "hnatao")
+	query := __client.DocSearchMatchQuery("name", "goio")
 	p := &Pagination{
 		Sort:   "name",
 		Order:  true,
@@ -120,7 +120,7 @@ func TestClient_DocSearch2(t *testing.T) {
 	}
 
 	query := __client.DocSearchBoolQuery(BoolQueryFilter,
-		__client.DocSearchMatchQuery("name", "hnatao"),
+		__client.DocSearchMatchQuery("name", "goio"),
 		__client.DocSearchMatchQuery("name", "noname_1002"))
 	p := &Pagination{
 		Sort:   "name",
