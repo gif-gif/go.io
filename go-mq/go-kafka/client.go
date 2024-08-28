@@ -58,6 +58,11 @@ func (cli *client) CreateTopicsRequest(topicName string, partitions int, replica
 		ReplicationFactor: int16(replicationFactors),
 	}
 	broker := cli.Brokers()[0]
+	err := broker.Open(cli.Config())
+	if err != nil {
+		return err
+	}
+	defer broker.Close()
 	ok, err := broker.Connected()
 	if err != nil {
 		return err
