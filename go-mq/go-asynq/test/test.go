@@ -38,7 +38,7 @@ func clientAsynq() {
 	}
 	log.Printf("enqueued task: id=%s queue=%s", info.ID, info.Queue)
 
-	info, err = client.Enqueue(tasks.TypeImageResize, tasks.ImageResizePayload{SourceURL: "https://example.com/myassets/image.jpg"}, asynq.MaxRetry(10), asynq.Group(), asynq.Timeout(3*time.Second))
+	info, err = client.Enqueue(tasks.TypeImageResize, tasks.ImageResizePayload{SourceURL: "https://example.com/myassets/image.jpg"}, asynq.MaxRetry(10), asynq.Timeout(3*time.Second))
 	if err != nil {
 		log.Fatalf("could not enqueue task: %v", err)
 	}
