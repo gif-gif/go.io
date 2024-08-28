@@ -19,7 +19,7 @@ func GrpcContext(c *gin.Context) context.Context {
 			md.Set("env", v)
 		}
 		if v := RequestId(c); v != "" {
-			md.Set("trace-id", v)
+			md.Set("gotrace-id", v)
 		}
 		if v := RequestId(c); v != "" {
 			arr := gofile.Trace(2)

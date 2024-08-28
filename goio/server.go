@@ -145,11 +145,11 @@ func (s *Server) log(c *gin.Context) {
 	}
 
 	req := gin.H{
-		"method":    c.Request.Method,
-		"uri":       c.Request.RequestURI,
-		"header":    header,
-		"client-ip": ClientIP(c),
-		"trace-id":  RequestId(c),
+		"method":     c.Request.Method,
+		"uri":        c.Request.RequestURI,
+		"header":     header,
+		"client-ip":  ClientIP(c),
+		"gotrace-id": RequestId(c),
 	}
 	if v := RequestBody(c); v != nil {
 		req["body"] = v

@@ -29,15 +29,15 @@ func main() {
 
 	//handler := func(name string) tele.HandlerFunc {
 	//	return func(c tele.Context) error {
-	//		trace = append(trace, name)
+	//		gotrace = append(gotrace, name)
 	//		return nil
 	//	}
 	//}
 	//
 	//middleware := func(c tele.Context, next tele.HandlerFunc, params ...any) error {
-	//	trace = append(trace, gconv.String(params[0])+":in")
+	//	gotrace = append(gotrace, gconv.String(params[0])+":in")
 	//	err := next(c)
-	//	trace = append(trace, gconv.String(params[0])+":out")
+	//	gotrace = append(gotrace, gconv.String(params[0])+":out")
 	//	return err
 	//}
 	//
