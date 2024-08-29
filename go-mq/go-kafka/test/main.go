@@ -39,7 +39,7 @@ func main() {
 		return
 	}
 
-	topic := "biu_account"
+	topic := "test_account"
 	err = gokafka.Client().CreateTopicsRequest(topic, 0, -1)
 	if err != nil {
 		golog.WithTag("CreateTopicsRequest").Error(err.Error())

@@ -9,7 +9,7 @@ type group struct {
 	handler ConsumerHandler
 }
 
-func (g group) Setup(sarama.ConsumerGroupSession) error {
+func (g group) Setup(sess sarama.ConsumerGroupSession) error {
 	return nil
 }
 

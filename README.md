@@ -142,7 +142,7 @@ func main() {
 
 	req := &gohttp.Request{
 		Url: "/main",
-		Urls: []string{
+		Urls: []string{ //Retry urls
 			"/main1",
 			"/main2",
 			"/main3",
