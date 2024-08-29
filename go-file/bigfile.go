@@ -21,10 +21,10 @@ type BigFile struct {
 	FileChunkCallback   func(chunk *FileChunk) error // 分片处理消息
 	SuccessChunkIndexes []int64                      //处理成功的碎片index
 
-	fileReader *os.File
-	fileSize   int64
-	__ctx      context.Context
-	pool       *errgroup.Group
+	fileReader   *os.File
+	fileSize     int64
+	__ctx        context.Context
+	errGroupPool *errgroup.Group
 }
 
 func (b *BigFile) IsSuccess() bool {
@@ -57,8 +57,8 @@ func (b *BigFile) Start() error {
 
 	g, ctx := errgroup.WithContext(context.Background())
 	b.__ctx = ctx
-	b.pool = g
-	b.pool.SetLimit(b.MaxWorkers)
+	b.errGroupPool = g
+	b.errGroupPool.SetLimit(b.MaxWorkers)
 
 	cSize := float64(fileInfo.Size()) / float64(b.ChunkSize*1024*1024)
 	chunkCount := gconv.Int(math.Ceil(cSize))
@@ -68,7 +68,7 @@ func (b *BigFile) Start() error {
 
 	for i := 0; i < chunkCount; i++ {
 		chunkIndex := gconv.Int64(i)
-		b.pool.Go(func() error {
+		b.errGroupPool.Go(func() error {
 			if goutils.IsContextDone(b.__ctx) {
 				return nil
 			}
@@ -84,7 +84,7 @@ func (b *BigFile) Start() error {
 			return nil
 		})
 	}
-	return b.pool.Wait()
+	return b.errGroupPool.Wait()
 }
 
 func (b *BigFile) createChunk(file *os.File, index int64) (*FileChunk, error) {
