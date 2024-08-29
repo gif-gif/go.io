@@ -38,7 +38,11 @@ func (cli *client) init() (err error) {
 	config.Consumer.Offsets.AutoCommit.Enable = true              // 自动提交
 	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second // 间隔
 	config.Consumer.Offsets.Retry.Max = 5
-	config.Consumer.Offsets.Initial = sarama.OffsetNewest
+	if cli.conf.OffsetNewest {
+		config.Consumer.Offsets.Initial = sarama.OffsetNewest
+	} else {
+		config.Consumer.Offsets.Initial = sarama.OffsetOldest
+	}
 	config.Consumer.Group.Rebalance.GroupStrategies = []sarama.BalanceStrategy{
 		sarama.NewBalanceStrategyRoundRobin(),
 		sarama.NewBalanceStrategySticky(),
@@ -66,7 +70,7 @@ func (cli *client) init() (err error) {
 		config.Consumer.Group.Rebalance.Timeout = time.Duration(cli.conf.RebalanceTimeout) * time.Second
 	}
 
-	config.Consumer.Group.InstanceId = id
+	//config.Consumer.Group.InstanceId = id
 
 	cli.Client, err = sarama.NewClient(cli.conf.Addrs, config)
 	if err != nil {

@@ -9,4 +9,5 @@ type Config struct {
 	HeartbeatInterval int      `json:"heartbeatInterval" yaml:"HeartbeatInterval"`
 	SessionTimeout    int      `json:"sessionTimeout" yaml:"SessionTimeout"`
 	RebalanceTimeout  int      `json:"rebalanceTimeout" yaml:"RebalanceTimeout"`
+	OffsetNewest      bool     `json:"offsetNewest" yaml:"OffsetNewest"`
 }
