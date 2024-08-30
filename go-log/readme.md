@@ -26,7 +26,7 @@
 - `FilePathOption()` 定义文件路径
 - `FileMaxSizeOption()` 定义文件大小最大值
 
-# 输出对象
+# 输出对象(Adapters)
 
 - console
 - file

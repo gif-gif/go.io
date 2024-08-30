@@ -3,53 +3,47 @@ package adapters
 import (
 	goes "github.com/gif-gif/go.io/go-db/go-es"
 	"github.com/gif-gif/go.io/go-log"
-	gokafka "github.com/gif-gif/go.io/go-mq/go-kafka"
-	"log"
 	"sync"
 )
 
 type EsAdapter struct {
-	topic string
+	index string
+	id    string
 	opt   goes.Config
 	mu    sync.Mutex
 }
 
-func NewEsLog(topic string, opt goes.Config) *golog.Logger {
-	return golog.New(NewEsAdapter(topic, opt))
+func NewEsLog(index, id string, opt goes.Config) *golog.Logger {
+	return golog.New(NewEsAdapter(index, id, opt))
 }
 
-func NewEsAdapter(topic string, opt goes.Config) *EsAdapter {
+func NewEsAdapter(index, id string, opt goes.Config) *EsAdapter {
 	err := goes.Init(opt)
 	if err != nil {
 		return nil
 	}
 	fa := &EsAdapter{
-		topic: topic,
+		index: index,
+		id:    id,
 		opt:   opt,
 	}
 	return fa
 }
 
 func (fa *EsAdapter) Write(msg *golog.Message) {
-	client := gokafka.GetClient(fa.opt.Name)
+	client := goes.GetClient(fa.opt.Name)
 	if client == nil {
 		return
 	}
-
-	err := client.Producer().SendAsyncMessage(fa.topic, msg.JSON(), func(msg *gokafka.ProducerMessage, err error) {
-
-	})
-
+	_, err := goes.GetClient(fa.opt.Name).DocCreate(fa.index, fa.id, msg.MAP())
 	if err != nil {
-		log.Println(err.Error())
+		return
 	}
 }
 
 func (fa *EsAdapter) closeEs() {
-	client := gokafka.GetClient(fa.opt.Name)
+	client := goes.GetClient(fa.opt.Name)
 	if client == nil {
 		return
 	}
-
-	client.Close()
 }

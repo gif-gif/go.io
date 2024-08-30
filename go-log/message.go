@@ -15,6 +15,11 @@ type Message struct {
 }
 
 func (msg *Message) JSON() []byte {
+	buf, _ := json.Marshal(msg.JSON())
+	return buf
+}
+
+func (msg *Message) MAP() *map[string]interface{} {
 	data := map[string]interface{}{}
 
 	if l := len(msg.Entry.Data); l > 0 {
@@ -44,6 +49,5 @@ func (msg *Message) JSON() []byte {
 		}
 	}
 
-	buf, _ := json.Marshal(&data)
-	return buf
+	return &data
 }
