@@ -15,7 +15,7 @@ type Message struct {
 }
 
 func (msg *Message) JSON() []byte {
-	buf, _ := json.Marshal(msg.JSON())
+	buf, _ := json.Marshal(msg.MAP())
 	return buf
 }
 
