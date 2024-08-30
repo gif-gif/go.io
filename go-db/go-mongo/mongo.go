@@ -1,6 +1,9 @@
 package gomongo
 
-import golog "github.com/gif-gif/go.io/go-log"
+import (
+	"errors"
+	golog "github.com/gif-gif/go.io/go-log"
+)
 
 var __clients = map[string]*GoMongo{}
 
@@ -10,6 +13,10 @@ func Init(configs ...Config) (err error) {
 		name := conf.Name
 		if name == "" {
 			name = "default"
+		}
+
+		if __clients[name] != nil {
+			return errors.New("client already exists")
 		}
 
 		__clients[name], err = New(conf)

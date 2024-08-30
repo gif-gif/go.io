@@ -83,13 +83,17 @@ func New(conf Config) (cli *GoClickHouse, err error) {
 			return nil, err
 		}
 		cron.Start()
-		_, err = cron.SecondX(nil, 5, __client.ping)
+		_, err = cron.SecondX(nil, 5, cli.ping)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	return
+}
+
+func (cli *GoClickHouse) DB() *sql.DB {
+	return cli.db
 }
 
 func (cli *GoClickHouse) ping() {

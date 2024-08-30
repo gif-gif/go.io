@@ -1,17 +1,17 @@
-package goes
+package eslog
 
 import (
 	golog "github.com/gif-gif/go.io/go-log"
 	"strings"
 )
 
-type logger struct {
-	level golog.Level
+type Logger struct {
+	Level golog.Level
 }
 
-func (l logger) Printf(format string, v ...interface{}) {
+func (l Logger) Printf(format string, v ...interface{}) {
 	log := golog.WithTag("goo-es")
-	switch l.level {
+	switch l.Level {
 	case golog.DEBUG:
 		log.DebugF(format, v...)
 	case golog.INFO:

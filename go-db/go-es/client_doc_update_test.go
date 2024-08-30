@@ -20,7 +20,7 @@ func TestClient_DocUpdate(t *testing.T) {
 
 	index := "test_202209"
 
-	fmt.Println(__client.DocUpdate(index, "1001", map[string]interface{}{"name": "noname_1001"}))
+	fmt.Println(Default().DocUpdate(index, "1001", map[string]interface{}{"name": "noname_1001"}))
 }
 
 func TestClient_DocUpset(t *testing.T) {
@@ -37,7 +37,7 @@ func TestClient_DocUpset(t *testing.T) {
 
 	index := "test_202209"
 
-	fmt.Println(__client.DocUpset(index, "1004", map[string]interface{}{"name": "noname_1004"}))
+	fmt.Println(Default().DocUpset(index, "1004", map[string]interface{}{"name": "noname_1004"}))
 }
 
 func TestClient_DocBatchUpdate(t *testing.T) {
@@ -66,7 +66,7 @@ func TestClient_DocBatchUpdate(t *testing.T) {
 		})
 	}
 
-	fmt.Println(__client.DocBatchUpset(index, ids, docs))
+	fmt.Println(Default().DocBatchUpset(index, ids, docs))
 }
 
 func TestClient_DocBatchUpset(t *testing.T) {
@@ -95,5 +95,5 @@ func TestClient_DocBatchUpset(t *testing.T) {
 		})
 	}
 
-	fmt.Println(__client.DocBatchUpset(index, ids, docs))
+	fmt.Println(Default().DocBatchUpset(index, ids, docs))
 }

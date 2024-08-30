@@ -1,6 +1,7 @@
 package goetcd
 
 import (
+	"errors"
 	golog "github.com/gif-gif/go.io/go-log"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
@@ -12,6 +13,10 @@ func Init(configs ...Config) (err error) {
 		name := conf.Name
 		if name == "" {
 			name = "default"
+		}
+
+		if __clients[name] != nil {
+			return errors.New("client already exists")
 		}
 
 		__clients[name], err = New(conf)

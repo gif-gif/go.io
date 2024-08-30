@@ -1,4 +1,4 @@
-package golog
+package adapters
 
 var defaultFileOptions = fileOptions{
 	Filepath: "logs/",

@@ -20,23 +20,23 @@ func TestClient_IndexGet(t *testing.T) {
 
 	index := "test_202209"
 
-	//if err := __client.IndexCreate(index, ``); err != nil {
+	//if err := Default().IndexCreate(index, ``); err != nil {
 	//	fmt.Println(err)
 	//	return
 	//}
 
-	//fmt.Println(__client.IndexGet(index))
-	//fmt.Println(__client.IndexMapping(index))
-	//fmt.Println(__client.IndexSettings(index))
+	//fmt.Println(Default().IndexGet(index))
+	//fmt.Println(Default().IndexMapping(index))
+	//fmt.Println(Default().IndexSettings(index))
 
-	fmt.Println(__client.IndexUpdateMapping(index, `{"properties": {"name": {"type":"text", "fielddata": true}}}`))
+	fmt.Println(Default().IndexUpdateMapping(index, `{"properties": {"name": {"type":"text", "fielddata": true}}}`))
 
-	//fmt.Println(__client.IndexExists(index))
+	//fmt.Println(Default().IndexExists(index))
 
-	//fmt.Println(__client.IndexNames())
+	//fmt.Println(Default().IndexNames())
 
-	//fmt.Println(__client.IndexAlias(index, index+"_aa"))
-	//fmt.Println(__client.IndexAliasRemove(index, index+"_aa"))
+	//fmt.Println(Default().IndexAlias(index, index+"_aa"))
+	//fmt.Println(Default().IndexAliasRemove(index, index+"_aa"))
 
-	//fmt.Println(__client.Client().ElasticsearchVersion(conf.Addr))
+	//fmt.Println(Default().Client().ElasticsearchVersion(conf.Addr))
 }

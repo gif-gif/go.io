@@ -1,30 +1,74 @@
 package goclickhouse
 
-import "database/sql"
+import (
+	"errors"
+	golog "github.com/gif-gif/go.io/go-log"
+)
 
-var __client *GoClickHouse
+var __clients = map[string]*GoClickHouse{}
 
-func DB() *sql.DB {
-	return __client.db
-}
+// 可以一次初始化多个Redis实例或者 多次调用初始化多个实例
+func Init(configs ...Config) (err error) {
+	for _, conf := range configs {
+		name := conf.Name
+		if name == "" {
+			name = "default"
+		}
 
-// 全局
-func Init(conf Config) error {
-	client, err := CreateConnection(conf)
-	if err != nil {
-		return err
+		if __clients[name] != nil {
+			return errors.New("client already exists")
+		}
+
+		__clients[name], err = New(conf)
+		if err != nil {
+			return
+		}
 	}
 
-	__client = client
+	return
+}
+
+func GetClient(names ...string) *GoClickHouse {
+	name := "default"
+	if l := len(names); l > 0 {
+		name = names[0]
+		if name == "" {
+			name = "default"
+		}
+	}
+	if cli, ok := __clients[name]; ok {
+		return cli
+	}
 	return nil
+
+	//if l := len(names); l > 0 {
+	//	name := names[0]
+	//	if cli, ok := __clients[name]; ok {
+	//		return cli
+	//	}
+	//	return nil
+	//} else {
+	//	if l := len(__clients); l == 1 {
+	//		for _, cli := range __clients {
+	//			return cli
+	//		}
+	//	}
+	//	return nil
+	//}
 }
 
-// 创建一个连接
-func CreateConnection(conf Config) (*GoClickHouse, error) {
-	client, err := New(conf)
-	if err != nil {
-		return nil, err
+func Default() *GoClickHouse {
+	if cli, ok := __clients["default"]; ok {
+		return cli
 	}
 
-	return client, nil
+	if l := len(__clients); l == 1 {
+		for _, cli := range __clients {
+			return cli
+		}
+	}
+
+	golog.WithTag("goredis").Error("no default redis client")
+
+	return nil
 }

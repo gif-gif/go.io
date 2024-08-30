@@ -19,7 +19,7 @@ func TestClient_DocCreate(t *testing.T) {
 
 	index := "test_202209"
 
-	resp, err := __client.DocCreate(index, "1001", map[string]interface{}{
+	resp, err := Default().DocCreate(index, "1001", map[string]interface{}{
 		"name": "goio",
 	})
 	fmt.Println(resp, err)
@@ -46,6 +46,6 @@ func TestClient_DocBatchCreate(t *testing.T) {
 			"name": "noname_1003",
 		},
 	}
-	resp, err := __client.DocBatchCreate(index, data)
+	resp, err := Default().DocBatchCreate(index, data)
 	fmt.Println(resp, err)
 }

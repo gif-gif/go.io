@@ -1,6 +1,8 @@
-package golog
+package test
 
 import (
+	"github.com/gif-gif/go.io/go-log"
+	"github.com/gif-gif/go.io/go-log/adapters"
 	"log"
 	"sync"
 	"testing"
@@ -8,12 +10,12 @@ import (
 )
 
 func TestNewFileLog(t *testing.T) {
-	l := NewFileLog(
-		FilePathOption("logs/"),
-		FileMaxSizeOption(1<<20),
+	l := adapters.NewFileLog(
+		adapters.FilePathOption("logs/"),
+		adapters.FileMaxSizeOption(1<<20),
 	)
 
-	l.WithHook(func(msg *Message) {
+	l.WithHook(func(msg *golog.Message) {
 		log.Println("this is hook", msg)
 	})
 

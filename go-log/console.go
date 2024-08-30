@@ -22,7 +22,7 @@ func (ca *ConsoleAdapter) Write(msg *Message) {
 		buf   bytes.Buffer
 		nw    = time.Now()
 		level = LevelText[msg.Level]
-		color = colors[msg.Level]
+		color = Colors[msg.Level]
 	)
 
 	buf.WriteString(nw.Format("2006-01-02 15:04:05"))

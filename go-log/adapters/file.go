@@ -1,7 +1,8 @@
-package golog
+package adapters
 
 import (
 	"fmt"
+	"github.com/gif-gif/go.io/go-log"
 	"log"
 	"os"
 	"path/filepath"
@@ -22,8 +23,8 @@ type FileAdapter struct {
 	mu sync.Mutex
 }
 
-func NewFileLog(opts ...FileOption) *Logger {
-	return New(NewFileAdapter(opts...))
+func NewFileLog(opts ...FileOption) *golog.Logger {
+	return golog.New(NewFileAdapter(opts...))
 }
 
 func NewFileAdapter(opt ...FileOption) *FileAdapter {
@@ -57,7 +58,7 @@ func NewFileAdapter(opt ...FileOption) *FileAdapter {
 	return fa
 }
 
-func (fa *FileAdapter) Write(msg *Message) {
+func (fa *FileAdapter) Write(msg *golog.Message) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {

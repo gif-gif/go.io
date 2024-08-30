@@ -1,6 +1,7 @@
 package gokafka
 
 import (
+	"errors"
 	"github.com/IBM/sarama"
 	gocontext "github.com/gif-gif/go.io/go-context"
 	golog "github.com/gif-gif/go.io/go-log"
@@ -14,6 +15,9 @@ func Init(configs ...Config) (err error) {
 		name := conf.Name
 		if name == "" || name == "default" {
 			conf.Name = "default"
+		}
+		if __clients[name] != nil {
+			return errors.New("client already exists")
 		}
 		__clients[name], err = New(conf)
 		if err != nil {

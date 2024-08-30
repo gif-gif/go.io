@@ -1,14 +1,15 @@
-package golog
+package test
 
 import (
+	"github.com/gif-gif/go.io/go-log"
 	"log"
 	"testing"
 )
 
 func TestNewConsoleLog(t *testing.T) {
-	l := NewConsoleLog()
+	l := golog.NewConsoleLog()
 
-	l.WithHook(func(msg *Message) {
+	l.WithHook(func(msg *golog.Message) {
 		log.Println("this is hook", msg)
 	})
 

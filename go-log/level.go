@@ -22,7 +22,7 @@ var (
 		FATAL: "FATAL",
 	}
 
-	colors = map[Level]brush{
+	Colors = map[Level]brush{
 		DEBUG: newBrush("1;34"), // blue
 		INFO:  newBrush("1;32"), // green
 		WARN:  newBrush("1;33"), // yellow

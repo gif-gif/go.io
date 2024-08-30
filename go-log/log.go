@@ -1,6 +1,8 @@
 package golog
 
-import "sync"
+import (
+	"sync"
+)
 
 var (
 	__log  *Logger

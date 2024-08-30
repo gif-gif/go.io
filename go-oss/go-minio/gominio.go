@@ -1,6 +1,7 @@
 package gominio
 
 import (
+	"errors"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/minio/minio-go/v7"
 )
@@ -12,6 +13,10 @@ func Init(configs ...Config) (err error) {
 		name := conf.Name
 		if name == "" {
 			name = "default"
+		}
+
+		if __clients[name] != nil {
+			return errors.New("client already exists")
 		}
 
 		o, err := Create(conf)

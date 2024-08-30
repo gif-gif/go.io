@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	golog "github.com/gif-gif/go.io/go-log"
+	"github.com/gif-gif/go.io/go-log/adapters"
 	"github.com/gif-gif/go.io/go-utils/prometheusx"
 	"github.com/gif-gif/go.io/goio"
 	conf "github.com/gif-gif/go.io/goio/server-case/config"
@@ -44,7 +45,7 @@ func startSever() {
 
 	// 日志输出到文件
 	if confs.Env == goio.TEST || confs.Env == goio.PRODUCTION {
-		golog.SetAdapter(golog.NewFileAdapter())
+		golog.SetAdapter(adapters.NewFileAdapter())
 	}
 
 	goio.Init(confs.Env)

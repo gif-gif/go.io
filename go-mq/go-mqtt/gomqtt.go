@@ -14,9 +14,10 @@ func Init(configs ...Config) (err error) {
 			conf.Name = "default"
 		}
 
-		if GetClient(conf.Name) != nil {
-			return errors.New(conf.Name + " 实例已存在")
+		if __clients[name] != nil {
+			return errors.New("client already exists")
 		}
+
 		__clients[name], err = NewClient(conf)
 		if err != nil {
 			return err

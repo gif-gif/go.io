@@ -2,6 +2,7 @@ package goes
 
 import (
 	"context"
+	"github.com/gif-gif/go.io/go-db/go-es/eslog"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/olivere/elastic/v7"
@@ -22,9 +23,9 @@ func New(conf Config, options ...elastic.ClientOptionFunc) (cli *client, err err
 	)
 
 	if conf.EnableLog {
-		options = append(options, elastic.SetErrorLog(logger{golog.ERROR}))
-		options = append(options, elastic.SetTraceLog(logger{golog.DEBUG}))
-		options = append(options, elastic.SetInfoLog(logger{golog.INFO}))
+		options = append(options, elastic.SetErrorLog(eslog.Logger{golog.ERROR}))
+		options = append(options, elastic.SetTraceLog(eslog.Logger{golog.DEBUG}))
+		options = append(options, elastic.SetInfoLog(eslog.Logger{golog.INFO}))
 	}
 
 	cli = &client{

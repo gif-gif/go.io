@@ -1,19 +1,26 @@
 package goasynq
 
+import "errors"
+
 var __clients = map[string]*GoAsynqClient{}
 var __servers = map[string]*GoAsynqServer{}
 
 // client
-func InitClient(configs ...ClientConfig) {
+func InitClient(configs ...ClientConfig) error {
 	for _, conf := range configs {
 		name := conf.Name
 		if name == "" {
 			name = "default"
 		}
+
+		if __clients[name] != nil {
+			return errors.New("client already exists")
+		}
+
 		__clients[name] = NewClient(conf)
 	}
 
-	return
+	return nil
 }
 
 func GetClient(names ...string) *GoAsynqClient {
@@ -44,16 +51,20 @@ func DefaultClient() *GoAsynqClient {
 }
 
 // server
-func InitServer(configs ...ServerConfig) {
+func InitServer(configs ...ServerConfig) error {
 	for _, conf := range configs {
 		name := conf.Name
 		if name == "" {
 			name = "default"
 		}
+		if __clients[name] != nil {
+			return errors.New("client already exists")
+		}
+
 		__servers[name] = RunServer(conf)
 	}
 
-	return
+	return nil
 }
 
 func GetServer(names ...string) *GoAsynqServer {
