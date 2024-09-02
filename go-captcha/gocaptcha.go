@@ -9,18 +9,31 @@ import (
 )
 
 // 默认内存，分布式用redis等
-//
-//	type Store interface {
-//		// Set sets the digits for the captcha id.
-//		Set(id string, value string) error
-//
-//		// Get returns stored digits for the captcha id. Clear indicates
-//		// whether the captcha must be deleted from the store.
-//		Get(id string, clear bool) string
-//
-//		//Verify captcha's answer directly
-//		Verify(id, answer string, clear bool) bool
-//	}
+type Config struct {
+	Name        string          `json:"name,optional" yaml:"Name"`
+	RedisConfig *goredis.Config `json:"redisConfig,optional" yaml:"RedisConfig"`
+}
+
+type configJsonBody struct {
+	Id            string
+	CaptchaType   string
+	VerifyValue   string
+	DriverAudio   *base64Captcha.DriverAudio
+	DriverString  *base64Captcha.DriverString
+	DriverChinese *base64Captcha.DriverChinese
+	DriverMath    *base64Captcha.DriverMath
+	DriverDigit   *base64Captcha.DriverDigit
+}
+
+type CaptchaData struct {
+	Data      string `json:"data"`
+	CaptchaId string `json:"captchaId"`
+	Answer    string `json:"answer"`
+}
+
+type GoCaptcha struct {
+	store base64Captcha.Store //验证码信息自定义存储
+}
 
 type RedisStore struct {
 	redis   *goredis.GoRedis
@@ -45,27 +58,6 @@ func (r *RedisStore) Verify(id, answer string, clear bool) bool {
 	return rst == answer
 }
 
-type configJsonBody struct {
-	Id            string
-	CaptchaType   string
-	VerifyValue   string
-	DriverAudio   *base64Captcha.DriverAudio
-	DriverString  *base64Captcha.DriverString
-	DriverChinese *base64Captcha.DriverChinese
-	DriverMath    *base64Captcha.DriverMath
-	DriverDigit   *base64Captcha.DriverDigit
-}
-
-type CaptchaData struct {
-	Data      string `json:"data"`
-	CaptchaId string `json:"captchaId"`
-	Answer    string `json:"answer"`
-}
-
-type GoCaptcha struct {
-	store base64Captcha.Store //验证码信息自定义存储
-}
-
 // new other store
 func NewRedis(config goredis.Config) (*GoCaptcha, error) {
 	err := goredis.Init(config)
@@ -77,14 +69,13 @@ func NewRedis(config goredis.Config) (*GoCaptcha, error) {
 	if redis == nil {
 		return nil, fmt.Errorf("failed to connect to redis %v", config)
 	}
-	g := &GoCaptcha{
-		store: &RedisStore{
-			redis:   redis,
-			Context: context.Background(),
-		},
-	}
-	return g, nil
+
+	return New(&RedisStore{
+		redis:   redis,
+		Context: context.Background(),
+	}), nil
 }
+
 func New(store base64Captcha.Store) *GoCaptcha {
 	return &GoCaptcha{
 		store: store,
@@ -137,6 +128,17 @@ func (g *GoCaptcha) CaptchaVerify(id, code string) bool {
 }
 
 func (g *GoCaptcha) DigitCaptcha(width, height, length int) (*CaptchaData, error) {
+	if width == 0 {
+		width = 240
+	}
+	if height == 0 {
+		height = 80
+	}
+
+	if length == 0 {
+		length = 4
+	}
+
 	var param = configJsonBody{
 		CaptchaType: "",
 		DriverDigit: &base64Captcha.DriverDigit{
@@ -156,6 +158,12 @@ func (g *GoCaptcha) DigitCaptcha(width, height, length int) (*CaptchaData, error
 }
 
 func (g *GoCaptcha) StringCaptcha(width, height, length int) (*CaptchaData, error) {
+	if width == 0 {
+		width = 240
+	}
+	if height == 0 {
+		height = 80
+	}
 	var param = configJsonBody{
 		CaptchaType: "string",
 		DriverString: &base64Captcha.DriverString{
@@ -177,6 +185,9 @@ func (g *GoCaptcha) StringCaptcha(width, height, length int) (*CaptchaData, erro
 }
 
 func (g *GoCaptcha) AudioCaptcha(language string, length int) (*CaptchaData, error) {
+	if language == "" {
+		language = "123456"
+	}
 	var param = configJsonBody{
 		CaptchaType: "audio",
 		DriverAudio: &base64Captcha.DriverAudio{
@@ -195,6 +206,9 @@ func (g *GoCaptcha) AudioCaptcha(language string, length int) (*CaptchaData, err
 
 // source是中文英文字列表
 func (g *GoCaptcha) ChineseCaptcha(width, height, length int, source string) (*CaptchaData, error) {
+	if source == "" {
+		source = "123456qwertyu你好adfkl在在载在饿工一ioplkjhgfdsazxcvbnm"
+	}
 	var param = configJsonBody{
 		CaptchaType: "chinese",
 		DriverChinese: &base64Captcha.DriverChinese{
@@ -217,6 +231,12 @@ func (g *GoCaptcha) ChineseCaptcha(width, height, length int, source string) (*C
 
 // 数学计算
 func (g *GoCaptcha) MathCaptcha(width, height int) (*CaptchaData, error) {
+	if width == 0 {
+		width = 240
+	}
+	if height == 0 {
+		height = 80
+	}
 	var param = configJsonBody{
 		CaptchaType: "math",
 		DriverMath: &base64Captcha.DriverMath{

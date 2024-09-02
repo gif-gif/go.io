@@ -42,7 +42,7 @@ require (
 	golang.org/x/sync v0.8.0
 	golang.org/x/text v0.17.0
 	google.golang.org/grpc v1.65.0
-	gopkg.in/telebot.v3 v3.3.6
+	gopkg.in/telebot.v3 v3.3.8
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/clickhouse v0.6.1
 	gorm.io/driver/mysql v1.5.7

@@ -126,7 +126,7 @@ func captchaVerifyHandle(w http.ResponseWriter, r *http.Request) {
 // start a net/http server
 func main() {
 	config := goredis.Config{
-		Name:     "",
+		Name:     "gocaptcha",
 		Addr:     "127.0.0.1:6379",
 		Password: "",
 		DB:       0,
@@ -134,13 +134,18 @@ func main() {
 		AutoPing: true,
 	}
 
-	a, err := gocaptcha.NewRedis(config)
+	err := gocaptcha.Init(gocaptcha.Config{
+		RedisConfig: &config,
+	})
+
 	if err != nil {
 		golog.Error(err.Error())
 		return
 	}
-	goutils.InitCaptcha(a)
-	goutils.CaptchaGet(0, 0)
+
+	data, err := gocaptcha.Default().DigitCaptcha(0, 0, 0)
+	golog.WithTag("data").Info(data)
+
 	simpleServer()
 }
 
