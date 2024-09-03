@@ -55,6 +55,7 @@ func (cli *client) init() (err error) {
 	config.Consumer.Group.Heartbeat.Interval = 5 * time.Second
 	config.Consumer.Group.Session.Timeout = 15 * time.Second
 	config.Consumer.Group.Rebalance.Timeout = 12 * time.Second
+	config.Producer.Timeout = 10 * time.Second
 
 	if cli.conf.Timeout > 0 {
 		config.Producer.Timeout = time.Duration(cli.conf.Timeout) * time.Second

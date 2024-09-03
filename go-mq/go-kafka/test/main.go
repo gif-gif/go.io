@@ -33,6 +33,14 @@ func main() {
 		return
 	}
 
+	topics, err := gokafka.Client().Topics()
+	if err != nil {
+		golog.WithTag("gokafka").Error(err.Error())
+		return
+	}
+
+	golog.WithTag("gokafka").InfoF("topics:", topics)
+
 	msg := Account{}
 	b, err := json.Marshal(msg)
 
