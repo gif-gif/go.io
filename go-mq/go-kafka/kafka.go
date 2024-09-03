@@ -55,6 +55,7 @@ func GetClient(names ...string) *client {
 	return nil
 }
 
+// default or 只有一个kafka实例直接返回
 func Client() *client {
 	if cli, ok := __clients["default"]; ok {
 		return cli
