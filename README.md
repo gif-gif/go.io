@@ -173,27 +173,27 @@ func main() {
 ```
 
 ### 验证码(支持分布式验证,基于redis)
-```
-	config := goredis.Config{
-		Name:     "gocaptcha",
-		Addr:     "127.0.0.1:6379",
-		Password: "",
-		DB:       0,
-		Prefix:   "gocaptcha",
-		AutoPing: true,
-	}
+```go
+config := goredis.Config{
+    Name:     "gocaptcha",
+    Addr:     "127.0.0.1:6379",
+    Password: "",
+    DB:       0,
+    Prefix:   "gocaptcha",
+    AutoPing: true,
+}
 
-	err := gocaptcha.Init(gocaptcha.Config{
-		RedisConfig: &config,
-	})
+err := gocaptcha.Init(gocaptcha.Config{
+    RedisConfig: &config,
+})
 
-	if err != nil {
-		golog.Error(err.Error())
-		return
-	}
+if err != nil {
+    golog.Error(err.Error())
+    return
+}
 
-	data, err := gocaptcha.Default().DigitCaptcha(0, 0, 0)
-	golog.WithTag("data").Info(data)
+data, err := gocaptcha.Default().DigitCaptcha(0, 0, 0)
+golog.WithTag("data").Info(data)
 ```
 
 ### gojob 模块
