@@ -14,3 +14,6 @@ return nil
 ```go
 rst, err := gohttpx.Post(url, []byte(postParams))
 ```
+```go
+clientIp := gohttpx.GetClientIp(request)
+```
