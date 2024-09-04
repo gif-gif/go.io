@@ -310,7 +310,7 @@ func mysqlTest() {
 - https://github.com/wenlng/go-captcha
 - https://github.com/mochi-mqtt/server
 - https://github.com/eclipse/paho.mqtt.golang
-- https://github.com/apache/rocketmq-clients
+- https://github.com/apache/rocketmq-client-go
 - https://github.com/hibiken/asynq
 
 ## 杂项

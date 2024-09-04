@@ -24,7 +24,8 @@ type PayPlanItemConfig struct {
 
 func main() {
 	goio.Init(goio.DEVELOPMENT)
-	testGenerateAesKeys()
+	//testGenerateAesKeys()
+	testSha1Sign()
 	<-gocontext.Cancel().Done()
 }
 
@@ -53,6 +54,12 @@ func testGetFieldValue() {
 func testSign() {
 	ts := time.Now().Unix()
 	sign := goutils.Md5([]byte(gconv.String(ts) + "123456"))
+	golog.WithTag("sign").Info(ts, sign)
+}
+
+func testSha1Sign() {
+	ts := time.Now().Unix()
+	sign := goutils.CheckSignSha1("adfafds1", "bbv32", 20, ts, "1111")
 	golog.WithTag("sign").Info(ts, sign)
 }
 

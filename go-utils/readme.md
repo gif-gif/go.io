@@ -27,6 +27,7 @@
 #### Utils
 
 - func CheckSign(secret string, linkSignTimeout int64, ts int64, sign string) bool // 常用签名验证, sign md5 小写
+- func CheckSignSha1(secret, nonce string, linkSignTimeout int64, ts int64, sign string) bool {
 - func IsInArray[T any](arr []T, target T) bool // 元素都转换成字符串比较
 - func IfNot[T any](isTrue bool, a, b T) T  // 通用三目运算
 - func IfString(isTrue bool, a, b string) string 

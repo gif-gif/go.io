@@ -102,6 +102,7 @@ func Md5(buf []byte) string {
 	return strings.ToLower(hex.EncodeToString(h.Sum(nil)))
 }
 
+// 小写
 func SHA1(buf []byte) string {
 	h := sha1.New()
 	h.Write(buf)
