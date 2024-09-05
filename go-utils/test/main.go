@@ -8,6 +8,8 @@ import (
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gif-gif/go.io/goio"
 	"github.com/gogf/gf/util/gconv"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -58,9 +60,19 @@ func testSign() {
 }
 
 func testSha1Sign() {
-	ts := time.Now().Unix()
-	sign := goutils.CheckSignSha1("adfafds1", "bbv32", 20, ts, "1111")
-	golog.WithTag("sign").Info(ts, sign)
+
+	///api/mp/v1/verify?signature=950ef40c2493f20071382c888ee0858172a3b08e&echostr=4193083647034290167&timestamp=1725451984&nonce=138798064
+	signature := "950ef40c2493f20071382c888ee0858172a3b08e"
+	//echoStr := "4193083647034290167"
+	nonce := "1387980644"
+	var timestamp int64 = 1725451984
+	secret := "123qwe"
+	args := []string{secret, gconv.String(timestamp), nonce}
+	sort.Strings(args)
+	golog.WithTag("sign").Info(strings.Join(args, ""))
+
+	sign := goutils.CheckSignSha1(secret, nonce, 20000, timestamp, signature)
+	golog.WithTag("sign").Info(sign)
 }
 
 func testFileMd5() {
