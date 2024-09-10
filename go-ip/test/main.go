@@ -13,7 +13,7 @@ func main() {
 	config := goip.Config{
 		//Mmdb:          "GeoLite2-Country.mmdb",
 		//Ip2locationDB: "IP-COUNTRY-REGION-CITY-ISP.BIN",
-		IpServiceUrl: "http://172.99.189.235:20030/ip/country/v2",
+		IpServiceUrl: "",
 	}
 	err := goip.Init(config)
 	if err != nil {
