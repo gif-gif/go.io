@@ -76,16 +76,17 @@ func (g *GoHttp[T]) doHttpRequest(context context.Context, req *Request) (*T, er
 		restyClient.SetProxy(req.proxyURL)
 	}
 
-	for k, v := range g.GetGlobalHeaders() {
-		req.Headers[k] = v
-	}
-
 	if req.Headers == nil {
 		req.Headers = make(map[string]string)
 		req.Headers["Accept"] = CONTENT_TYPE_JSON
 	} else {
 		req.Headers["Accept"] = CONTENT_TYPE_JSON
 	}
+
+	for k, v := range g.GetGlobalHeaders() {
+		req.Headers[k] = v
+	}
+
 	var t T
 	var resp *resty.Response
 	var err error

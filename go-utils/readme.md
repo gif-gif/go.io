@@ -41,11 +41,12 @@
 - func MaxInt64(a, b int64) int64 
 - func MaxInt(a, b int) int
 - func GenValidateCode(width int) string {//随机数
-- func GetFieldValue(config interface{}, fieldName string) (interface{}, error) {// 通过反射获取结构体字段的值
 - func SplitStringArray(arr []string, size int) (list [][]string)
 - func SplitIntArray(arr []int, size int) (list [][]int)
 - func SplitInt64Array(arr []int64, size int) (list [][]int64)
 - func SplitArray(arr []interface{}, size int) (list [][]interface{}) 
+- func GetFieldValue(config interface{}, fieldName string) (interface{}, error) {// 通过反射获取结构体字段的值
+- func CopyProperties[T any](target interface{}) // 复制对象
 
 #### password
 - func BcryptHash(password string) string // BcryptHash 使用 bcrypt 对密码进行加密

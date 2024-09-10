@@ -146,3 +146,19 @@ func GetFieldValue(config interface{}, fieldName string) (interface{}, error) {
 
 	return field.Interface(), nil
 }
+
+// 使用反射复制A结构到B结构，前提是两个结构体字段数量和类型完全相同
+// 如：使用反射将 VO 转换为 DTO
+// 反射(reflect)虽爽，但很贵,性能会有损失
+func CopyProperties[T any](target interface{}) T {
+	var t T
+	voValue := reflect.ValueOf(target)
+	dtoValue := reflect.New(reflect.TypeOf(t)).Elem()
+
+	for i := 0; i < voValue.NumField(); i++ {
+		dtoField := dtoValue.Field(i)
+		voField := voValue.Field(i)
+		dtoField.Set(voField)
+	}
+	return dtoValue.Interface().(T)
+}
