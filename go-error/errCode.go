@@ -19,7 +19,5 @@ const USER_EXISTS_ERROR uint32 = 704
 // server
 const SERVER_COMMON_ERROR uint32 = 500
 const DB_ERROR uint32 = 555
-const DB_UPDATE_AFFECTED_ZERO_ERROR uint32 = 556
-const TOKEN_GENERATE_ERROR uint32 = 560
 
 //用户模块

@@ -6,11 +6,11 @@ import (
 )
 
 func IsErrCode(err error, code uint32) bool {
-	errCode, _ := GetErrCodeMsg(err, nil)
-	return uint32(code) == errCode
+	errCode, _ := GetErrCodeMsg(err)
+	return code == errCode
 }
 
-func GetErrCodeMsg(err error, errorsx map[uint32]string) (errCode uint32, errMsg string) {
+func GetErrCodeMsg(err error) (errCode uint32, errMsg string) {
 	if err == nil {
 		return 0, ""
 	}
