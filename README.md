@@ -317,15 +317,15 @@ func mysqlTest() {
 
 | Status       |Value|
 |:-------------|:---:|
-| Golang       |[![Release](https://img.shields.io/badge/Go-%3E%3D%201.23-yellowgreen?style=flat)](https://github.com/gif-gif/go.io)
-| Release      |[![Release](https://img.shields.io/github/v/release/gif-gif/go.io.svg)](https://github.com/gif-gif/go.io/releases)
 | Stars        |[![Stars](https://img.shields.io/github/stars/gif-gif/go.io)](https://github.com/gif-gif/go.io/stargazers)
 | Watchers     |[![Stars](https://img.shields.io/github/watchers/gif-gif/go.io.svg?label=Watchers&style=social)](https://github.com/gif-gif/go.io/watchers)
 | Forks        |[![Forks](https://img.shields.io/github/forks/gif-gif/go.io)](https://github.com/gif-gif/go.io/forks)
-| License      |[![License](https://img.shields.io/github/license/gif-gif/go.io)](https://github.com/gif-gif/go.io?tab=Apache-2.0-1-ov-file)
-| Issues       |[![Issues](https://img.shields.io/github/issues/gif-gif/go.io)](https://github.com/gif-gif/go.io/issues)
-| Commits      |[![Commits](https://img.shields.io/github/commit-activity/m/gif-gif/go.io.svg?style=flat&color=brightgreen&label=commits)](https://github.com/gif-gif/go.io)
-| Downloads    |[![Issues](https://img.shields.io/github/downloads/gif-gif/go.io/total.svg)](https://github.com/gif-gif/go.io/releases)
-| Contributors |[![Contributors](https://img.shields.io/github/contributors/gif-gif/go.io)](https://github.com/gif-gif/go.io/graphs/contributors)
-| Pull Request |[![PullRequest](https://img.shields.io/github/issues-pr/gif-gif/go.io?color=0088ff)](https://github.com/gif-gif/go.io/pulls)
+| Golang       |[![Release](https://img.shields.io/badge/Go-%3E%3D%201.23-yellowgreen?style=flat&color=117abe)](https://github.com/gif-gif/go.io)
+| Release      |[![Release](https://img.shields.io/github/v/release/gif-gif/go.io.svg)](https://github.com/gif-gif/go.io/releases)
+| License      |[![License](https://img.shields.io/github/license/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io?tab=Apache-2.0-1-ov-file)
+| Issues       |[![Issues](https://img.shields.io/github/issues/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/issues)
+| Commits      |[![Commits](https://img.shields.io/github/commit-activity/m/gif-gif/go.io.svg?style=flat&color=117abe&label=commits)](https://github.com/gif-gif/go.io)
+| Downloads    |[![Issues](https://img.shields.io/github/downloads/gif-gif/go.io/total.svg?color=117abe)](https://github.com/gif-gif/go.io/releases)
+| Contributors |[![Contributors](https://img.shields.io/github/contributors/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/graphs/contributors)
+| Pull Request |[![PullRequest](https://img.shields.io/github/issues-pr/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/pulls)
 
