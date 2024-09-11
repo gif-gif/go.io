@@ -1,5 +1,19 @@
-# go.io
-- Golang Development Framework Continuously Developing and Updating
+
+# go.io 
+Golang Development Framework Continuously Developing and Updating
+
+[![Stars](https://img.shields.io/github/stars/gif-gif/go.io)](https://github.com/gif-gif/go.io/stargazers)
+[![Watchers](https://img.shields.io/github/watchers/gif-gif/go.io.svg?label=Watchers&style=social)](https://github.com/gif-gif/go.io/watchers)
+[![Forks](https://img.shields.io/github/forks/gif-gif/go.io)](https://github.com/gif-gif/go.io/forks)
+[![Golang](https://img.shields.io/badge/Go-%3E%3D%201.23-yellowgreen?style=flat&color=117abe)](https://github.com/gif-gif/go.io)
+[![Release](https://img.shields.io/github/v/release/gif-gif/go.io.svg)](https://github.com/gif-gif/go.io/releases)
+[![License](https://img.shields.io/github/license/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io?tab=Apache-2.0-1-ov-file)
+[![Issues](https://img.shields.io/github/issues/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/issues)
+[![Commits](https://img.shields.io/github/commit-activity/m/gif-gif/go.io.svg?style=flat&color=117abe&label=commits)](https://github.com/gif-gif/go.io)
+[![Downloads](https://img.shields.io/github/downloads/gif-gif/go.io/total.svg?color=117abe)](https://github.com/gif-gif/go.io/releases)
+[![Contributors](https://img.shields.io/github/contributors/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/graphs/contributors)
+[![PullRequest](https://img.shields.io/github/issues-pr/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/pulls)
+
 
 ## 设计目标
 - goio 提供了常用库封装，支持必要的简洁使用功能，在其之上可以进二次开发，以提供更好的代码维护；
@@ -312,20 +326,3 @@ func mysqlTest() {
 - https://github.com/eclipse/paho.mqtt.golang
 - https://github.com/apache/rocketmq-client-go
 - https://github.com/hibiken/asynq
-
-## GIF-GIF
-
-| Status       |Value|
-|:-------------|:---:|
-| Stars        |[![Stars](https://img.shields.io/github/stars/gif-gif/go.io)](https://github.com/gif-gif/go.io/stargazers)
-| Watchers     |[![Stars](https://img.shields.io/github/watchers/gif-gif/go.io.svg?label=Watchers&style=social)](https://github.com/gif-gif/go.io/watchers)
-| Forks        |[![Forks](https://img.shields.io/github/forks/gif-gif/go.io)](https://github.com/gif-gif/go.io/forks)
-| Golang       |[![Release](https://img.shields.io/badge/Go-%3E%3D%201.23-yellowgreen?style=flat&color=117abe)](https://github.com/gif-gif/go.io)
-| Release      |[![Release](https://img.shields.io/github/v/release/gif-gif/go.io.svg)](https://github.com/gif-gif/go.io/releases)
-| License      |[![License](https://img.shields.io/github/license/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io?tab=Apache-2.0-1-ov-file)
-| Issues       |[![Issues](https://img.shields.io/github/issues/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/issues)
-| Commits      |[![Commits](https://img.shields.io/github/commit-activity/m/gif-gif/go.io.svg?style=flat&color=117abe&label=commits)](https://github.com/gif-gif/go.io)
-| Downloads    |[![Issues](https://img.shields.io/github/downloads/gif-gif/go.io/total.svg?color=117abe)](https://github.com/gif-gif/go.io/releases)
-| Contributors |[![Contributors](https://img.shields.io/github/contributors/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/graphs/contributors)
-| Pull Request |[![PullRequest](https://img.shields.io/github/issues-pr/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/pulls)
-
