@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/rand"
 	"reflect"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -161,4 +162,10 @@ func CopyProperties[T any](target interface{}) T {
 		dtoField.Set(voField)
 	}
 	return dtoValue.Interface().(T)
+}
+
+func GetRuntimeStack() string {
+	var buf [4096]byte
+	n := runtime.Stack(buf[:], false)
+	return string(buf[:n])
 }

@@ -47,6 +47,7 @@
 - func SplitArray(arr []interface{}, size int) (list [][]interface{}) 
 - func GetFieldValue(config interface{}, fieldName string) (interface{}, error) {// 通过反射获取结构体字段的值
 - func CopyProperties[T any](target interface{}) // 复制对象
+- func GetRuntimeStack() string // 获取运行堆栈
 
 #### password
 - func BcryptHash(password string) string // BcryptHash 使用 bcrypt 对密码进行加密
