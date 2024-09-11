@@ -9,7 +9,7 @@ Golang Development Framework Continuously Developing and Updating
 [![Release](https://img.shields.io/github/v/release/gif-gif/go.io.svg)](https://github.com/gif-gif/go.io/releases)
 [![License](https://img.shields.io/github/license/gif-gif/go.io)](https://github.com/gif-gif/go.io?tab=Apache-2.0-1-ov-file)
 [![Issues](https://img.shields.io/github/issues/gif-gif/go.io)](https://github.com/gif-gif/go.io/issues)
-[![Commits](https://img.shields.io/github/commit-activity/m/gif-gif/go.io.svg?style=flat&label=commits)](https://github.com/gif-gif/go.io)
+[![Commits](https://img.shields.io/github/commit-activity/m/gif-gif/go.io.svg?style=flat&label=commits)](https://github.com/gif-gif/go.io/graphs/commit-activity)
 [![Downloads](https://img.shields.io/github/downloads/gif-gif/go.io/total.svg)](https://github.com/gif-gif/go.io/releases)
 [![Contributors](https://img.shields.io/github/contributors/gif-gif/go.io)](https://github.com/gif-gif/go.io/graphs/contributors)
 [![PullRequest](https://img.shields.io/github/issues-pr/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/pulls)
