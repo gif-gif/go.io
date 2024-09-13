@@ -15,13 +15,6 @@ func InitCaptcha(captcha *gocaptcha.GoCaptcha) {
 
 // 获取图片验证码-数字
 func CaptchaGet(width, height int) map[string]string {
-	if width == 0 {
-		width = 240
-	}
-	if height == 0 {
-		height = 80
-	}
-
 	data, err := defaultCaptcha.DigitCaptcha(width, height, 4)
 	if err != nil {
 		return map[string]string{
@@ -37,13 +30,6 @@ func CaptchaGet(width, height int) map[string]string {
 }
 
 func CaptchaChineseGet(width, height int, source string) map[string]string {
-	if width == 0 {
-		width = 240
-	}
-	if height == 0 {
-		height = 80
-	}
-
 	data, err := defaultCaptcha.ChineseCaptcha(width, height, 4, source)
 	if err != nil {
 		return map[string]string{
@@ -59,13 +45,6 @@ func CaptchaChineseGet(width, height int, source string) map[string]string {
 }
 
 func CaptchaMathGet(width, height int) map[string]string {
-	if width == 0 {
-		width = 240
-	}
-	if height == 0 {
-		height = 80
-	}
-
 	data, err := defaultCaptcha.MathCaptcha(width, height)
 	if err != nil {
 		return map[string]string{

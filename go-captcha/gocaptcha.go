@@ -209,6 +209,13 @@ func (g *GoCaptcha) ChineseCaptcha(width, height, length int, source string) (*C
 	if source == "" {
 		source = "123456qwertyu你好adfkl在在载在饿工一ioplkjhgfdsazxcvbnm"
 	}
+	if width == 0 {
+		width = 240
+	}
+	if height == 0 {
+		height = 80
+	}
+	
 	var param = configJsonBody{
 		CaptchaType: "chinese",
 		DriverChinese: &base64Captcha.DriverChinese{
