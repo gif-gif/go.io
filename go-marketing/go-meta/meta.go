@@ -73,12 +73,15 @@ func (m *Market) RefreshToken(clientId string, clientSecret string) (*TokenRespo
 	}
 	api := m.BaseApi + ApiRefreshToken
 	params, _ := query.Values(req)
-	gh := gohttp.GoHttp[TokenResponse]{}
+
 	request := &gohttp.Request{
 		Url:          api,
 		ParamsValues: params,
 	}
-	result, err := gh.HttpGet(context.Background(), request)
+	gh := gohttp.GoHttp[TokenResponse]{
+		Request: request,
+	}
+	result, err := gh.HttpGet(context.Background())
 	if err != nil {
 		return nil, err
 	}

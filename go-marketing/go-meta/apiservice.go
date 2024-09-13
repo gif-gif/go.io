@@ -12,12 +12,12 @@ func (m *Market) getAccountsByBusinessId(req *RequestData, businessId string) (*
 	api = fmt.Sprintf(api, businessId)
 	params, _ := query.Values(req)
 
-	gh := gohttp.GoHttp[AccountResponse]{}
 	request := &gohttp.Request{
 		Url:          api,
 		ParamsValues: params,
 	}
-	result, err := gh.HttpGet(context.Background(), request)
+	gh := gohttp.GoHttp[AccountResponse]{Request: request}
+	result, err := gh.HttpGet(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -30,12 +30,12 @@ func (m *Market) getAllDataByAccountId(req *RequestData, accountId string, dataT
 	api = fmt.Sprintf(api, accountId)
 	params, _ := query.Values(req)
 
-	gh := gohttp.GoHttp[AllDataResponse]{}
 	request := &gohttp.Request{
 		Url:          api,
 		ParamsValues: params,
 	}
-	result, err := gh.HttpGet(context.Background(), request)
+	gh := gohttp.GoHttp[AllDataResponse]{Request: request}
+	result, err := gh.HttpGet(context.Background())
 
 	if err != nil {
 		return nil, err
@@ -61,12 +61,15 @@ func (m *Market) getDetailByDataId(req *DetailsDataRequest, dataId string, dataT
 	}
 
 	params, _ := query.Values(req)
-	gh := gohttp.GoHttp[DataDetailResponse]{}
+
 	request := &gohttp.Request{
 		Url:          api,
 		ParamsValues: params,
 	}
-	result, err := gh.HttpGet(context.Background(), request)
+	gh := gohttp.GoHttp[DataDetailResponse]{
+		Request: request,
+	}
+	result, err := gh.HttpGet(context.Background())
 	if err != nil {
 		return nil, err
 	}
