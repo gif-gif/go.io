@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-// Grpc 调用限流 limit 是最大并发数
+// Gozero Grpc 调用限流 limit 是最大并发数
 func GrpcLimit(s *zrpc.RpcServer, limit int) {
 	l := syncx.NewLimit(limit)
 	s.AddUnaryInterceptors(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
