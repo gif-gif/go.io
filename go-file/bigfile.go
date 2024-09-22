@@ -6,7 +6,6 @@ import (
 	"fmt"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gogf/gf/util/gconv"
-	"golang.org/x/sync/errgroup"
 	"math"
 	"os"
 	"path/filepath"
@@ -21,10 +20,9 @@ type BigFile struct {
 	FileChunkCallback   func(chunk *FileChunk) error // 分片处理消息
 	SuccessChunkIndexes []int64                      //处理成功的碎片index
 
-	fileReader   *os.File
-	fileSize     int64
-	__ctx        context.Context
-	errGroupPool *errgroup.Group
+	fileReader *os.File
+	fileSize   int64
+	ErrorGroup goutils.ErrorGroup
 }
 
 func (b *BigFile) IsSuccess() bool {
@@ -55,10 +53,7 @@ func (b *BigFile) Start() error {
 		return err
 	}
 
-	g, ctx := errgroup.WithContext(context.Background())
-	b.__ctx = ctx
-	b.errGroupPool = g
-	b.errGroupPool.SetLimit(b.MaxWorkers)
+	b.ErrorGroup = goutils.NewErrorGroup(context.TODO(), b.MaxWorkers)
 
 	cSize := float64(fileInfo.Size()) / float64(b.ChunkSize*1024*1024)
 	chunkCount := gconv.Int(math.Ceil(cSize))
@@ -68,8 +63,8 @@ func (b *BigFile) Start() error {
 
 	for i := 0; i < chunkCount; i++ {
 		chunkIndex := gconv.Int64(i)
-		b.errGroupPool.Go(func() error {
-			if goutils.IsContextDone(b.__ctx) {
+		b.ErrorGroup.Submit(func() error {
+			if b.ErrorGroup.IsContextDone() {
 				return nil
 			}
 			chunk, err := b.createChunk(b.fileReader, chunkIndex)
@@ -84,7 +79,7 @@ func (b *BigFile) Start() error {
 			return nil
 		})
 	}
-	return b.errGroupPool.Wait()
+	return b.ErrorGroup.Wait()
 }
 
 func (b *BigFile) createChunk(file *os.File, index int64) (*FileChunk, error) {

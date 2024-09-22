@@ -17,6 +17,7 @@
 - bigint 计算
 
 #### Goroutine 
+- NewErrorGroup(context.TODO(), maxWorkers) 并发可取消的协程组
 - AsyncFunc
 - AsyncFuncPanic
 - AsyncFuncGroup

@@ -3,9 +3,38 @@ package goutils
 import (
 	"context"
 	golog "github.com/gif-gif/go.io/go-log"
+	"golang.org/x/sync/errgroup"
 	"sync"
 	"time"
 )
+
+type ErrorGroup struct {
+	maxWorkers int
+	errGroup   *errgroup.Group
+	ctx        context.Context
+}
+
+// 当并发执行过程中有个错误时，会自动取消其他所有任务,通过CancelContext 取消来实现的
+// （最大并发数为 maxWorkers,超过阻塞等待 ）
+func NewErrorGroup(context context.Context, maxWorkers int) ErrorGroup {
+	e := ErrorGroup{}
+	e.maxWorkers = maxWorkers
+	e.errGroup, e.ctx = errgroup.WithContext(context)
+	e.errGroup.SetLimit(e.maxWorkers)
+	return e
+}
+
+func (e *ErrorGroup) Submit(fn func() error) {
+	e.errGroup.Go(fn)
+}
+
+func (e *ErrorGroup) Wait() error {
+	return e.errGroup.Wait()
+}
+
+func (e *ErrorGroup) IsContextDone() bool {
+	return IsContextDone(e.ctx)
+}
 
 // 捕获panic
 func Recovery(errFn func(err any)) {
