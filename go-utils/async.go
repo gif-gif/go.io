@@ -24,8 +24,14 @@ func NewErrorGroup(context context.Context, maxWorkers int) ErrorGroup {
 	return e
 }
 
-func (e *ErrorGroup) Submit(fn func() error) {
-	e.errGroup.Go(fn)
+func (e *ErrorGroup) Submit(fn ...func() error) {
+	for _, f := range fn {
+		e.errGroup.Go(f)
+	}
+}
+
+func (e *ErrorGroup) TryGo(fn func() error) bool {
+	return e.errGroup.TryGo(fn)
 }
 
 func (e *ErrorGroup) Wait() error {
