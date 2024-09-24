@@ -53,7 +53,7 @@ func Recovery(errFn func(err any)) {
 	}
 }
 
-// 异步执行（安全）errFn = nil 时自动Recovery 不会Panic
+// 异步执行（安全）errFn = nil 时自动Recovery 不会Panic, 建议使用NewErrorGroup 替代
 func AsyncFuncPanic(fn func(), errFn func(err any)) {
 	go func() {
 		defer Recovery(errFn)
@@ -61,7 +61,7 @@ func AsyncFuncPanic(fn func(), errFn func(err any)) {
 	}()
 }
 
-// 异步执行（安全）
+// 异步执行（安全）建议使用NewErrorGroup 替代
 func AsyncFunc(fn func()) {
 	go func() {
 		defer Recovery(nil)
@@ -69,7 +69,7 @@ func AsyncFunc(fn func()) {
 	}()
 }
 
-// 异步并发执行（安全
+// 异步并发执行（安全), 建议使用NewErrorGroup 替代
 func AsyncFuncGroup(fns ...func()) {
 	var wg sync.WaitGroup
 
@@ -87,6 +87,8 @@ func AsyncFuncGroup(fns ...func()) {
 }
 
 // 异步并发执行（安全）errFn = nil 时自动Recovery 不会Panic
+//
+// 建议使用NewErrorGroup 替代
 func AsyncFuncGroupPanic(errFn func(err any), fns ...func()) {
 	var wg sync.WaitGroup
 	for _, fn := range fns {
