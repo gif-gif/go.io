@@ -14,7 +14,7 @@ type ErrorGroup struct {
 	ctx        context.Context
 }
 
-// 当并发执行过程中有个错误时，会自动取消其他所有任务,通过CancelContext 取消来实现的
+// 当并发执行过程中有错误时，会自动取消其他所有任务,通过CancelContext 取消来实现
 // （最大并发数为 maxWorkers,超过阻塞等待 ）
 func NewErrorGroup(context context.Context, maxWorkers int) ErrorGroup {
 	e := ErrorGroup{}
@@ -53,7 +53,7 @@ func Recovery(errFn func(err any)) {
 	}
 }
 
-// 异步执行（安全）errFn = nil 时自动Recovery 不会Panic, 建议使用NewErrorGroup 替代
+// 异步执行（安全）errFn = nil 时自动Recovery 不会Panic
 func AsyncFuncPanic(fn func(), errFn func(err any)) {
 	go func() {
 		defer Recovery(errFn)
@@ -61,7 +61,7 @@ func AsyncFuncPanic(fn func(), errFn func(err any)) {
 	}()
 }
 
-// 异步执行（安全）建议使用NewErrorGroup 替代
+// 异步执行（安全）
 func AsyncFunc(fn func()) {
 	go func() {
 		defer Recovery(nil)
