@@ -1,4 +1,4 @@
-package server
+package goserver
 
 import (
 	"context"
