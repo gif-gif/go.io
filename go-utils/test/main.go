@@ -26,21 +26,23 @@ func main() {
 	goio.Init(goio.DEVELOPMENT)
 	//testGenerateAesKeys()
 	//testSha1Sign()
-	type DataVO struct {
-		ID   int
-		Name string
-		// 其他字段
-	}
-
-	// DataDTO 表示数据传输对象
-	type DataDTO struct {
-		ID   int
-		Name string
-		// 其他字段
-	}
-
-	a := goutils.CopyProperties[DataDTO](DataVO{ID: 1, Name: "John"})
-	golog.WithTag("a").Info(a)
+	testTimeLocal()
+	//
+	//type DataVO struct {
+	//	ID   int
+	//	Name string
+	//	// 其他字段
+	//}
+	//
+	//// DataDTO 表示数据传输对象
+	//type DataDTO struct {
+	//	ID   int
+	//	Name string
+	//	// 其他字段
+	//}
+	//
+	//a := goutils.CopyProperties[DataDTO](DataVO{ID: 1, Name: "John"})
+	//golog.WithTag("a").Info(a)
 	<-gocontext.Cancel().Done()
 }
 
@@ -126,4 +128,10 @@ func testGenerateAesKeys() {
 		return
 	}
 	golog.WithTag("aesKey").Info(key)
+}
+
+func testTimeLocal() {
+	today := goutils.DateTime2TsLocal("2023-12-07 02:12:33", time.UTC)
+	todayLocal := goutils.DateTime2TsLocal("2023-12-07 10:12:33", time.Local)
+	golog.WithTag("Time").Info(today, todayLocal)
 }
