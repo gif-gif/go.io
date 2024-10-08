@@ -1,4 +1,6 @@
-package goio
+package goserver
+
+import "github.com/gif-gif/go.io/goio"
 
 var defaultOptions = &options{
 	noAccessPath: map[string]struct{}{
@@ -21,7 +23,7 @@ type options struct {
 	pprofEnable bool
 
 	serverName string
-	env        Environment
+	env        goio.Environment
 
 	corsHeaders  []string
 	noAccessPath map[string]struct{}
@@ -63,7 +65,7 @@ func ServerNameOption(serverName string) Option {
 }
 
 // 运行环境
-func EnvOption(env Environment) Option {
+func EnvOption(env goio.Environment) Option {
 	return newFuncOption(func(opts *options) {
 		opts.env = env
 	})

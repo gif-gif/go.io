@@ -2,7 +2,7 @@ package common_controller
 
 import (
 	goutils "github.com/gif-gif/go.io/go-utils"
-	"github.com/gif-gif/go.io/goio"
+	"github.com/gif-gif/go.io/goio/server"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,9 +22,9 @@ type LoginResponse struct {
 	IsSuper  bool   `json:"is_super"`
 }
 
-func (this Login) DoHandle(ctx *gin.Context) *goio.Response {
+func (this Login) DoHandle(ctx *gin.Context) *goserver.Response {
 	if err := ctx.ShouldBind(&this.Request); err != nil {
-		return goio.ErrorWithValidate(err, map[string]string{
+		return goserver.ErrorWithValidate(err, map[string]string{
 			"account_required":      "登录账号 为空",
 			"password_required":     "登录密码 为空",
 			"captcha_id_required":   "验证码 无效",
@@ -33,14 +33,14 @@ func (this Login) DoHandle(ctx *gin.Context) *goio.Response {
 	}
 
 	if !goutils.CaptchaVerify(this.Request.CaptchaId, this.Request.CaptchaCode) {
-		return goio.Error(7001, "验证码错误")
+		return goserver.Error(7001, "验证码错误")
 	}
 
 	var userId int64 = 1
 	var userName = "tes"
-	token, err := goio.CreateToken("AppKey", userId)
+	token, err := goserver.CreateToken("AppKey", userId)
 	if err != nil {
-		return goio.Error(7004, "登录失败，提示信息："+err.Error())
+		return goserver.Error(7004, "登录失败，提示信息："+err.Error())
 	}
 
 	this.Response = LoginResponse{
@@ -60,5 +60,5 @@ func (this Login) DoHandle(ctx *gin.Context) *goio.Response {
 	ctx.Set("user_id", userId)
 	ctx.Set("username", userName)
 
-	return goio.Success(this.Response)
+	return goserver.Success(this.Response)
 }

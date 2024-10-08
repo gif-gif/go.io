@@ -1,4 +1,4 @@
-package goio
+package goserver
 
 import (
 	"bytes"

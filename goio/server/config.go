@@ -1,4 +1,4 @@
-package goio
+package goserver
 
 import (
 	"encoding/json"
@@ -11,12 +11,13 @@ import (
 	golog "github.com/gif-gif/go.io/go-log"
 	gokafka "github.com/gif-gif/go.io/go-mq/go-kafka"
 	"github.com/gif-gif/go.io/go-utils/prometheusx"
+	"github.com/gif-gif/go.io/goio"
 	"gopkg.in/yaml.v3"
 	"os"
 )
 
 type Config struct {
-	Env Environment `yaml:"env"`
+	Env goio.Environment `yaml:"env"`
 
 	Server struct {
 		Addr string `yaml:"addr"`
