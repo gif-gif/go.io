@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	golog "github.com/gif-gif/go.io/go-log"
+	"github.com/gif-gif/go.io/goio"
 	"go.etcd.io/etcd/client/pkg/v3/transport"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/naming/endpoints"
@@ -299,4 +300,24 @@ func (cli *GoEtcdClient) map2array(data map[string]string) []string {
 		arrData = append(arrData, v)
 	}
 	return arrData
+}
+
+// 检测 rpc服务是否启动
+func (cli *GoEtcdClient) CheckRpcServices(rpcServices []string) bool {
+	rpcStarted := true
+	for _, service := range rpcServices {
+		rpc := GetMap(service)
+		if len(rpc) == 0 {
+			if goio.Env == goio.TEST || goio.Env == goio.PRODUCTION {
+				golog.WithTag("CheckRpcService").Fatal(service + " rpc is not started")
+			} else {
+				golog.WithTag("CheckRpcService").Error(service + " rpc is not started")
+			}
+			rpcStarted = false
+		} else {
+			golog.WithTag("CheckRpcService").Info(service + " rpc is started")
+		}
+	}
+
+	return rpcStarted
 }
