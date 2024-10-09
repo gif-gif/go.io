@@ -26,7 +26,7 @@ func main() {
 	goio.Init(goio.DEVELOPMENT)
 	//testGenerateAesKeys()
 	//testSha1Sign()
-	testTimeLocal()
+	testSortFunc()
 	//
 	//type DataVO struct {
 	//	ID   int
@@ -134,4 +134,39 @@ func testTimeLocal() {
 	today := goutils.DateTime2TsLocal("2023-12-07 02:12:33", time.UTC)
 	todayLocal := goutils.DateTime2TsLocal("2023-12-07 10:12:33", time.Local)
 	golog.WithTag("Time").Info(today, todayLocal)
+}
+
+func testSortFunc() {
+	// 定义一个自定义结构体 Person
+	type Person struct {
+		Name string
+		Age  int
+	}
+
+	people := []Person{
+		{Name: "Charlie", Age: 30},
+		{Name: "Alice", Age: 25},
+		{Name: "Bob", Age: 35},
+	}
+
+	fmt.Println("原始数组：", people)
+
+	// 按年龄排序
+	goutils.InsertionSort(people, func(a, b Person) bool {
+		return a.Age < b.Age
+	})
+	fmt.Println("按年龄排序后的数组：", people)
+
+	// 恢复原始顺序，以便再次排序
+	people = []Person{
+		{Name: "Charlie", Age: 30},
+		{Name: "Alice", Age: 25},
+		{Name: "Bob", Age: 35},
+	}
+
+	// 按姓名排序
+	sortedByName := goutils.GenericSort(people, func(a, b Person) bool {
+		return a.Name < b.Name
+	})
+	fmt.Println("按姓名排序后的数组：", sortedByName)
 }

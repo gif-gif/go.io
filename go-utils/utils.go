@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"reflect"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 )
@@ -168,4 +169,30 @@ func GetRuntimeStack() string {
 	var buf [4096]byte
 	n := runtime.Stack(buf[:], false)
 	return string(buf[:n])
+}
+
+// 插入排序函数，使用泛型指定元素类型
+func InsertionSort[T any](arr []T, less func(T, T) bool) {
+	n := len(arr)
+	for i := 1; i < n; i++ {
+		key := arr[i]
+		j := i - 1
+
+		// 将比key大的元素向后移动一位
+		for j >= 0 && less(arr[j], key) == false {
+			arr[j+1] = arr[j]
+			j--
+		}
+
+		// 插入关键元素到正确的位置
+		arr[j+1] = key
+	}
+}
+
+// 定义一个泛型排序函数
+func GenericSort[T any](arr []T, less func(T, T) bool) []T {
+	sort.Slice(arr, func(i, j int) bool {
+		return less(arr[i], arr[j])
+	})
+	return arr
 }

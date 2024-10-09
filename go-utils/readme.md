@@ -49,6 +49,8 @@
 - func GetFieldValue(config interface{}, fieldName string) (interface{}, error) {// 通过反射获取结构体字段的值
 - func CopyProperties[T any](target interface{}) // 复制对象
 - func GetRuntimeStack() string // 获取运行堆栈
+- func GenericSort  // 通用排序
+- func InsertionSort // 通用插入排序
 
 #### password
 - func BcryptHash(password string) string // BcryptHash 使用 bcrypt 对密码进行加密
