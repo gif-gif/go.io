@@ -11,6 +11,7 @@ func main() {
 		AccessExpire:       100000,
 		RefreshTokenExpire: 100000,
 	}
+
 	params := map[string]any{
 		"aaa": 1,
 	}

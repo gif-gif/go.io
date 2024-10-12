@@ -21,7 +21,7 @@ func GenIdInit(adapter iGenId) {
 func GenId() int64 {
 	__genIdOne.Do(func() {
 		if __genId == nil {
-			__genId = &SnowFlakeId{machineId: 1}
+			__genId = &SnowFlakeId{WorkerId: 1}
 		}
 	})
 	return __genId.GenId()

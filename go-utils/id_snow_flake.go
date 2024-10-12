@@ -13,11 +13,11 @@ import (
 // 为什么如此重要？因为它提供了一种ID生成及生成的思路，当然这种方案就是需要考虑时钟回拨的问题以及做一些 buffer的缓冲设计提高性能。
 // 雪花算法
 type SnowFlakeId struct {
-	dataCenterId int // 机房ID
-	machineId    int // 机器ID
+	DataCenterId int // 机房或者数据中心ID 0 - 31
+	WorkerId     int // 机器或者容器ID 0 - 31
 
-	lastTime int64 // 最后时间
-	sn       int   // 序号
+	lastTime int64 // 最后生成ID时间
+	sn       int   // 毫秒内序列序号 0-4095
 
 	mu sync.Mutex
 }
@@ -46,10 +46,10 @@ func (sf *SnowFlakeId) GenId() int64 {
 	ts = ts << 22
 
 	// 机房ID，向左移动17位
-	dataCenterId := sf.dataCenterId << 17
+	dataCenterId := sf.DataCenterId << 17
 
 	// 机器ID，向左移动12位
-	machineId := sf.machineId << 12
+	machineId := sf.WorkerId << 12
 
 	return ts | int64(dataCenterId) | int64(machineId) | int64(sf.sn)
 }

@@ -190,9 +190,8 @@ func InsertionSort[T any](arr []T, less func(T, T) bool) {
 }
 
 // 定义一个泛型排序函数
-func GenericSort[T any](arr []T, less func(T, T) bool) []T {
+func GenericSort[T any](arr []T, less func(T, T) bool) {
 	sort.Slice(arr, func(i, j int) bool {
 		return less(arr[i], arr[j])
 	})
-	return arr
 }

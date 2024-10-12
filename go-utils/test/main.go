@@ -165,8 +165,8 @@ func testSortFunc() {
 	}
 
 	// 按姓名排序
-	sortedByName := goutils.GenericSort(people, func(a, b Person) bool {
+	goutils.GenericSort(people, func(a, b Person) bool {
 		return a.Name < b.Name
 	})
-	fmt.Println("按姓名排序后的数组：", sortedByName)
+	fmt.Println("按姓名排序后的数组：", people)
 }
