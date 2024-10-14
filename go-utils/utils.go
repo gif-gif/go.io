@@ -195,3 +195,30 @@ func GenericSort[T any](arr []T, less func(T, T) bool) {
 		return less(arr[i], arr[j])
 	})
 }
+
+// 把缺失的数字填充到数组中
+func FillMissingNumbers(nums []int64, max int64) []int64 {
+	// 创建一个新的切片来存储结果
+	var result []int64
+	// 从 1 开始
+	current := int64(1)
+
+	// 遍历给定的数字
+	for _, num := range nums {
+		// 填充中间缺失的数字
+		for current < num {
+			result = append(result, current)
+			current++
+		}
+		// 添加当前数字
+		result = append(result, num)
+		current = num + 1 // 更新当前数字到下一个
+	}
+
+	// 如果还有剩余的数字，继续填充
+	for i := current; i <= max; i++ { // 假设我们想填充到 20
+		result = append(result, i)
+	}
+
+	return result
+}

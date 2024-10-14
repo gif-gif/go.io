@@ -51,6 +51,7 @@
 - func GetRuntimeStack() string // 获取运行堆栈
 - func GenericSort  // 通用排序
 - func InsertionSort // 通用插入排序
+- func FillMissingNumbers 填充缺失数字
 
 #### password
 - func BcryptHash(password string) string // BcryptHash 使用 bcrypt 对密码进行加密
