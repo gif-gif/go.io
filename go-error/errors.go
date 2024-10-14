@@ -2,6 +2,7 @@ package goerror
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 )
 
 /**
@@ -40,4 +41,12 @@ func NewErrMsg(errMsg string) *CodeError {
 
 func NewParamErrMsg(errMsg string) *CodeError {
 	return &CodeError{errCode: REQUEST_PARAM_ERROR, errMsg: errMsg}
+}
+
+func NewErrorMsg(errCode uint32, errMsg string) error {
+	return errors.Wrap(&CodeError{errCode: errCode, errMsg: errMsg}, "")
+}
+
+func NewError(errCode uint32) error {
+	return errors.Wrap(&CodeError{errCode: errCode, errMsg: MapErrMsg(errCode)}, "")
 }
