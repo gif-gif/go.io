@@ -226,3 +226,20 @@ func FillMissingNumbers(nums []int64, max int64) []int64 {
 func GetPageCount(total int64, pageSize int64) (totalPages int64) {
 	return int64(math.Ceil(float64(total) / float64(pageSize)))
 }
+
+// 下一页
+func AfterPage(page int64, pageCount int64) int64 {
+	after := page + 1
+	if after > pageCount {
+		after = -1
+	}
+	return after
+}
+
+func BeforePage(page int64) int64 {
+	before := page - 1
+	if before <= 0 {
+		before = -1
+	}
+	return before
+}
