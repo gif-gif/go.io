@@ -229,6 +229,9 @@ func GetPageCount(total int64, pageSize int64) (totalPages int64) {
 
 // 下一页
 func AfterPage(page int64, pageCount int64) int64 {
+	if page <= 0 {
+		page = 1
+	}
 	after := page + 1
 	if after > pageCount {
 		after = -1
