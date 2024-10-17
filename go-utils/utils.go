@@ -222,3 +222,7 @@ func FillMissingNumbers(nums []int64, max int64) []int64 {
 
 	return result
 }
+
+func GetPageCount(total int64, pageSize int64) (totalPages int64) {
+	return int64(math.Ceil(float64(total) / float64(pageSize)))
+}
