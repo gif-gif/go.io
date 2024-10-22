@@ -1,4 +1,4 @@
-package gotransaction
+package transactionx
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package gotransaction
+package transactionx
 
 import (
 	"github.com/zeromicro/go-zero/core/stores/cache"
