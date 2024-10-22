@@ -12,14 +12,15 @@
 
 ```go
 func testSqlite3() {
-    db, err := gogorm.InitSqlite3("./test.db", gogorm.GoDbConfig{
-        MaxOpen:      100,
-        MaxIdleCount: 10,
+    err := gogorm.Init(gogorm.Config{
+        DataSource: "./test.db",
+        DBType:     gogorm.DATABASE_SQLITE,
     })
     if err != nil {
         golog.WithTag("godb").Error(err.Error())
         return
     }
+    db := gogorm.Default().DB
     err = db.AutoMigrate(&Product{})
     if err != nil {
         golog.WithTag("godb").Error(err.Error())
@@ -49,11 +50,15 @@ func testSqlite3() {
 
 ```go
 func mysqlTest() {
-	db, err := gogorm.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", gogorm.GoDbConfig{})
-	if err != nil {
-		golog.WithTag("godb").Error(err.Error())
-		return
-	}
+    err := gogorm.Init(gogorm.Config{
+        DataSource: "root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Localb",
+    })
+    if err != nil {
+        golog.WithTag("godb").Error(err.Error())
+        return
+    }
+    db := gogorm.Default().DB
+	
 	err = db.AutoMigrate(&Product{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
@@ -80,11 +85,17 @@ func mysqlTest() {
 ```go
 func testClickhouse() {
 	dsn := "tcp://localhost:9000?database=gorm&username=gorm&password=gorm&read_timeout=10&write_timeout=20"
-	db, err := gogorm.InitMysql(dsn, gogorm.GoDbConfig{})
-	if err != nil {
-		golog.WithTag("godb").Error(err.Error())
-		return
-	}
+    err := gogorm.Init(gogorm.Config{
+        DataSource: dsn,
+		DBType:     gogorm.DATABASE_CLICKHOUSE,
+    })
+	
+    if err != nil {
+        golog.WithTag("godb").Error(err.Error())
+        return
+    }
+    db := gogorm.Default().DB
+	
 	err = db.Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").AutoMigrate(&Product{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())

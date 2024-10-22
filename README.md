@@ -271,11 +271,15 @@ func testDynamicSize() {
 - tidb
 ```go
 func mysqlTest() {
-	db, err := gogorm.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", godb.GoDbConfig{})
-	if err != nil {
-		golog.WithTag("godb").Error(err.Error())
-		return
-	}
+    err := gogorm.Init(gogorm.Config{
+     DataSource: "root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Localb",
+    })
+    if err != nil {
+        golog.WithTag("godb").Error(err.Error())
+        return
+    }
+    db := gogorm.Default().DB
+	
 	err = db.AutoMigrate(&Product{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
