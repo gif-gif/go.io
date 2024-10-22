@@ -8,6 +8,7 @@ import (
 	"syscall"
 )
 
+// 应用程序全局上下文
 var (
 	__signal chan os.Signal
 	__ctx    context.Context

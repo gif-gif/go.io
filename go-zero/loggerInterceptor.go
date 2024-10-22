@@ -1,4 +1,4 @@
-package rpcserver
+package gozero
 
 import (
 	"context"
@@ -11,7 +11,6 @@ import (
 )
 
 func LoggerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-
 	resp, err = handler(ctx, req)
 	if err != nil {
 		causeErr := errors.Cause(err)                   // err类型

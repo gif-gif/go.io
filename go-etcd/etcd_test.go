@@ -1,27 +1,48 @@
 package goetcd
 
 import (
+	"encoding/json"
 	"fmt"
 	gocontext "github.com/gif-gif/go.io/go-context"
+	etcd_configurator "github.com/gif-gif/go.io/go-zero/etcd-configurator"
 	"log"
 	"testing"
 	"time"
 )
 
+// 配置结构定义
+type TestSt struct {
+	Name string `json:"name"`
+}
+
+func TestEtcdConfigListener(t *testing.T) {
+	etcd_configurator.NewConfigCenter[TestSt]("config-test", Config{
+		Endpoints: []string{"127.0.0.1:2379"},
+	}, func(t TestSt) {
+		println(t.Name)
+	})
+
+	select {}
+}
+
 func TestEtcdSaveConfig(t *testing.T) {
+
 	Init(Config{
 		Endpoints: []string{"127.0.0.1:2379"},
 		//Username:  "root",
 		//Password:  "123456",
 	})
+	Del("config-test")
 
-	if _, err := Set("config-test", "192.168.1.101:15001"); err != nil {
+	data := &TestSt{
+		Name: "Test111",
+	}
+	str, _ := json.Marshal(data)
+	if _, err := Set("config-test", string(str)); err != nil {
 		log.Fatalln(err)
 	}
-
 	fmt.Println("Setting config:", GetString("config-test"))
-
-	Del("config-test")
+	//Del("config-test")
 }
 
 func TestInit(t *testing.T) {
