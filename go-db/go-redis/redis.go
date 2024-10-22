@@ -16,7 +16,7 @@ func Init(configs ...Config) (err error) {
 		}
 
 		if __clients[name] != nil {
-			return errors.New("client already exists")
+			return errors.New("goredis client already exists")
 		}
 
 		__clients[name], err = New(conf)

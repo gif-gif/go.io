@@ -8,6 +8,22 @@ import (
 	"time"
 )
 
+func TestEtcdSaveConfig(t *testing.T) {
+	Init(Config{
+		Endpoints: []string{"127.0.0.1:2379"},
+		//Username:  "root",
+		//Password:  "123456",
+	})
+
+	if _, err := Set("config-test", "192.168.1.101:15001"); err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Println("Setting config:", GetString("config-test"))
+
+	Del("config-test")
+}
+
 func TestInit(t *testing.T) {
 	Init(Config{
 		Endpoints: []string{"127.0.0.1:23790"},

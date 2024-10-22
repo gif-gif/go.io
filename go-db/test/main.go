@@ -26,14 +26,16 @@ func main() {
 }
 
 func testSqlite3() {
-	db, err := gogorm.InitSqlite3("./test.db", gogorm.GormDbConfig{
-		MaxOpen:      100,
-		MaxIdleCount: 10,
+	err := gogorm.Init(gogorm.Config{
+		DataSource: "./test.db",
+		DBType:     gogorm.DATABASE_SQLITE,
 	})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
 	}
+	db := gogorm.Default().DB
+
 	err = db.AutoMigrate(&Product{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
@@ -61,11 +63,15 @@ func testSqlite3() {
 }
 
 func mysqlTest() {
-	db, err := gogorm.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", gogorm.GormDbConfig{})
+	err := gogorm.Init(gogorm.Config{
+		DataSource: "root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local",
+	})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
 	}
+	db := gogorm.Default().DB
+
 	err = db.AutoMigrate(&Product{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
@@ -89,12 +95,16 @@ func mysqlTest() {
 }
 
 func testClickhouse() {
-	dsn := "tcp://localhost:9000?database=gorm&username=gorm&password=gorm&read_timeout=10&write_timeout=20"
-	db, err := gogorm.InitMysql(dsn, gogorm.GormDbConfig{})
+	err := gogorm.Init(gogorm.Config{
+		DataSource: "tcp://localhost:9000?database=gorm&username=gorm&password=gorm&read_timeout=10&write_timeout=20",
+		DBType:     gogorm.DATABASE_CLICKHOUSE,
+	})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
 	}
+	db := gogorm.Default().DB
+
 	err = db.Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").AutoMigrate(&Product{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
@@ -118,18 +128,22 @@ func testClickhouse() {
 }
 
 func testTransaction() {
-	db, err := gogorm.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", gogorm.GormDbConfig{})
+	err := gogorm.Init(gogorm.Config{
+		DataSource: "root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local",
+	})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
 	}
+	db := gogorm.Default().DB
+
 	err = db.AutoMigrate(&Product{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
 	}
 
-	tx := db.BeginTransaction()
+	tx := db.Begin()
 
 	// Create
 	insertProduct := &Product{Code: "D42", Price: 100}
@@ -168,11 +182,7 @@ func testTransaction() {
 		tx.Rollback()
 	}
 
-	err = tx.Commit()
-	if err != nil {
-		fmt.Println("Commit error ", txd.Error.Error())
-		tx.Rollback()
-	}
+	tx.Commit()
 }
 
 func testHasMany() {
@@ -189,11 +199,14 @@ func testHasMany() {
 		CreditCards []CreditCard `gorm:"foreignKey:UserRefer"`
 	}
 
-	db, err := gogorm.InitMysql("root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local", gogorm.GormDbConfig{})
+	err := gogorm.Init(gogorm.Config{
+		DataSource: "root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local",
+	})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
 	}
+	db := gogorm.Default().DB
 	err = db.AutoMigrate(&User{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
@@ -221,11 +234,16 @@ func testHasMany() {
 }
 
 func postgreSqlTest() {
-	db, err := gogorm.InitPostgreSql("host=122.228.113.238 user=postgres password=223238 dbname=passwall port=5432 sslmode=disable TimeZone=Asia/Shanghai", gogorm.GormDbConfig{})
+	err := gogorm.Init(gogorm.Config{
+		DataSource: "host=122.228.113.238 user=postgres password=223238 dbname=passwall port=5432 sslmode=disable TimeZone=Asia/Shanghai",
+		DBType:     gogorm.DATABASE_POSTGRESQL,
+	})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
 		return
 	}
+	db := gogorm.Default().DB
+
 	err = db.AutoMigrate(&Product{})
 	if err != nil {
 		golog.WithTag("godb").Error(err.Error())
