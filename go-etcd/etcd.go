@@ -53,7 +53,7 @@ func Default() *GoEtcdClient {
 		}
 	}
 
-	golog.WithTag("goredis").Error("no default redis client")
+	golog.WithTag("goetcd").Error("no default goetcd client")
 
 	return nil
 }

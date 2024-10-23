@@ -30,6 +30,7 @@ var (
 	ErrDBError           = NewErrCode(DB_ERROR)
 	ErrServerError       = NewErrCode(SERVER_COMMON_ERROR)
 	ErrRedisError        = NewErrCode(REDIS_ERROR)
+	ErrEtcdError         = NewErrCode(ETCD_ERROR)
 )
 
 // 扩展的错误类型这里初始化

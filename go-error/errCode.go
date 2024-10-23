@@ -20,5 +20,6 @@ const USER_EXISTS_ERROR uint32 = 704
 const SERVER_COMMON_ERROR uint32 = 500
 const DB_ERROR uint32 = 555
 const REDIS_ERROR uint32 = 666
+const ETCD_ERROR uint32 = 777
 
 //用户模块
