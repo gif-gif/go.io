@@ -8,6 +8,7 @@ import (
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gif-gif/go.io/goio"
 	"github.com/gogf/gf/util/gconv"
+	"reflect"
 	"time"
 )
 
@@ -45,7 +46,36 @@ func main() {
 	//
 	//a := goutils.CopyProperties[DataDTO](DataVO{ID: 1, Name: "John"})
 	//golog.WithTag("a").Info(a)
+
+	testReflect()
 	<-gocontext.Cancel().Done()
+}
+
+type Person struct {
+	name string // 私有属性
+	Age  int
+}
+
+func testReflect() {
+	p := &Person{name: "Alice", Age: 30}
+
+	// 获取 Person 类型的反射值
+	v := reflect.ValueOf(p).Elem()
+
+	// 获取私有属性 name
+	nameField := v.FieldByName("name")
+	if nameField.IsValid() && nameField.CanSet() {
+		// 修改私有属性
+		nameField.SetString("Bob")
+	}
+
+	// 修改公共属性 Age
+	ageField := v.FieldByName("Age")
+	if ageField.IsValid() && ageField.CanSet() {
+		ageField.SetInt(35)
+	}
+
+	fmt.Printf("Updated Person: %+v\n", p)
 }
 
 func testGetFieldValue() {

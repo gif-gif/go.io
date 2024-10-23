@@ -3,6 +3,7 @@ package gojwt
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"strings"
 	"time"
 )
 
@@ -53,6 +54,9 @@ func (c *GoJwt) GeneratedTokens(params map[string]any) (accessToken, refreshToke
 
 // 解析token
 func (c *GoJwt) ParseToken(tokenString string) (map[string]interface{}, error) {
+	if strings.Contains(tokenString, "Bearer ") {
+		tokenString = tokenString[7:]
+	}
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -73,6 +77,9 @@ func (c *GoJwt) ParseToken(tokenString string) (map[string]interface{}, error) {
 }
 
 func (c *GoJwt) IsValidToken(tokenString string) bool {
+	if strings.Contains(tokenString, "Bearer ") {
+		tokenString = tokenString[7:]
+	}
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -88,6 +95,9 @@ func (c *GoJwt) IsValidToken(tokenString string) bool {
 
 // 验证Refresh Token并生成新的Access Token
 func (c *GoJwt) RefreshAccessToken(refreshTokenStr string) (accessToken, refreshToken string, expires int64, err error) {
+	if strings.Contains(refreshTokenStr, "Bearer ") {
+		refreshTokenStr = refreshTokenStr[7:]
+	}
 	if !c.IsValidToken(refreshTokenStr) {
 		return "", "", 0, fmt.Errorf("invalid refresh token")
 	}
