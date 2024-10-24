@@ -78,6 +78,14 @@ func Get(key string, opts ...clientv3.OpOption) (rsp *clientv3.GetResponse, err 
 	return Default().Get(key, opts...)
 }
 
+func Exists(key string, opts ...clientv3.OpOption) (bool, error) {
+	e, err := Get(key, opts...)
+	if err != nil {
+		return false, err
+	}
+	return e.Count > 0, err
+}
+
 func GetString(key string) string {
 	return Default().GetString(key)
 }

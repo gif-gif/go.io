@@ -1,10 +1,8 @@
 package goetcd
 
 import (
-	"encoding/json"
 	"fmt"
 	gocontext "github.com/gif-gif/go.io/go-context"
-	etcd_configurator "github.com/gif-gif/go.io/go-zero/etcd-configurator"
 	"log"
 	"testing"
 	"time"
@@ -13,36 +11,6 @@ import (
 // 配置结构定义
 type TestSt struct {
 	Name string `json:"name"`
-}
-
-func TestEtcdConfigListener(t *testing.T) {
-	etcd_configurator.NewConfigCenter[TestSt]("config-test", Config{
-		Endpoints: []string{"127.0.0.1:2379"},
-	}, func(t TestSt) {
-		println(t.Name)
-	})
-
-	select {}
-}
-
-func TestEtcdSaveConfig(t *testing.T) {
-
-	Init(Config{
-		Endpoints: []string{"127.0.0.1:2379"},
-		//Username:  "root",
-		//Password:  "123456",
-	})
-	Del("config-test")
-
-	data := &TestSt{
-		Name: "Test111",
-	}
-	str, _ := json.Marshal(data)
-	if _, err := Set("config-test", string(str)); err != nil {
-		log.Fatalln(err)
-	}
-	fmt.Println("Setting config:", GetString("config-test"))
-	//Del("config-test")
 }
 
 func TestInit(t *testing.T) {
@@ -87,14 +55,14 @@ func TestRegisterService(t *testing.T) {
 
 func TestWatch(t *testing.T) {
 	Init(Config{
-		Endpoints: []string{"127.0.0.1:23790"},
+		Endpoints: []string{"127.0.0.1:2379"},
 		//Username:  "root",
 		//Password:  "123456",
 	})
 
 	go func() {
 		for i := 0; i < 100; i++ {
-			SetTTL(fmt.Sprintf("/xz/dsp/http-api/node-%d", i), fmt.Sprintf("192.168.1.%d", i), 5)
+			SetTTL(fmt.Sprintf("/xz/dsp/http-api/node-%d", 100), fmt.Sprintf("192.168.1.%d", i), 5)
 			time.Sleep(time.Second)
 		}
 	}()
