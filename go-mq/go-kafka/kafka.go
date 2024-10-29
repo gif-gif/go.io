@@ -55,6 +55,14 @@ func GetClient(names ...string) *client {
 	return nil
 }
 
+func DelClient(names ...string) {
+	if l := len(names); l > 0 {
+		for _, name := range names {
+			delete(__clients, name)
+		}
+	}
+}
+
 // default or 只有一个kafka实例直接返回
 func Client() *client {
 	if cli, ok := __clients["default"]; ok {

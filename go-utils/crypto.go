@@ -353,3 +353,12 @@ func Base59Decoding(strByte []byte, key ...string) []byte {
 	str, _ := url.PathUnescape(string(ret.Bytes()))
 	return []byte(str)
 }
+
+func UrlEncode(str string) string {
+	return url.QueryEscape(str)
+}
+
+func UrlDecode(str string) string {
+	str, _ = url.QueryUnescape(str)
+	return str
+}

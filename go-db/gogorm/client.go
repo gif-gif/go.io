@@ -41,6 +41,14 @@ func GetClient(names ...string) *GoGorm {
 	return nil
 }
 
+func DelClient(names ...string) {
+	if l := len(names); l > 0 {
+		for _, name := range names {
+			delete(_clients, name)
+		}
+	}
+}
+
 func Default() *GoGorm {
 	if cli, ok := _clients["default"]; ok {
 		return cli

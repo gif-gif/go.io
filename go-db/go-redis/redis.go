@@ -16,7 +16,7 @@ func Init(configs ...Config) (err error) {
 		}
 
 		if __clients[name] != nil {
-			return errors.New("goredis client already exists")
+			return errors.New("goredis client [" + name + "] already exists")
 		}
 
 		__clients[name], err = New(conf)
@@ -55,6 +55,14 @@ func GetClient(names ...string) *GoRedis {
 	//	}
 	//	return nil
 	//}
+}
+
+func DelClient(names ...string) {
+	if l := len(names); l > 0 {
+		for _, name := range names {
+			delete(__clients, name)
+		}
+	}
 }
 
 func Default() *GoRedis {

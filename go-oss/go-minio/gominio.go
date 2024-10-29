@@ -51,6 +51,14 @@ func GetClient(names ...string) *Uploader {
 	return nil
 }
 
+func DelClient(names ...string) {
+	if l := len(names); l > 0 {
+		for _, name := range names {
+			delete(__clients, name)
+		}
+	}
+}
+
 func Default() *Uploader {
 	if cli, ok := __clients["default"]; ok {
 		return cli

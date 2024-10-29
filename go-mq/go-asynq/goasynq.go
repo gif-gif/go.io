@@ -50,6 +50,14 @@ func DefaultClient() *GoAsynqClient {
 	return nil
 }
 
+func DelClient(names ...string) {
+	if l := len(names); l > 0 {
+		for _, name := range names {
+			delete(__clients, name)
+		}
+	}
+}
+
 // server
 func InitServer(configs ...ServerConfig) error {
 	for _, conf := range configs {
@@ -79,6 +87,14 @@ func GetServer(names ...string) *GoAsynqServer {
 		return cli
 	}
 	return nil
+}
+
+func DelServer(names ...string) {
+	if l := len(names); l > 0 {
+		for _, name := range names {
+			delete(__servers, name)
+		}
+	}
 }
 
 func DefaultServer() *GoAsynqServer {

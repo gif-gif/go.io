@@ -57,6 +57,14 @@ func GetClient(names ...string) *GoClickHouse {
 	//}
 }
 
+func DelClient(names ...string) {
+	if l := len(names); l > 0 {
+		for _, name := range names {
+			delete(__clients, name)
+		}
+	}
+}
+
 func Default() *GoClickHouse {
 	if cli, ok := __clients["default"]; ok {
 		return cli
@@ -68,7 +76,7 @@ func Default() *GoClickHouse {
 		}
 	}
 
-	golog.WithTag("goredis").Error("no default redis client")
+	golog.WithTag("goredis").Error("no default GoClickHouse client")
 
 	return nil
 }

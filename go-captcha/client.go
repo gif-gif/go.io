@@ -45,6 +45,14 @@ func GetClient(names ...string) *GoCaptcha {
 	return nil
 }
 
+func DelClient(names ...string) {
+	if l := len(names); l > 0 {
+		for _, name := range names {
+			delete(__clients, name)
+		}
+	}
+}
+
 func Default() *GoCaptcha {
 	if cli, ok := __clients["default"]; ok {
 		return cli
