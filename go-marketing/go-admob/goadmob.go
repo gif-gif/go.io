@@ -36,7 +36,7 @@ type ResponseItem struct {
 	Earnings        int64 //美分
 	Impressions     int64
 	ImpressionCtr   float64
-	ImpressionRpm   int64 //美分
+	ImpressionRpm   float64 //美分
 	MatchedRequests int64
 	MatchRate       float64
 	ShowRate        float64
@@ -216,6 +216,10 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 			DimensionFilters: dimensionFilters,
 			MaxReportRows:    req.MaxReportRows,
 			Metrics:          req.Metrics,
+			LocalizationSettings: &admob.LocalizationSettings{
+				CurrencyCode: "USD",
+				LanguageCode: "en-US",
+			},
 		},
 	}
 
@@ -292,7 +296,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 					item.ImpressionCtr = value.DoubleValue
 					break
 				case "IMPRESSION_RPM":
-					item.ImpressionRpm = value.MicrosValue / 1000
+					item.ImpressionRpm = value.DoubleValue
 					break
 				case "MATCHED_REQUESTS":
 					item.MatchedRequests = value.IntegerValue
