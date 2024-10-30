@@ -27,6 +27,23 @@ type ReportReq struct {
 	//Date Month Week
 }
 
+type ResponseItem struct {
+	Date            string
+	AdUnit          string
+	Country         string
+	AdRequest       int64
+	Clicks          int64
+	Earnings        int64 //美分
+	Impressions     int64
+	ImpressionCtr   float64
+	ImpressionRpm   int64 //美分
+	MatchedRequests int64
+	MatchRate       float64
+	ShowRate        float64
+}
+
+var metrics = []string{"AD_REQUESTS", "CLICKS", "ESTIMATED_EARNINGS", "IMPRESSIONS", "IMPRESSION_CTR", "IMPRESSION_RPM", "MATCHED_REQUESTS", "MATCH_RATE", "SHOW_RATE"}
+
 // accessToken 会在60分钟后过期
 type GoAdmob struct {
 	ctx          context.Context
@@ -146,7 +163,7 @@ func (c *GoAdmob) RefreshToken() error {
 //
 // GROUP BY DATE, APP, COUNTRY
 // ORDER BY APP ASC, CLICKS DESC;
-func (c *GoAdmob) GetReport(req *ReportReq) (*[]*admob.GenerateNetworkReportResponse, error) {
+func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 	if req.MaxReportRows == 0 {
 		return nil, errors.New("MaxReportRows is empty")
 	}
@@ -222,7 +239,77 @@ func (c *GoAdmob) GetReport(req *ReportReq) (*[]*admob.GenerateNetworkReportResp
 		return nil, err
 	}
 
-	return res, nil
+	//type ResponseItem struct {
+	//	Date            string
+	//	AdUnit          string
+	//	Country         string
+	//	AdRequest       int64
+	//	Clicks          int64
+	//	Earnings        float64
+	//	Impressions     int64
+	//	ImpressionCtr   float64
+	//	ImpressionRpm   float64
+	//	MatchedRequests int64
+	//	MatchRate       float64
+	//	ShowRate        float64
+	//}
+	//
+	//var metrics = []string{"AD_REQUESTS", "CLICKS", "ESTIMATED_EARNINGS", "IMPRESSIONS", "IMPRESSION_CTR", "IMPRESSION_RPM", "MATCHED_REQUESTS", "MATCH_RATE", "SHOW_RATE"}
+	list := []*ResponseItem{}
+	for _, response := range *res {
+		item := ResponseItem{}
+		row := response.Row
+		if row != nil {
+			for fieldName, value := range row.DimensionValues {
+				switch fieldName {
+				case "DATE":
+					item.Date = value.Value
+					break
+				case "APP":
+					item.AdUnit = value.Value
+					break
+				case "COUNTRY":
+					item.Country = value.Value
+					break
+				}
+			}
+
+			for fieldName, value := range row.MetricValues {
+				switch fieldName {
+				case "AD_REQUESTS":
+					item.AdRequest = value.IntegerValue
+					break
+				case "CLICKS":
+					item.Clicks = value.IntegerValue
+					break
+				case "ESTIMATED_EARNINGS":
+					item.Earnings = value.MicrosValue / 10000
+					break
+				case "IMPRESSIONS":
+					item.Impressions = value.IntegerValue
+					break
+				case "IMPRESSION_CTR":
+					item.ImpressionCtr = value.DoubleValue
+					break
+				case "IMPRESSION_RPM":
+					item.ImpressionRpm = value.MicrosValue / 1000
+					break
+				case "MATCHED_REQUESTS":
+					item.MatchedRequests = value.IntegerValue
+					break
+				case "MATCH_RATE":
+					item.MatchRate = value.DoubleValue
+					break
+				case "SHOW_RATE":
+					item.ShowRate = value.DoubleValue
+					break
+				}
+			}
+			list = append(list, &item)
+		}
+	}
+
+	return list, nil
 }
 
 // 获取账号下所有APP信息
