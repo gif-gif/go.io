@@ -6,9 +6,11 @@ import (
 	gohttp "github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
+	"github.com/gogf/gf/util/gconv"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/admob/v1"
 	"google.golang.org/api/option"
+	"math"
 	"time"
 )
 
@@ -36,7 +38,7 @@ type ResponseItem struct {
 	Earnings        int64 //美分
 	Impressions     int64
 	ImpressionCtr   float64
-	ImpressionRpm   float64 //美分
+	ImpressionRpm   int64 //美分
 	MatchedRequests int64
 	MatchRate       float64
 	ShowRate        float64
@@ -296,7 +298,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 					item.ImpressionCtr = value.DoubleValue
 					break
 				case "IMPRESSION_RPM":
-					item.ImpressionRpm = value.DoubleValue
+					item.ImpressionRpm = gconv.Int64(math.Floor(value.DoubleValue * 100))
 					break
 				case "MATCHED_REQUESTS":
 					item.MatchedRequests = value.IntegerValue
