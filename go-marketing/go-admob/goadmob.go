@@ -14,6 +14,36 @@ import (
 	"time"
 )
 
+const (
+	DefaultCurrencyCode = "USD"
+	DefaultLanguageCode = "en-US"
+)
+
+// 常用纬度
+const (
+	FILTER_APP              = "APP"
+	FILTER_COUNTRY          = "COUNTRY"
+	FILTER_DATE             = "DATE"
+	FILTER_PLATFORM         = "PLATFORM"
+	FILTER_AD_UNIT          = "AD_UNIT"
+	FILTER_FORMAT           = "FORMAT"
+	FILTER_APP_VERSION_NAME = "APP_VERSION_NAME"
+)
+
+const (
+	AD_REQUESTS        = "AD_REQUESTS"
+	CLICKS             = "CLICKS"
+	ESTIMATED_EARNINGS = "ESTIMATED_EARNINGS"
+	IMPRESSIONS        = "IMPRESSIONS"
+	IMPRESSION_CTR     = "IMPRESSION_CTR"
+	IMPRESSION_RPM     = "IMPRESSION_RPM"
+	MATCHED_REQUESTS   = "MATCHED_REQUESTS"
+	MATCH_RATE         = "MATCH_RATE"
+	SHOW_RATE          = "SHOW_RATE"
+)
+
+var DefaultMetrics = []string{AD_REQUESTS, CLICKS, ESTIMATED_EARNINGS, IMPRESSIONS, IMPRESSION_CTR, IMPRESSION_RPM, MATCHED_REQUESTS, MATCH_RATE, SHOW_RATE}
+
 type ReportReq struct {
 	Dimensions      []string //查询维度列表
 	AdUnits         []string //广告位
@@ -26,6 +56,9 @@ type ReportReq struct {
 
 	StartDate admob.Date
 	EndDate   admob.Date
+
+	CurrencyCode string //default currency USD
+	LanguageCode string //default language en-US
 
 	//Date Month Week
 }
@@ -45,27 +78,14 @@ type ResponseItem struct {
 	ShowRate        float64
 }
 
-const (
-	AD_REQUESTS        = "AD_REQUESTS"
-	CLICKS             = "CLICKS"
-	ESTIMATED_EARNINGS = "ESTIMATED_EARNINGS"
-	IMPRESSIONS        = "IMPRESSIONS"
-	IMPRESSION_CTR     = "IMPRESSION_CTR"
-	IMPRESSION_RPM     = "IMPRESSION_RPM"
-	MATCHED_REQUESTS   = "MATCHED_REQUESTS"
-	MATCH_RATE         = "MATCH_RATE"
-	SHOW_RATE          = "SHOW_RATE"
-)
-
-var DefaultMetrics = []string{AD_REQUESTS, CLICKS, ESTIMATED_EARNINGS, IMPRESSIONS, IMPRESSION_CTR, IMPRESSION_RPM, MATCHED_REQUESTS, MATCH_RATE, SHOW_RATE}
-
 // accessToken 会在60分钟后过期
 type GoAdmob struct {
-	ctx          context.Context
-	Config       Config
-	AuthConfig   oauth2.Config
-	AdmobService *admob.Service
-	Token        *oauth2.Token
+	ctx            context.Context
+	Config         Config
+	AuthConfig     oauth2.Config
+	AdmobService   *admob.Service
+	Token          *oauth2.Token
+	RequestTimeout int64 //default request timeout 30s
 }
 
 // 每次调用时都需要调用这个方法
@@ -136,7 +156,7 @@ func (c *GoAdmob) RefreshToken() error {
 	return nil
 }
 
-// 获取广告报表信息
+// 获取广告报表信息 这个接口不支持查询维度，返回接口有bug
 //func (c *GoAdmob) GetReport() (*admob.GenerateNetworkReportResponse, error) {
 //	res, err := c.AdmobService.Accounts.NetworkReport.Generate("accounts/"+c.Config.AccountId, &admob.GenerateNetworkReportRequest{
 //		ReportSpec: &admob.NetworkReportSpec{
@@ -187,7 +207,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 	dimensionFilters := []*admob.NetworkReportSpecDimensionFilter{}
 	if len(req.AdUnits) > 0 {
 		dimensionFilters = append(dimensionFilters, &admob.NetworkReportSpecDimensionFilter{
-			Dimension: "AD_UNIT",
+			Dimension: FILTER_AD_UNIT,
 			MatchesAny: &admob.StringList{
 				Values: req.AdUnits,
 			},
@@ -196,7 +216,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 
 	if len(req.AdFormats) > 0 {
 		dimensionFilters = append(dimensionFilters, &admob.NetworkReportSpecDimensionFilter{
-			Dimension: "FORMAT",
+			Dimension: FILTER_FORMAT,
 			MatchesAny: &admob.StringList{
 				Values: req.AdFormats,
 			},
@@ -205,7 +225,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 
 	if len(req.Platforms) > 0 {
 		dimensionFilters = append(dimensionFilters, &admob.NetworkReportSpecDimensionFilter{
-			Dimension: "PLATFORM",
+			Dimension: FILTER_PLATFORM,
 			MatchesAny: &admob.StringList{
 				Values: req.Platforms,
 			},
@@ -214,7 +234,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 
 	if len(req.AppVersionNames) > 0 {
 		dimensionFilters = append(dimensionFilters, &admob.NetworkReportSpecDimensionFilter{
-			Dimension: "APP_VERSION_NAME",
+			Dimension: FILTER_APP_VERSION_NAME,
 			MatchesAny: &admob.StringList{
 				Values: req.AppVersionNames,
 			},
@@ -222,7 +242,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 	}
 	if len(req.Countries) > 0 {
 		dimensionFilters = append(dimensionFilters, &admob.NetworkReportSpecDimensionFilter{
-			Dimension: "COUNTRY",
+			Dimension: FILTER_COUNTRY,
 			MatchesAny: &admob.StringList{
 				Values: req.Countries,
 			},
@@ -231,6 +251,14 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 
 	if len(req.Metrics) == 0 {
 		req.Metrics = DefaultMetrics
+	}
+
+	if req.CurrencyCode == "" {
+		req.CurrencyCode = DefaultCurrencyCode
+	}
+
+	if req.LanguageCode == "" {
+		req.LanguageCode = DefaultLanguageCode
 	}
 
 	params := &admob.GenerateNetworkReportRequest{
@@ -244,15 +272,15 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 			MaxReportRows:    req.MaxReportRows,
 			Metrics:          req.Metrics,
 			LocalizationSettings: &admob.LocalizationSettings{
-				CurrencyCode: "USD",
-				LanguageCode: "en-US",
+				CurrencyCode: req.CurrencyCode,
+				LanguageCode: req.LanguageCode,
 			},
 		},
 	}
 
 	dataReq := &gohttp.Request{
 		Url:     url,
-		Timeout: time.Second * 20,
+		Timeout: time.Second * 30,
 		Body:    params,
 	}
 
@@ -277,13 +305,13 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 		if row != nil {
 			for fieldName, value := range row.DimensionValues {
 				switch fieldName {
-				case "DATE":
+				case FILTER_DATE:
 					item.Date = value.Value
 					break
-				case "APP":
+				case FILTER_APP:
 					item.AdUnit = value.Value
 					break
-				case "COUNTRY":
+				case FILTER_COUNTRY:
 					item.Country = value.Value
 					break
 				}
@@ -291,31 +319,31 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 
 			for fieldName, value := range row.MetricValues {
 				switch fieldName {
-				case "AD_REQUESTS":
+				case AD_REQUESTS:
 					item.AdRequest = value.IntegerValue
 					break
-				case "CLICKS":
+				case CLICKS:
 					item.Clicks = value.IntegerValue
 					break
-				case "ESTIMATED_EARNINGS":
+				case ESTIMATED_EARNINGS:
 					item.Earnings = value.MicrosValue / 10000
 					break
-				case "IMPRESSIONS":
+				case IMPRESSIONS:
 					item.Impressions = value.IntegerValue
 					break
-				case "IMPRESSION_CTR":
+				case IMPRESSION_CTR:
 					item.ImpressionCtr = value.DoubleValue
 					break
-				case "IMPRESSION_RPM":
+				case IMPRESSION_RPM:
 					item.ImpressionRpm = gconv.Int64(math.Floor(value.DoubleValue * 100))
 					break
-				case "MATCHED_REQUESTS":
+				case MATCHED_REQUESTS:
 					item.MatchedRequests = value.IntegerValue
 					break
-				case "MATCH_RATE":
+				case MATCH_RATE:
 					item.MatchRate = value.DoubleValue
 					break
-				case "SHOW_RATE":
+				case SHOW_RATE:
 					item.ShowRate = value.DoubleValue
 					break
 				}
