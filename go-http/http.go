@@ -132,7 +132,7 @@ func (g *GoHttp[T]) doHttpRequest(context context.Context, req *Request) (*T, er
 	}
 
 	if resp.StatusCode() != http.StatusOK {
-		return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "request timeout or unknown error")
+		return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "request timeout or unknown error->" + string(resp.Body()))
 	}
 	req.TraceInfo = resp.Request.TraceInfo() //调试信息
 	respData, ok := resp.Result().(*T)
