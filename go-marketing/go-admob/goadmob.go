@@ -45,7 +45,19 @@ type ResponseItem struct {
 	ShowRate        float64
 }
 
-var metrics = []string{"AD_REQUESTS", "CLICKS", "ESTIMATED_EARNINGS", "IMPRESSIONS", "IMPRESSION_CTR", "IMPRESSION_RPM", "MATCHED_REQUESTS", "MATCH_RATE", "SHOW_RATE"}
+const (
+	AD_REQUESTS        = "AD_REQUESTS"
+	CLICKS             = "CLICKS"
+	ESTIMATED_EARNINGS = "ESTIMATED_EARNINGS"
+	IMPRESSIONS        = "IMPRESSIONS"
+	IMPRESSION_CTR     = "IMPRESSION_CTR"
+	IMPRESSION_RPM     = "IMPRESSION_RPM"
+	MATCHED_REQUESTS   = "MATCHED_REQUESTS"
+	MATCH_RATE         = "MATCH_RATE"
+	SHOW_RATE          = "SHOW_RATE"
+)
+
+var DefaultMetrics = []string{AD_REQUESTS, CLICKS, ESTIMATED_EARNINGS, IMPRESSIONS, IMPRESSION_CTR, IMPRESSION_RPM, MATCHED_REQUESTS, MATCH_RATE, SHOW_RATE}
 
 // accessToken 会在60分钟后过期
 type GoAdmob struct {
@@ -217,6 +229,10 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 		})
 	}
 
+	if len(req.Metrics) == 0 {
+		req.Metrics = DefaultMetrics
+	}
+
 	params := &admob.GenerateNetworkReportRequest{
 		ReportSpec: &admob.NetworkReportSpec{
 			DateRange: &admob.DateRange{
@@ -254,22 +270,6 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 		return nil, err
 	}
 
-	//type ResponseItem struct {
-	//	Date            string
-	//	AdUnit          string
-	//	Country         string
-	//	AdRequest       int64
-	//	Clicks          int64
-	//	Earnings        float64
-	//	Impressions     int64
-	//	ImpressionCtr   float64
-	//	ImpressionRpm   float64
-	//	MatchedRequests int64
-	//	MatchRate       float64
-	//	ShowRate        float64
-	//}
-	//
-	//var metrics = []string{"AD_REQUESTS", "CLICKS", "ESTIMATED_EARNINGS", "IMPRESSIONS", "IMPRESSION_CTR", "IMPRESSION_RPM", "MATCHED_REQUESTS", "MATCH_RATE", "SHOW_RATE"}
 	list := []*ResponseItem{}
 	for _, response := range *res {
 		item := ResponseItem{}
