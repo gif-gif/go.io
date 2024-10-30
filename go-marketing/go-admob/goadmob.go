@@ -3,17 +3,31 @@ package goadmob
 import (
 	"context"
 	"errors"
+	gohttp "github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/admob/v1"
 	"google.golang.org/api/option"
+	"time"
 )
 
-// accessToken 会在60分钟后过期
-var client_id = "273488495628-h81gn5a7q5a6632j4nbapfpu6cq3454l.apps.googleusercontent.com"
-var client_secret = "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"
+type ReportReq struct {
+	Dimensions      []string //查询维度列表
+	AdUnits         []string //广告位
+	AdFormats       []string //原生、横幅、插屏、开屏、激励视频
+	Platforms       []string //应用的移动操作系统平台（例如“Android”或“iOS”）。
+	AppVersionNames []string //对于 Android，应用版本名称可以在 PackageInfo 中的 versionName 中找到。对于 iOS，可以在 CFBundleShortVersionString 中找到应用版本名称。警告：该维度与 ESTIMATED_EARNINGS 和 OBSERVED_ECPM 指标不兼容。
+	MaxReportRows   int64    //最大返回数量
+	Metrics         []string //查询字段、注意：这里的查询字段在不同的纬度下有互斥情况
 
+	StartDate admob.Date
+	EndDate   admob.Date
+
+	//Date Month Week
+}
+
+// accessToken 会在60分钟后过期
 type GoAdmob struct {
 	ctx          context.Context
 	Config       Config
@@ -91,35 +105,132 @@ func (c *GoAdmob) RefreshToken() error {
 }
 
 // 获取广告报表信息
-func (c *GoAdmob) GetReport() (*admob.GenerateNetworkReportResponse, error) {
-	res, err := c.AdmobService.Accounts.NetworkReport.Generate("accounts/pub-2200607303212623", &admob.GenerateNetworkReportRequest{
+//func (c *GoAdmob) GetReport() (*admob.GenerateNetworkReportResponse, error) {
+//	res, err := c.AdmobService.Accounts.NetworkReport.Generate("accounts/"+c.Config.AccountId, &admob.GenerateNetworkReportRequest{
+//		ReportSpec: &admob.NetworkReportSpec{
+//			DateRange: &admob.DateRange{
+//				EndDate: &admob.Date{
+//					Day:   21,
+//					Month: 8,
+//					Year:  2024,
+//				},
+//				StartDate: &admob.Date{
+//					Day:   20,
+//					Month: 8,
+//					Year:  2024,
+//				},
+//			},
+//			Dimensions: []string{"DATE", "APP", "COUNTRY"},
+//			//DimensionFilters: []*admob.NetworkReportSpecDimensionFilter{
+//			//	{
+//			//		Dimension: "COUNTRY",
+//			//		MatchesAny: &admob.StringList{
+//			//			Values: []string{"US"},
+//			//		},
+//			//	},
+//			//},
+//			MaxReportRows: 10,
+//			Metrics:       []string{"CLICKS", "ESTIMATED_EARNINGS"},
+//		},
+//	}).Do()
+//	return res, err
+//}
+
+// dimensions 指定查询维度，如：[]string{"DATE", "APP", "COUNTRY"}
+//
+// SELECT DATE, APP, COUNTRY, CLICKS, ESTIMATED_EARNINGS
+// FROM NETWORK_REPORT
+// WHERE DATE >= '2021-09-01' AND DATE <= '2021-09-30'
+//
+//	AND COUNTRY IN ('US', 'CN')
+//
+// GROUP BY DATE, APP, COUNTRY
+// ORDER BY APP ASC, CLICKS DESC;
+func (c *GoAdmob) GetReport(req *ReportReq) (*[]*admob.GenerateNetworkReportResponse, error) {
+	if req.MaxReportRows == 0 {
+		return nil, errors.New("MaxReportRows is empty")
+	}
+
+	url := "/v1/accounts/" + c.Config.AccountId + "/networkReport:generate"
+	dimensionFilters := []*admob.NetworkReportSpecDimensionFilter{}
+	if len(req.AdUnits) > 0 {
+		dimensionFilters = append(dimensionFilters, &admob.NetworkReportSpecDimensionFilter{
+			Dimension: "AD_UNIT",
+			MatchesAny: &admob.StringList{
+				Values: req.AdUnits,
+			},
+		})
+	}
+
+	if len(req.AdFormats) > 0 {
+		dimensionFilters = append(dimensionFilters, &admob.NetworkReportSpecDimensionFilter{
+			Dimension: "FORMAT",
+			MatchesAny: &admob.StringList{
+				Values: req.AdFormats,
+			},
+		})
+	}
+
+	if len(req.Platforms) > 0 {
+		dimensionFilters = append(dimensionFilters, &admob.NetworkReportSpecDimensionFilter{
+			Dimension: "PLATFORM",
+			MatchesAny: &admob.StringList{
+				Values: req.Platforms,
+			},
+		})
+	}
+
+	if len(req.AppVersionNames) > 0 {
+		dimensionFilters = append(dimensionFilters, &admob.NetworkReportSpecDimensionFilter{
+			Dimension: "APP_VERSION_NAME",
+			MatchesAny: &admob.StringList{
+				Values: req.AppVersionNames,
+			},
+		})
+	}
+
+	params := &admob.GenerateNetworkReportRequest{
 		ReportSpec: &admob.NetworkReportSpec{
 			DateRange: &admob.DateRange{
-				EndDate: &admob.Date{
-					Day:   21,
-					Month: 8,
-					Year:  2021,
-				},
-				StartDate: &admob.Date{
-					Day:   20,
-					Month: 8,
-					Year:  2021,
-				},
+				EndDate:   &req.EndDate,
+				StartDate: &req.StartDate,
 			},
-			Dimensions:    []string{"DATE", "APP", "COUNTRY"},
-			MaxReportRows: 100000,
-			Metrics:       []string{"CLICKS", "ESTIMATED_EARNINGS"},
+			Dimensions:       req.Dimensions, //[]string{"DATE", "APP", "COUNTRY"}, //group by
+			DimensionFilters: dimensionFilters,
+			MaxReportRows:    req.MaxReportRows,
+			Metrics:          req.Metrics,
 		},
-	}).Do()
-	return res, err
+	}
+
+	dataReq := &gohttp.Request{
+		Url:     url,
+		Timeout: time.Second * 20,
+		Body:    params,
+	}
+
+	gh := &gohttp.GoHttp[[]*admob.GenerateNetworkReportResponse]{
+		Request: dataReq,
+		BaseUrl: "https://admob.googleapis.com",
+		Headers: map[string]string{
+			"X-Google-AuthUser": "0",
+			"Authorization":     "Bearer " + c.Token.AccessToken,
+		},
+	}
+
+	res, err := gh.HttpPostJson(c.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 // 获取账号下所有APP信息
-func (c *GoAdmob) GetApps(accountId string) (*admob.ListAppsResponse, error) {
-	if accountId == "" {
+func (c *GoAdmob) GetApps() (*admob.ListAppsResponse, error) {
+	if c.Config.AccountId == "" {
 		return nil, errors.New("accountId is empty")
 	}
-	res, err := c.AdmobService.Accounts.Apps.List("accounts/" + accountId).Do()
+	res, err := c.AdmobService.Accounts.Apps.List("accounts/" + c.Config.AccountId).Do()
 	if err != nil {
 		return nil, err
 	}
@@ -128,11 +239,11 @@ func (c *GoAdmob) GetApps(accountId string) (*admob.ListAppsResponse, error) {
 }
 
 // 获取当前appId下所有的广告信息
-func (c *GoAdmob) GetAdUnits(accountId string) (*admob.ListAdUnitsResponse, error) {
-	if accountId == "" {
+func (c *GoAdmob) GetAdUnits() (*admob.ListAdUnitsResponse, error) {
+	if c.Config.AccountId == "" {
 		return nil, errors.New("accountId is empty")
 	}
-	res, err := c.AdmobService.Accounts.AdUnits.List("accounts/" + accountId).Do()
+	res, err := c.AdmobService.Accounts.AdUnits.List("accounts/" + c.Config.AccountId).Do()
 	if err != nil {
 		return nil, err
 	}

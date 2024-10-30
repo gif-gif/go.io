@@ -1,65 +1,150 @@
 package goadmob
 
 import (
-	"context"
+	gocontext "github.com/gif-gif/go.io/go-context"
+	"github.com/gif-gif/go.io/go-db/gogorm"
 	golog "github.com/gif-gif/go.io/go-log"
-	"golang.org/x/oauth2"
 	"google.golang.org/api/admob/v1"
-	"google.golang.org/api/option"
 	"testing"
+	"time"
 )
 
-func TestAdmob(t *testing.T) {
-	ctx := context.Background()
-	Init(Config{
-		ClientId:     ".apps.googleusercontent.com",
-		ClientSecret: "",
-		RedirectUrl:  "URL_ADDRESS",
-		State:        "123456",
+func init() {
+	gogorm.Init(gogorm.Config{
+		DataSource: "root:payda6b4eb0f3@tcp(test.gif-gif.com:30061)/admob?charset=utf8mb4&parseTime=True&loc=Local",
 	})
-	select {}
 }
 
-// ya29.a0AeDClZA_Fa7P107WdgLtsygrei4DadnbugnQ5HAQ7qxCC5o6d3_VV-8VqOvZNH2MeqATbpGf-vRgnRGpA8RQgAEjFBVtJvbLdlKtQ-kXOviFIAM1QjwgZrjV-ipxUk0tBZ5HB6zt1Qa5o8AITh7VP29TGfRK2lT7uxkgvobcaCgYKAYwSARISFQHGX2MiYWz4pU5sbWqu7s8B9PEICg0175
-// 1//0ecJCv_hmW44mCgYIARAAGA4SNwF-L9Irk_ZNfBfC28DxaCWrUwsMVo0_wZhV9xdHQnU4Z1wNXSUwRUeiCo7wM-FaQ0HRtogYBwE
+func TestAdmobApps(t *testing.T) {
+	err := Default().Refresh()
+	if err != nil {
+		golog.WithTag("goadmob").Error(err.Error())
+		return
+	}
 
-func TestEtcdConfigListener(t *testing.T) {
-	ctx := context.Background()
-	config := &oauth2.Config{
-		ClientID:     "273488495628-a56cdd6vrnkm5i5ors5vl2bmrj3rh622.apps.googleusercontent.com",
-		ClientSecret: "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",
-		RedirectURL:  "https://bangbox.jidianle.cc",
-		Endpoint: oauth2.Endpoint{
-			AuthURL:   "https://accounts.google.com/o/oauth2/auth",
-			TokenURL:  "https://oauth2.googleapis.com/token",
-			AuthStyle: oauth2.AuthStyleInParams,
+	apps, err := Default().GetApps()
+	if err != nil {
+		golog.WithTag("goadmob").Error(err.Error())
+		return
+	}
+
+	type AdAccount struct {
+		Id         int64
+		AccountId  string
+		Channel    string
+		Status     int64
+		CreateTime int64
+		UpdateTime int64
+	}
+
+	adAccount := AdAccount{}
+	db := gogorm.Default().DB
+	err = db.Table("ad_account").Select("id,account_id,channel,status,create_time,update_time").First(&adAccount).Error
+	if err != nil {
+		golog.WithTag("godb").Error(err.Error())
+		return
+	}
+
+	for _, app := range apps.Apps {
+		err = db.Table("ad_app").Exec("insert into ad_app(app_code,platform,title,ad_account_id,app_pub_id,app_store_id,status,create_time,update_time)values(?,?,?,?,?,?,?,?,?)", app.LinkedAppInfo.DisplayName, app.Platform, app.LinkedAppInfo.DisplayName, adAccount.Id, app.AppId, app.LinkedAppInfo.AppStoreId, 1, time.Now().Unix(), time.Now().Unix()).Error
+		if err != nil {
+			golog.WithTag("godb").Error(err.Error())
+			return
+		}
+		golog.WithTag("admob").WithField("appId", app.AppId).Info("OK")
+	}
+
+	<-gocontext.Cancel().Done()
+}
+
+type AdApp struct {
+	Id       int64
+	AppPubId string
+}
+
+func TestAdmobAdUnits(t *testing.T) {
+	var adAppMap = make(map[string]int64)
+	db := gogorm.Default().DB
+	adApps := []AdApp{}
+	err := db.Table("ad_app").Select("id,app_pub_id").Scan(&adApps).Error
+	if err != nil {
+		golog.WithTag("goadmob").Error(err.Error())
+		return
+	}
+
+	for _, app := range adApps {
+		adAppMap[app.AppPubId] = app.Id
+	}
+
+	err = Default().Refresh()
+	if err != nil {
+		golog.WithTag("goadmob").Error(err.Error())
+		return
+	}
+
+	apps, err := Default().GetAdUnits()
+	if err != nil {
+		golog.WithTag("goadmob").Error(err.Error())
+		return
+	}
+
+	for _, app := range apps.AdUnits {
+		appId := adAppMap[app.AppId]
+		err = db.Table("ad_info").Exec("insert into ad_info(ad_app_id,title,ad_type,ad_unit,status,create_time,update_time)values(?,?,?,?,?,?,?)", appId, app.DisplayName, app.AdFormat, app.AdUnitId, 1, time.Now().Unix(), time.Now().Unix()).Error
+		if err != nil {
+			golog.WithTag("goadmob").Error(err.Error())
+			return
+		}
+		golog.WithTag("admob").WithField("appId", app.AdUnitId).Info("OK")
+	}
+
+	<-gocontext.Cancel().Done()
+}
+
+func TestAdmobReport(t *testing.T) {
+	var adAppMap = make(map[string]int64)
+	db := gogorm.Default().DB
+	adApps := []AdApp{}
+	err := db.Table("ad_app").Select("id,app_pub_id").Scan(&adApps).Error
+	if err != nil {
+		golog.WithTag("goadmob").Error(err.Error())
+		return
+	}
+
+	for _, app := range adApps {
+		adAppMap[app.AppPubId] = app.Id
+	}
+
+	err = Default().Refresh()
+	if err != nil {
+		golog.WithTag("goadmob").Error(err.Error())
+		return
+	}
+
+	req := &ReportReq{
+		MaxReportRows: 100,
+		Dimensions:    []string{"DATE", "APP", "COUNTRY"},
+		AdUnits:       []string{"ca-app-pub-4328354313035484/2826310677"},
+		Metrics:       []string{"AD_REQUESTS", "CLICKS", "ESTIMATED_EARNINGS", "IMPRESSIONS", "IMPRESSION_CTR", "IMPRESSION_RPM", "MATCHED_REQUESTS", "MATCH_RATE", "SHOW_RATE"},
+		EndDate: admob.Date{
+			Day:   21,
+			Month: 8,
+			Year:  2024,
+		},
+		StartDate: admob.Date{
+			Day:   20,
+			Month: 8,
+			Year:  2024,
 		},
 	}
 
-	token, err := config.TokenSource(ctx, &oauth2.Token{
-		RefreshToken: "1//0ecJCv_hmW44mCgYIARAAGA4SNwF-L9Irk_ZNfBfC28DxaCWrUwsMVo0_wZhV9xdHQnU4Z1wNXSUwRUeiCo7wM-FaQ0HRtogYBwE",
-	}).Token()
-
-	//token, err := config.Exchange(ctx, "4/0AVG7fiRTFumd6aP08kwz_FPtq7x6-1iEQpqUBK5UNlbJTQqVicCIgS4ritCFFQD3vDmGfw")
+	res, err := Default().GetReport(req)
 	if err != nil {
-		golog.WithTag("goadmob").Error("token:" + err.Error())
+		golog.WithTag("goadmob").Error(err.Error())
 		return
 	}
 
-	golog.WithTag("goadmob").Info(token.AccessToken, token.RefreshToken, token.Expiry)
+	golog.WithTag("admob").Info(res)
 
-	admobService, err := admob.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-	if err != nil {
-		golog.WithTag("goadmob").Error(err)
-		return
-	}
-	res, err := admobService.Accounts.Apps.List("accounts/pub-9876543210987654").Do()
-	if err != nil {
-		golog.WithTag("goadmob").Error(err)
-		return
-	}
-
-	golog.WithTag("goadmob").Info(res)
-
-	select {}
+	<-gocontext.Cancel().Done()
 }
