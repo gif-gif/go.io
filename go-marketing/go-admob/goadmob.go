@@ -6,17 +6,16 @@ import (
 	gohttp "github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
-	"github.com/gogf/gf/util/gconv"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/admob/v1"
 	"google.golang.org/api/option"
-	"math"
 	"time"
 )
 
 type ReportReq struct {
 	Dimensions      []string //查询维度列表
 	AdUnits         []string //广告位
+	Countries       []string //国家
 	AdFormats       []string //原生、横幅、插屏、开屏、激励视频
 	Platforms       []string //应用的移动操作系统平台（例如“Android”或“iOS”）。
 	AppVersionNames []string //对于 Android，应用版本名称可以在 PackageInfo 中的 versionName 中找到。对于 iOS，可以在 CFBundleShortVersionString 中找到应用版本名称。警告：该维度与 ESTIMATED_EARNINGS 和 OBSERVED_ECPM 指标不兼容。
@@ -38,7 +37,7 @@ type ResponseItem struct {
 	Earnings        int64 //美分
 	Impressions     int64
 	ImpressionCtr   float64
-	ImpressionRpm   int64 //美分
+	ImpressionRpm   float64 //美分
 	MatchedRequests int64
 	MatchRate       float64
 	ShowRate        float64
@@ -207,6 +206,14 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 			},
 		})
 	}
+	if len(req.Countries) > 0 {
+		dimensionFilters = append(dimensionFilters, &admob.NetworkReportSpecDimensionFilter{
+			Dimension: "COUNTRY",
+			MatchesAny: &admob.StringList{
+				Values: req.Countries,
+			},
+		})
+	}
 
 	params := &admob.GenerateNetworkReportRequest{
 		ReportSpec: &admob.NetworkReportSpec{
@@ -298,7 +305,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 					item.ImpressionCtr = value.DoubleValue
 					break
 				case "IMPRESSION_RPM":
-					item.ImpressionRpm = gconv.Int64(math.Floor(value.DoubleValue * 100))
+					item.ImpressionRpm = value.DoubleValue
 					break
 				case "MATCHED_REQUESTS":
 					item.MatchedRequests = value.IntegerValue
