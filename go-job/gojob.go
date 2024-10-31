@@ -271,6 +271,11 @@ func (c *GoJob) Hour(options *[]gocron.JobOption, fn any, parameters ...any) (go
 	return c.CronJob("0 0 */1 * * *", options, fn, parameters...)
 }
 
+// crontab 每小时minute分执行
+func (c *GoJob) HourMinute(options *[]gocron.JobOption, minute int, fn any, parameters ...any) (gocron.Job, error) {
+	return c.CronJob(fmt.Sprintf("0 %d */1 * * *", minute), options, fn, parameters...)
+}
+
 // crontab 每隔x小时执行
 func (c *GoJob) HourX(options *[]gocron.JobOption, x int, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob(fmt.Sprintf("0 0 */%d * * *", x), options, fn, parameters...)
