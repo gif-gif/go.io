@@ -27,9 +27,9 @@ func main() {
 	goio.Init(goio.DEVELOPMENT)
 	//testGenerateAesKeys()
 	//testSha1Sign()
-	nums := []int64{2, 4, 6, 10, 11, 14, 15}
-	filled := fillMissingNumbers(nums, 0)
-	fmt.Println(filled) // 输出补充后的数字
+	//nums := []int64{2, 4, 6, 10, 11, 14, 15}
+	//filled := fillMissingNumbers(nums, 0)
+	//fmt.Println(filled) // 输出补充后的数字
 	//
 	//type DataVO struct {
 	//	ID   int
@@ -47,7 +47,7 @@ func main() {
 	//a := goutils.CopyProperties[DataDTO](DataVO{ID: 1, Name: "John"})
 	//golog.WithTag("a").Info(a)
 
-	testReflect()
+	testTIme()
 	<-gocontext.Cancel().Done()
 }
 
@@ -227,4 +227,17 @@ func fillMissingNumbers(nums []int64, max int64) []int64 {
 	}
 
 	return result
+}
+
+func testTIme() {
+	a, b, c := goutils.LastHourStartAndEnd(true)
+	s := goutils.Ts2DateTime(b)
+	e := goutils.Ts2DateTime(c)
+	golog.WithTag("testTIme").Info(a, b, c)
+	golog.WithTag("testTIme").Info(s, e)
+
+	_, month, day := time.Now().Date()
+
+	golog.WithTag("testTIme").Info(int64(month), day)
+
 }

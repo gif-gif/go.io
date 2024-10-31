@@ -42,6 +42,10 @@ func GetTimeNow() time.Time {
 	return time.Now()
 }
 
+func Ts2Time(t int64) time.Time {
+	return time.Unix(t, 0)
+}
+
 func GetChinaTomorrowAMSeconds(isBeijing bool) int64 {
 	now := GetTimeNow()
 	if isBeijing {
@@ -232,22 +236,4 @@ func TimeRangeDates(startDate string, endDate string) []string {
 	}
 
 	return dates
-}
-
-// timezone 时区相关
-func parseDateToTimestamp(dateStr string, timeZoneOffset int) (int64, error) { // 2. 将字符串日期转换为 time.Time 类型
-	date, err := time.Parse(time.DateOnly, dateStr)
-	if err != nil {
-		fmt.Println(err)
-		return 0, err
-	}
-
-	// 3. 根据时区差创建一个特定的时区
-	//offset := 8 * 60 * 60 // 时差8小时，例如中国北京时间
-	location := time.FixedZone("Custom", timeZoneOffset)
-	// 4. 将解析后的时间转换为特定时区的时间
-	dateInZone := date.In(location)
-	// 5. 将时区内的时间转换为时间戳
-	timestamp := dateInZone.Unix()
-	return timestamp, nil
 }

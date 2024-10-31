@@ -27,7 +27,7 @@ https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https%3A%2F%2Fbangbox.
 curl -X POST \
       https://admob.googleapis.com/v1/accounts/pub-4328354313035484/networkReport:generate \
       -H "Content-Type: application/json" \
-      -H "Authorization: Bearer ya29.a0AeDClZDwt6OuYT2sn6WWkyYnO8rZlLDjEB5O0K5f_K4Bf82FERBrbXrkrqHk4fLF3PX9BXfPy5vxoPT4h22mh9UI7EhD3R_7exG4aQNgKf-uFX_54UjcH4evy57A6HKSnwBnntcoTA4TztQPv2B5X7ul63uWVII2r854XIwLkwaCgYKASwSARISFQHGX2Mi2sMVueB5UvyB5NF7mxfidg0177" \
+      -H "Authorization: Bearer " \
       -H "X-Goog-AuthUser": "0" \
       --data @- << EOF
 {
