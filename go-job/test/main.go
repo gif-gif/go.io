@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	gocontext "github.com/gif-gif/go.io/go-context"
 	gojob "github.com/gif-gif/go.io/go-job"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/goio"
@@ -67,7 +68,6 @@ func testJob() {
 }
 
 func simpleUseGoJob() {
-	n := 0
 	cron, err := gojob.New()
 	if err != nil {
 		golog.WithTag("gojob").Error(err)
@@ -75,17 +75,22 @@ func simpleUseGoJob() {
 	defer cron.Stop()
 	cron.Start()
 
-	job, err := cron.SecondX(nil, 1, func(nn int) error {
-		golog.WithTag("gojob").Info("testing->" + gconv.String(nn))
+	cron.HourMinute(nil, 10, func() error {
+		golog.WithTag("gojob").Info("testing->----------")
 		return nil
-	}, n)
+	})
+	//
+	//job, err := cron.SecondX(nil, 1, func(nn int) error {
+	//	golog.WithTag("gojob").Info("testing->" + gconv.String(nn))
+	//	return nil
+	//}, n)
+	//
+	//if err != nil {
+	//	golog.WithTag("gojob").Error(err)
+	//} else {
+	//	golog.WithTag("gojob").Info("job.ID:" + job.ID().String())
+	//}
 
-	if err != nil {
-		golog.WithTag("gojob").Error(err)
-	} else {
-		golog.WithTag("gojob").Info("job.ID:" + job.ID().String())
-	}
-
-	time.Sleep(time.Second * 500)
+	<-gocontext.Cancel().Done()
 	golog.InfoF("end of gojob")
 }
