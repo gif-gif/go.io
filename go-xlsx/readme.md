@@ -2,5 +2,5 @@
 
 ```
 基于这个库
-https://github.com/360EntSecGroup-Skylar/excelize
+go get github.com/xuri/excelize/v2
 ```
