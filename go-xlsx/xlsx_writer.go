@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"
+	"net/http"
 )
 
 type XlsxWrite struct {
@@ -63,7 +64,7 @@ func (x *XlsxWrite) Save2File(filename string) (err error) {
 	return nil
 }
 
-func (x *XlsxWrite) Output(ctx *gin.Context, filename string) (err error) {
+func (x *XlsxWrite) OutputForGin(ctx *gin.Context, filename string) (err error) {
 	err = x.fh.SetSheetRow(x.sheetName, "A1", x.titles)
 	if err != nil {
 		return err
@@ -81,6 +82,32 @@ func (x *XlsxWrite) Output(ctx *gin.Context, filename string) (err error) {
 	ctx.Header("Content-Transfer-Encoding", "binary")
 
 	if err = x.fh.Write(ctx.Writer); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (x *XlsxWrite) Output(w http.ResponseWriter, filename string) (err error) {
+	err = x.fh.SetSheetRow(x.sheetName, "A1", x.titles)
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < len(x.rows); i++ {
+		err = x.fh.SetSheetRow(x.sheetName, fmt.Sprintf("A%d", i+2), x.rows[i])
+		if err != nil {
+			return err
+		}
+	}
+
+	header := w.Header()
+
+	header.Set("Content-Type", "application/octet-stream")
+	header.Set("Content-Disposition", "attachment; filename="+filename)
+	header.Set("Content-Transfer-Encoding", "binary")
+
+	if err = x.fh.Write(w); err != nil {
 		return err
 	}
 
