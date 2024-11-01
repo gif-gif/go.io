@@ -3,7 +3,6 @@ module github.com/gif-gif/go.io
 go 1.23
 
 require (
-	github.com/360EntSecGroup-Skylar/excelize v1.4.1
 	github.com/ClickHouse/clickhouse-go/v2 v2.25.0
 	github.com/IBM/sarama v1.43.3
 	github.com/alitto/pond v1.9.1
@@ -16,7 +15,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-co-op/gocron/v2 v2.8.0
 	github.com/go-playground/validator/v10 v10.20.0
-	github.com/go-resty/resty/v2 v2.13.1
+	github.com/go-resty/resty/v2 v2.15.3
 	github.com/gogf/gf v1.16.9
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/go-querystring v1.1.0
@@ -155,6 +154,8 @@ require (
 	github.com/prometheus/common v0.55.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
+	github.com/richardlehane/mscfb v1.0.4 // indirect
+	github.com/richardlehane/msoleps v1.0.4 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/rs/xid v1.5.0 // indirect
@@ -170,6 +171,9 @@ require (
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
+	github.com/xuri/efp v0.0.0-20240408161823-9ad904a10d6d // indirect
+	github.com/xuri/excelize/v2 v2.9.0 // indirect
+	github.com/xuri/nfp v0.0.0-20240318013403-ab9948c2c4a7 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.15 // indirect
 	go.opencensus.io v0.24.0 // indirect

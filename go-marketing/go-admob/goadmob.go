@@ -60,6 +60,9 @@ type ReportReq struct {
 	CurrencyCode string //default currency USD
 	LanguageCode string //default language en-US
 
+	RetryWaitTime time.Duration
+	RetryCount    int
+
 	//Date Month Week
 }
 
@@ -279,9 +282,11 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 	}
 
 	dataReq := &gohttp.Request{
-		Url:     url,
-		Timeout: time.Second * 30,
-		Body:    params,
+		Url:           url,
+		RetryCount:    req.RetryCount,
+		RetryWaitTime: req.RetryWaitTime,
+		Timeout:       time.Second * 30,
+		Body:          params,
 	}
 
 	gh := &gohttp.GoHttp[[]*admob.GenerateNetworkReportResponse]{
