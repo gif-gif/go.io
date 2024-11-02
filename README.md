@@ -330,3 +330,4 @@ func mysqlTest() {
 - https://github.com/eclipse/paho.mqtt.golang
 - https://github.com/apache/rocketmq-client-go
 - https://github.com/hibiken/asynq
+- https://github.com/xuri/excelize
