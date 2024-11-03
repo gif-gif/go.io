@@ -261,7 +261,7 @@ func (c *GoJob) DayHour(options *[]gocron.JobOption, hour int, fn any, parameter
 	return c.CronJob(fmt.Sprintf("0 0 %d * * *", hour), options, fn, parameters...)
 }
 
-// crontab 每天x点x分0秒执行
+// crontab 每天每x点每x分0秒执行
 func (c *GoJob) DayHourMinute(options *[]gocron.JobOption, hour, minute int, fn any, parameters ...any) (gocron.Job, error) {
 	return c.CronJob(fmt.Sprintf("0 %d %d * * *", minute, hour), options, fn, parameters...)
 }
