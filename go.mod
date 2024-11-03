@@ -32,6 +32,7 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/silenceper/wechat/v2 v2.1.6
+	github.com/xuri/excelize/v2 v2.9.0
 	github.com/zeromicro/go-zero v1.7.3
 	go.etcd.io/etcd/client/pkg/v3 v3.5.15
 	go.etcd.io/etcd/client/v3 v3.5.15
@@ -81,6 +82,7 @@ require (
 	github.com/fatih/color v1.17.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
@@ -172,7 +174,6 @@ require (
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/xuri/efp v0.0.0-20240408161823-9ad904a10d6d // indirect
-	github.com/xuri/excelize/v2 v2.9.0 // indirect
 	github.com/xuri/nfp v0.0.0-20240318013403-ab9948c2c4a7 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.15 // indirect
