@@ -137,13 +137,13 @@ func (o *GoAdmob) Refresh() error {
 //
 // 3、获取code后执行 Exchange 方法获取token
 func (c *GoAdmob) AuthUrl() string {
-	url := `https://accounts.google.com/o/oauth2/v2/auth?client_id=` + c.Config.ClientId + `&redirect_uri=` + goutils.UrlEncode(c.Config.RedirectUrl) + `&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.readonly+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.report&prompt=consent&state=` + c.Config.State + `&response_type=code&access_type=offline`
+	url := `https://accounts.google.com/o/oauth2/v2/auth?client_id=` + c.Config.ClientId + `&redirect_uri=` + goutils.UrlEncode(c.Config.RedirectUrl) + `&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.readonly+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.report&prompt=consent&state=` + goutils.UrlEncode(c.Config.State) + `&response_type=code&access_type=offline`
 	return url
 }
 
 // 获取token
-func (c *GoAdmob) Exchange(ctx context.Context, code string) (*oauth2.Token, error) {
-	token, err := c.AuthConfig.Exchange(ctx, code)
+func (c *GoAdmob) Exchange(ctx context.Context, authorizationCode string) (*oauth2.Token, error) {
+	token, err := c.AuthConfig.Exchange(ctx, authorizationCode)
 	if err != nil {
 		golog.WithTag("goadmob").Error("token:" + err.Error())
 		return nil, err

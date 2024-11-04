@@ -9,9 +9,10 @@ import (
 )
 
 type Config struct {
-	Name         string `yaml:"Name" json:"name,optional"`
-	ApiVersion   string `yaml:"ApiVersion" json:"apiVersion,optional"`
-	AccessToken  string `yaml:"AccessToken" json:"accessToken"`
+	Name        string `yaml:"Name" json:"name,optional"`
+	ApiVersion  string `yaml:"ApiVersion" json:"apiVersion,optional"`
+	AccessToken string `yaml:"AccessToken" json:"accessToken"`
+
 	ClientId     string `yaml:"ClientId" json:"clientId"`
 	ClientSecret string `yaml:"ClientSecret" json:"clientSecret"`
 	RedirectUri  string `yaml:"RedirectUri" json:"redirectUri"`
@@ -173,7 +174,7 @@ func (c *Market) Exchange(authorizationCode string) (*TokenResponse, error) {
 //
 // DOC: https://developers.facebook.com/docs/marketing-api/overview/authorization
 func (c *Market) AuthUrl(scope string) string {
-	return c.Config.baseApi + "/dialog/oauth?client_id=" + c.Config.ClientId + "&redirect_uri=" + goutils.UrlEncode(c.Config.RedirectUri) + "&scope=" + scope
+	return c.Config.baseApi + "/dialog/oauth?client_id=" + c.Config.ClientId + "&redirect_uri=" + goutils.UrlEncode(c.Config.RedirectUri) + "&scope=" + goutils.UrlEncode(scope)
 }
 
 //
