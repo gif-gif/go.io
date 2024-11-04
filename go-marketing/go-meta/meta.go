@@ -170,6 +170,8 @@ func (c *Market) Exchange(authorizationCode string) (*TokenResponse, error) {
 }
 
 // 授权URL
+//
+// DOC: https://developers.facebook.com/docs/marketing-api/overview/authorization
 func (c *Market) AuthUrl(scope string) string {
 	return c.Config.baseApi + "/dialog/oauth?client_id=" + c.Config.ClientId + "&redirect_uri=" + goutils.UrlEncode(c.Config.RedirectUri) + "&scope=" + scope
 }
