@@ -158,6 +158,14 @@ type RequestData struct {
 	DateStart string `url:"date_start"`
 	DateStop  string `url:"date_stop"`
 	TimeRange string `url:"time_range"` //DateStart And DateStop are here for query
+
+	TimeIncrement int    `url:"time_increment"` // 1表示以天为单位
+	Timezone      string `url:"time_zone"`      //日期时区Asia/Shanghai
+	Breakdowns    string `url:"breakdowns"`     //['country'] 以国家纬度group by 查询
+}
+
+type RequestAccessKes struct {
+	AccessToken string `url:"access_token"`
 }
 
 type DetailsDataRequest struct {
