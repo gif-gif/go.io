@@ -147,6 +147,13 @@ type ApiRefreshTokenRequest struct {
 	FbExchangeToken string `url:"fb_exchange_token"`
 }
 
+type ApiAccessTokenRequest struct {
+	RedirectUri  string `url:"redirect_uri"`
+	ClientId     string `url:"client_id"`
+	ClientSecret string `url:"client_secret"`
+	Code         string `url:"code,optional"`
+}
+
 type RequestData struct {
 	Limit int `url:"limit"`
 	//Before string `json:"before"`

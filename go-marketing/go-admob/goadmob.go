@@ -129,7 +129,13 @@ func (o *GoAdmob) Refresh() error {
 	return nil
 }
 
-// 授权admobURL
+// 授权admobURL OAuth2.0
+//
+// 1、https://developers.google.com/admob/api/v1/getting-started?hl=zh-cn 创建一个新的授权客户端 获取client_id 和 client_secret
+//
+// 2、浏览器中执行 AuthUrl 方法获取授权code
+//
+// 3、获取code后执行 Exchange 方法获取token
 func (c *GoAdmob) AuthUrl() string {
 	url := `https://accounts.google.com/o/oauth2/v2/auth?client_id=` + c.Config.ClientId + `&redirect_uri=` + goutils.UrlEncode(c.Config.RedirectUrl) + `&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.readonly+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.report&prompt=consent&state=` + c.Config.State + `&response_type=code&access_type=offline`
 	return url

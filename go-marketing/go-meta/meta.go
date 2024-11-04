@@ -4,16 +4,19 @@ import (
 	"context"
 	"fmt"
 	gohttp "github.com/gif-gif/go.io/go-http"
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/google/go-querystring/query"
 )
 
 type Config struct {
-	Name        string `yaml:"Name" json:"name,optional"`
-	BaseApi     string `yaml:"BaseApi" json:"baseApi,optional"`
-	AccessToken string `yaml:"AccessToken" json:"accessToken"`
-	StartDate   string `yaml:"StartDate" json:"startDate"`
-	EndDate     string `yaml:"EndDate" json:"endDate"`
-	PageSize    int    `yaml:"PageSize" json:"pageSize,optional"`
+	Name         string `yaml:"Name" json:"name,optional"`
+	ApiVersion   string `yaml:"ApiVersion" json:"apiVersion,optional"`
+	AccessToken  string `yaml:"AccessToken" json:"accessToken"`
+	ClientId     string `yaml:"ClientId" json:"clientId"`
+	ClientSecret string `yaml:"ClientSecret" json:"clientSecret"`
+	RedirectUri  string `yaml:"RedirectUri" json:"redirectUri"`
+
+	baseApi string
 }
 
 type Market struct {
@@ -21,12 +24,14 @@ type Market struct {
 }
 
 func New(config Config) *Market {
-	if config.BaseApi == "" {
-		config.BaseApi = "https://graph.facebook.com/v17.0"
-	}
-	return &Market{
+	mm := &Market{
 		Config: config,
 	}
+	if mm.Config.ApiVersion == "" {
+		mm.Config.ApiVersion = "v17.0"
+	}
+	mm.Config.baseApi = "https://graph.facebook.com/" + mm.Config.ApiVersion
+	return mm
 }
 
 func (m *Market) handleRequest(req *RequestData) *RequestData {
@@ -49,7 +54,7 @@ func (m *Market) GetAccountsByBusinessId(businessId string, pageSize int) (*Acco
 	if pageSize == 0 {
 		pageSize = 10000
 	}
-	api := m.Config.BaseApi + ApiAccount
+	api := m.Config.baseApi + ApiAccount
 	api = fmt.Sprintf(api, businessId)
 
 	req := &RequestData{
@@ -74,7 +79,7 @@ func (m *Market) GetAccountsByBusinessId(businessId string, pageSize int) (*Acco
 
 // all data -------------------------------
 func (m *Market) GetAllDataByAccountId(req *RequestData, accountId string) (*AllDataResponse, error) {
-	api := m.Config.BaseApi + ApiAccountAdsets
+	api := m.Config.baseApi + ApiAccountAdsets
 	api = fmt.Sprintf(api, accountId)
 	req = m.handleRequest(req)
 	params, _ := query.Values(req)
@@ -94,7 +99,7 @@ func (m *Market) GetAllDataByAccountId(req *RequestData, accountId string) (*All
 
 // 根据数据类型获取某个详情，如：广告组详情 广告详情  -------------------------------
 func (m *Market) GetDetailByDataId(req *RequestData, dataId string) (*DataDetailResponse, error) {
-	api := m.Config.BaseApi + ApiDataDetails
+	api := m.Config.baseApi + ApiDataDetails
 	api = fmt.Sprintf(api, dataId)
 
 	req = m.handleRequest(req)
@@ -121,7 +126,7 @@ func (m *Market) RefreshToken(clientId string, clientSecret string) (*TokenRespo
 		GrantType:       "fb_exchange_token",
 		FbExchangeToken: m.Config.AccessToken,
 	}
-	api := m.Config.BaseApi + ApiRefreshToken
+	api := m.Config.baseApi + ApiRefreshToken
 	params, _ := query.Values(req)
 
 	request := &gohttp.Request{
@@ -138,9 +143,40 @@ func (m *Market) RefreshToken(clientId string, clientSecret string) (*TokenRespo
 	return result, nil
 }
 
+// 获取token
+func (c *Market) Exchange(authorizationCode string) (*TokenResponse, error) {
+	req := &ApiAccessTokenRequest{
+		ClientId:     c.Config.ClientId,
+		ClientSecret: c.Config.ClientSecret,
+		Code:         authorizationCode,
+		RedirectUri:  c.Config.RedirectUri,
+	}
+
+	api := c.Config.baseApi + ApiRefreshToken
+	params, _ := query.Values(req)
+
+	request := &gohttp.Request{
+		Url:          api,
+		ParamsValues: params,
+	}
+	gh := gohttp.GoHttp[TokenResponse]{
+		Request: request,
+	}
+	result, err := gh.HttpGet(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// 授权URL
+func (c *Market) AuthUrl(scope string) string {
+	return c.Config.baseApi + "/dialog/oauth?client_id=" + c.Config.ClientId + "&redirect_uri=" + goutils.UrlEncode(c.Config.RedirectUri) + "&scope=" + scope
+}
+
 //
 //func (m *Market) AccessKeys(accountId string) {
-//	api := m.Config.BaseApi + "/" + accountId + "/access_keys"
+//	api := m.Config.baseApi + "/" + accountId + "/access_keys"
 //	request := &gohttp.Request{
 //		Url:         api,
 //		QueryParams: map[string]string{"access_token": m.Config.AccessToken},
