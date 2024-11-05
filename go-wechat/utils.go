@@ -1,4 +1,4 @@
-package gowx
+package gowechat
 
 import (
 	goutils "github.com/gif-gif/go.io/go-utils"
