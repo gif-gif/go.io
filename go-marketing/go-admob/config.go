@@ -1,10 +1,11 @@
 package goadmob
 
-type Config struct {
-	Name             string `yaml:"Name" json:"name,optional"`
-	AccountId        string `yaml:"AccountId" json:"accountId,optional"`
-	GoAuthClientName string `yaml:"GoAuthClientName" json:"goAuthClientName,optional"` // goAuth 客户端名称
+import gooauth "github.com/gif-gif/go.io/go-sso/go-oauth"
 
+type Config struct {
+	Name       string `yaml:"Name" json:"name,optional"`
+	AccountId  string `yaml:"AccountId" json:"accountId,optional"`
+	AuthConfig gooauth.Config
 	//AccessToken  string `yaml:"AccessToken" json:"accessToken"`
 	//RefreshToken string `yaml:"RefreshToken" json:"refreshToken"`
 	//ClientId     string `yaml:"ClientId" json:"clientId"`

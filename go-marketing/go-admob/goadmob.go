@@ -92,14 +92,14 @@ type GoAdmob struct {
 
 // 每次调用时都需要调用这个方法
 func New(ctx context.Context, config Config) (*GoAdmob, error) {
-	if config.GoAuthClientName == "" {
-		return nil, errors.New("goauth client name must not be empty")
+	err := gooauth.Init(config.AuthConfig)
+	if err != nil {
+		return nil, err
 	}
-
 	o := &GoAdmob{
 		ctx:    ctx,
 		Config: config,
-		GoAuth: gooauth.GetClient(config.GoAuthClientName),
+		GoAuth: gooauth.GetClient(config.AuthConfig.Name),
 	}
 
 	return o, nil
