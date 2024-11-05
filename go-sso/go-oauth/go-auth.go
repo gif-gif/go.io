@@ -10,7 +10,7 @@ type Config struct {
 	AccessToken  string `yaml:"AccessToken" json:"accessToken"`
 	RefreshToken string `yaml:"RefreshToken" json:"refreshToken"`
 	State        string `yaml:"State" json:"state"`
-	AuthConfig   oauth2.Config
+	OAuthConfig  oauth2.Config
 }
 
 type GoOAuth struct {
@@ -25,18 +25,18 @@ func New(config Config) *GoOAuth {
 }
 
 func (c *GoOAuth) TokenSource(ctx context.Context) oauth2.TokenSource {
-	return c.Config.AuthConfig.TokenSource(ctx, c.Token)
+	return c.Config.OAuthConfig.TokenSource(ctx, c.Token)
 }
 
 // 获取授权url
 func (c *GoOAuth) AuthUrl() string {
-	url := c.Config.AuthConfig.AuthCodeURL(c.Config.State)
+	url := c.Config.OAuthConfig.AuthCodeURL(c.Config.State)
 	return url
 }
 
 // 获取token
 func (c *GoOAuth) Exchange(ctx context.Context, authorizationCode string) (*oauth2.Token, error) {
-	token, err := c.Config.AuthConfig.Exchange(ctx, authorizationCode)
+	token, err := c.Config.OAuthConfig.Exchange(ctx, authorizationCode)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *GoOAuth) Exchange(ctx context.Context, authorizationCode string) (*oaut
 
 // 刷新token
 func (c *GoOAuth) RefreshToken(ctx context.Context) (*oauth2.Token, error) {
-	token, err := c.Config.AuthConfig.TokenSource(ctx, &oauth2.Token{
+	token, err := c.Config.OAuthConfig.TokenSource(ctx, &oauth2.Token{
 		RefreshToken: c.Config.RefreshToken,
 	}).Token()
 	if err != nil {
