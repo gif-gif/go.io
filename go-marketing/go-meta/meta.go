@@ -5,19 +5,25 @@ import (
 	"fmt"
 	gohttp "github.com/gif-gif/go.io/go-http"
 	goutils "github.com/gif-gif/go.io/go-utils"
+	"github.com/gogf/gf/util/gconv"
 	"github.com/google/go-querystring/query"
+	"time"
 )
 
 type Config struct {
-	Name        string `yaml:"Name" json:"name,optional"`
+	Name string `yaml:"Name" json:"name,optional"`
+	//请求参数
 	ApiVersion  string `yaml:"ApiVersion" json:"apiVersion,optional"`
 	AccessToken string `yaml:"AccessToken" json:"accessToken"`
 
+	// 授权参数
 	ClientId     string `yaml:"ClientId" json:"clientId"`
 	ClientSecret string `yaml:"ClientSecret" json:"clientSecret"`
 	RedirectUri  string `yaml:"RedirectUri" json:"redirectUri"`
 
-	baseApi string
+	//基础API
+	baseApi               string
+	currentVersionBaseApi string
 }
 
 type Market struct {
@@ -31,7 +37,8 @@ func New(config Config) *Market {
 	if mm.Config.ApiVersion == "" {
 		mm.Config.ApiVersion = "v17.0"
 	}
-	mm.Config.baseApi = "https://graph.facebook.com/" + mm.Config.ApiVersion
+	mm.Config.baseApi = "https://graph.facebook.com"
+	mm.Config.currentVersionBaseApi = mm.Config.baseApi + "/" + mm.Config.ApiVersion
 	return mm
 }
 
@@ -50,12 +57,35 @@ func (m *Market) handleRequest(req *RequestData) *RequestData {
 	return req
 }
 
+func (m *Market) DecryptEcpms(appId string, encryptedEcpms []string) (*EncryptedEcpmRes, error) {
+	api := m.Config.baseApi + "/" + appId + "/aggregate_revenue"
+	req := EncryptedEcpmReq{
+		AccessToken: m.Config.AccessToken,
+		Ecpms:       encryptedEcpms,
+		RequestId:   gconv.String(time.Now().UnixNano()),
+		SyncApi:     true,
+	}
+
+	request := &gohttp.Request{
+		Url:  api,
+		Body: req,
+	}
+
+	gh := gohttp.GoHttp[EncryptedEcpmRes]{Request: request}
+	result, err := gh.HttpPostJson(context.Background())
+
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 // 某个商户下所有账号信息 账号余额，状态等等
 func (m *Market) GetAccountsByBusinessId(businessId string, pageSize int) (*AccountResponse, error) {
 	if pageSize == 0 {
 		pageSize = 10000
 	}
-	api := m.Config.baseApi + ApiAccount
+	api := m.Config.currentVersionBaseApi + ApiAccount
 	api = fmt.Sprintf(api, businessId)
 
 	req := &RequestData{
@@ -80,7 +110,7 @@ func (m *Market) GetAccountsByBusinessId(businessId string, pageSize int) (*Acco
 
 // all data -------------------------------
 func (m *Market) GetAllDataByAccountId(req *RequestData, accountId string) (*AllDataResponse, error) {
-	api := m.Config.baseApi + ApiAccountAdsets
+	api := m.Config.currentVersionBaseApi + ApiAccountAdsets
 	api = fmt.Sprintf(api, accountId)
 	req = m.handleRequest(req)
 	params, _ := query.Values(req)
@@ -100,7 +130,7 @@ func (m *Market) GetAllDataByAccountId(req *RequestData, accountId string) (*All
 
 // 根据数据类型获取某个详情，如：广告组详情 广告详情  -------------------------------
 func (m *Market) GetDetailByDataId(req *RequestData, dataId string) (*DataDetailResponse, error) {
-	api := m.Config.baseApi + ApiDataDetails
+	api := m.Config.currentVersionBaseApi + ApiDataDetails
 	api = fmt.Sprintf(api, dataId)
 
 	req = m.handleRequest(req)
@@ -127,7 +157,7 @@ func (m *Market) RefreshToken(clientId string, clientSecret string) (*TokenRespo
 		GrantType:       "fb_exchange_token",
 		FbExchangeToken: m.Config.AccessToken,
 	}
-	api := m.Config.baseApi + ApiRefreshToken
+	api := m.Config.currentVersionBaseApi + ApiRefreshToken
 	params, _ := query.Values(req)
 
 	request := &gohttp.Request{
@@ -153,7 +183,7 @@ func (c *Market) Exchange(authorizationCode string) (*TokenResponse, error) {
 		RedirectUri:  c.Config.RedirectUri,
 	}
 
-	api := c.Config.baseApi + ApiRefreshToken
+	api := c.Config.currentVersionBaseApi + ApiRefreshToken
 	params, _ := query.Values(req)
 
 	request := &gohttp.Request{
@@ -174,27 +204,8 @@ func (c *Market) Exchange(authorizationCode string) (*TokenResponse, error) {
 //
 // DOC: https://developers.facebook.com/docs/marketing-api/overview/authorization
 func (c *Market) AuthUrl(scope string) string {
-	return c.Config.baseApi + "/dialog/oauth?client_id=" + c.Config.ClientId + "&redirect_uri=" + goutils.UrlEncode(c.Config.RedirectUri) + "&scope=" + goutils.UrlEncode(scope)
+	return c.Config.currentVersionBaseApi + "/dialog/oauth?client_id=" + c.Config.ClientId + "&redirect_uri=" + goutils.UrlEncode(c.Config.RedirectUri) + "&scope=" + goutils.UrlEncode(scope)
 }
-
-//
-//func (m *Market) AccessKeys(accountId string) {
-//	api := m.Config.baseApi + "/" + accountId + "/access_keys"
-//	request := &gohttp.Request{
-//		Url:         api,
-//		QueryParams: map[string]string{"access_token": m.Config.AccessToken},
-//	}
-//
-//	gh := gohttp.GoHttp[TokenResponse]{
-//		Request: request,
-//	}
-//
-//	gh.HttpGet(context.Background())
-//	//if err != nil {
-//	//	return nil, err
-//	//}
-//	//return result, nil
-//}
 
 //---------------------------------------------------------------- 使用例子方法----------------------------------------------------------------
 

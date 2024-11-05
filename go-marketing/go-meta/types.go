@@ -197,3 +197,25 @@ type DataDetailResponse struct {
 type TokenResponse struct {
 	TokenItem
 }
+
+// ---------meta变现端--------------------------------
+type EncryptedEcpmReq struct {
+	RequestId   string   `json:"request_id"`
+	Ecpms       []string `json:"ecpms"`
+	AccessToken string   `json:"access_token"`
+	SyncApi     bool     `json:"sync_api"`
+}
+
+type EncryptedEcpmRes struct {
+	RequestId string `json:"request_id"`
+	Success   struct {
+		Value    float64 `json:"value"`
+		Accuracy string  `json:"accuracy"`
+	} `json:"success"`
+	Error struct {
+		Reason                 string `json:"reason"`
+		Description            string `json:"description"`
+		NoImpressionCount      int    `json:"no_impression_count"`
+		InvalidImpressionCount int    `json:"invalid_impression_count"`
+	} `json:"error"`
+}
