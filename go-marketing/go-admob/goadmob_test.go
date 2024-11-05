@@ -1,6 +1,7 @@
 package goadmob
 
 import (
+	"context"
 	gocontext "github.com/gif-gif/go.io/go-context"
 	"github.com/gif-gif/go.io/go-db/gogorm"
 	golog "github.com/gif-gif/go.io/go-log"
@@ -147,4 +148,17 @@ func TestAdmobReport(t *testing.T) {
 	golog.WithTag("admob").Info(res)
 
 	<-gocontext.Cancel().Done()
+}
+
+func TestAdmobAuthUrl(t *testing.T) {
+	Init(context.Background(), Config{
+
+		Cl:           "admob",
+		ClientSecret: "secret",
+		RedirectUrl:  "https://test.com",
+		State:        "test",
+	})
+	url := Default().AuthUrl()
+	golog.WithTag("admob").Info(url)
+
 }

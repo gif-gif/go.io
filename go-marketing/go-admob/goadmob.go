@@ -5,7 +5,7 @@ import (
 	"errors"
 	gohttp "github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
-	goutils "github.com/gif-gif/go.io/go-utils"
+	gooauth "github.com/gif-gif/go.io/go-sso/go-oauth"
 	"github.com/gogf/gf/util/gconv"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/admob/v1"
@@ -85,29 +85,21 @@ type ResponseItem struct {
 type GoAdmob struct {
 	ctx            context.Context
 	Config         Config
-	AuthConfig     oauth2.Config
+	GoAuth         *gooauth.GoOAuth
 	AdmobService   *admob.Service
-	Token          *oauth2.Token
 	RequestTimeout int64 //default request timeout 30s
 }
 
 // 每次调用时都需要调用这个方法
 func New(ctx context.Context, config Config) (*GoAdmob, error) {
-	authConfig := oauth2.Config{
-		ClientID:     config.ClientId,
-		ClientSecret: config.ClientSecret,
-		RedirectURL:  config.RedirectUrl,
-		Endpoint: oauth2.Endpoint{
-			AuthURL:   "https://accounts.google.com/o/oauth2/auth",
-			TokenURL:  "https://oauth2.googleapis.com/token",
-			AuthStyle: oauth2.AuthStyleInParams,
-		},
+	if config.GoAuthClientName == "" {
+		return nil, errors.New("goauth client name must not be empty")
 	}
 
 	o := &GoAdmob{
-		ctx:        ctx,
-		AuthConfig: authConfig,
-		Config:     config,
+		ctx:    ctx,
+		Config: config,
+		GoAuth: gooauth.GetClient(config.GoAuthClientName),
 	}
 
 	return o, nil
@@ -120,7 +112,7 @@ func (o *GoAdmob) Refresh() error {
 		return err
 	}
 
-	admobService, err := admob.NewService(o.ctx, option.WithTokenSource(o.AuthConfig.TokenSource(o.ctx, o.Token)))
+	admobService, err := admob.NewService(o.ctx, option.WithTokenSource(o.GoAuth.TokenSource(o.ctx)))
 	if err != nil {
 		return err
 	}
@@ -137,13 +129,12 @@ func (o *GoAdmob) Refresh() error {
 //
 // 3、获取code后执行 Exchange 方法获取token
 func (c *GoAdmob) AuthUrl() string {
-	url := `https://accounts.google.com/o/oauth2/v2/auth?client_id=` + c.Config.ClientId + `&redirect_uri=` + goutils.UrlEncode(c.Config.RedirectUrl) + `&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.readonly+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.report&prompt=consent&state=` + goutils.UrlEncode(c.Config.State) + `&response_type=code&access_type=offline`
-	return url
+	return c.GoAuth.AuthUrl()
 }
 
 // 获取token
 func (c *GoAdmob) Exchange(ctx context.Context, authorizationCode string) (*oauth2.Token, error) {
-	token, err := c.AuthConfig.Exchange(ctx, authorizationCode)
+	token, err := c.GoAuth.Exchange(ctx, authorizationCode)
 	if err != nil {
 		golog.WithTag("goadmob").Error("token:" + err.Error())
 		return nil, err
@@ -154,14 +145,11 @@ func (c *GoAdmob) Exchange(ctx context.Context, authorizationCode string) (*oaut
 
 // 刷新token
 func (c *GoAdmob) RefreshToken() error {
-	token, err := c.AuthConfig.TokenSource(c.ctx, &oauth2.Token{
-		RefreshToken: c.Config.RefreshToken,
-	}).Token()
+	_, err := c.GoAuth.RefreshToken(c.ctx)
 	if err != nil {
 		golog.WithTag("goadmob").Error("token:" + err.Error())
 		return err
 	}
-	c.Token = token
 	return nil
 }
 
@@ -300,7 +288,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 		BaseUrl: "https://admob.googleapis.com",
 		Headers: map[string]string{
 			"X-Google-AuthUser": "0",
-			"Authorization":     "Bearer " + c.Token.AccessToken,
+			"Authorization":     "Bearer " + c.GoAuth.GetAccessToken(),
 		},
 	}
 
