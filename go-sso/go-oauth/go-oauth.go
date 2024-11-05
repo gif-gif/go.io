@@ -20,6 +20,10 @@ type GoOAuth struct {
 
 func New(config Config) *GoOAuth {
 	return &GoOAuth{
+		Token: &oauth2.Token{ //兼容处理，初始化的token不支持检查过期时间
+			AccessToken:  config.AccessToken,
+			RefreshToken: config.RefreshToken,
+		},
 		Config: config,
 	}
 }

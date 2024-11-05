@@ -16,15 +16,10 @@ func Init(configs ...Config) (err error) {
 		}
 
 		if __clients[name] != nil {
-			return errors.New("GoAuth [" + name + "] already exists")
+			return errors.New("GoOAuth [" + name + "] already exists")
 		}
-
 		__clients[name] = New(conf)
-		if err != nil {
-			return
-		}
 	}
-
 	return
 }
 
@@ -61,7 +56,7 @@ func Default() *GoOAuth {
 		}
 	}
 
-	golog.WithTag("GoAuth").Error("no default GoAuth client")
+	golog.WithTag("GoOAuth").Error("no default GoOAuth client")
 
 	return nil
 }
