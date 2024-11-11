@@ -9,7 +9,7 @@ https://developers.google.com/oauthplayground/
 ### 1 把 redirect_uri 改为自己的服务器地址
 
 ```json
-https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https%3A%2F%2Fbangbox.jidianle.cc&prompt=consent&response_type=code&client_id=273488495628-a56cdd6vrnkm5i5ors5vl2bmrj3rh622.apps.googleusercontent.com&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.readonly+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.report&access_type=offline
+https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https%3A%2F%2Fbangbox.jidianle.cc&prompt=consent&response_type=code&client_id=&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.readonly+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.report&access_type=offline
 ```
 #### 跳转后选择权限 需要授权账号
 

@@ -5,6 +5,8 @@ import (
 	gocontext "github.com/gif-gif/go.io/go-context"
 	"github.com/gif-gif/go.io/go-db/gogorm"
 	golog "github.com/gif-gif/go.io/go-log"
+	gooauth "github.com/gif-gif/go.io/go-sso/go-oauth"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/admob/v1"
 	"testing"
 	"time"
@@ -152,11 +154,15 @@ func TestAdmobReport(t *testing.T) {
 
 func TestAdmobAuthUrl(t *testing.T) {
 	Init(context.Background(), Config{
-
-		Cl:           "admob",
-		ClientSecret: "secret",
-		RedirectUrl:  "https://test.com",
-		State:        "test",
+		Name:      "admob",
+		AccountId: "123",
+		AuthConfig: gooauth.Config{
+			State: "test",
+			OAuthConfig: oauth2.Config{
+				ClientSecret: "secret",
+				RedirectURL:  "https://test.com",
+			},
+		},
 	})
 	url := Default().AuthUrl()
 	golog.WithTag("admob").Info(url)

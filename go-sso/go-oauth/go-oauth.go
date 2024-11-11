@@ -33,14 +33,14 @@ func (c *GoOAuth) TokenSource(ctx context.Context) oauth2.TokenSource {
 }
 
 // 获取授权url
-func (c *GoOAuth) AuthUrl() string {
-	url := c.Config.OAuthConfig.AuthCodeURL(c.Config.State)
+func (c *GoOAuth) AuthUrl(opts ...oauth2.AuthCodeOption) string {
+	url := c.Config.OAuthConfig.AuthCodeURL(c.Config.State, opts...)
 	return url
 }
 
 // 获取token
-func (c *GoOAuth) Exchange(ctx context.Context, authorizationCode string) (*oauth2.Token, error) {
-	token, err := c.Config.OAuthConfig.Exchange(ctx, authorizationCode)
+func (c *GoOAuth) Exchange(ctx context.Context, authorizationCode string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
+	token, err := c.Config.OAuthConfig.Exchange(ctx, authorizationCode, opts...)
 	if err != nil {
 		return nil, err
 	}
