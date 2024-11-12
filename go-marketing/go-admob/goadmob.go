@@ -371,8 +371,20 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 // 获取账号下所有APP信息
 func (c *GoAdmob) GetApps() (*admob.ListAppsResponse, error) {
 	if c.Config.AccountId == "" {
-		return nil, errors.New("accountId is empty")
+		return nil, errors.New("GetApps accountId is empty")
 	}
+	if c.AdmobService == nil {
+		return nil, errors.New("GetApps AdmobService is empty")
+	}
+
+	if c.AdmobService.Accounts == nil {
+		return nil, errors.New("GetApps AdmobService.Accounts is empty")
+	}
+
+	if c.AdmobService.Accounts.Apps == nil {
+		return nil, errors.New("GetApps sAdmobService.Accounts.Apps is empty")
+	}
+
 	res, err := c.AdmobService.Accounts.Apps.List("accounts/" + c.Config.AccountId).Do()
 	if err != nil {
 		return nil, err
@@ -386,6 +398,18 @@ func (c *GoAdmob) GetAdUnits() (*admob.ListAdUnitsResponse, error) {
 	if c.Config.AccountId == "" {
 		return nil, errors.New("accountId is empty")
 	}
+	if c.AdmobService == nil {
+		return nil, errors.New("GetAdUnits AdmobService is empty")
+	}
+
+	if c.AdmobService.Accounts == nil {
+		return nil, errors.New("GetAdUnits AdmobService.Accounts is empty")
+	}
+
+	if c.AdmobService.Accounts.AdUnits == nil {
+		return nil, errors.New("GetAdUnits sAdmobService.Accounts.AdUnits is empty")
+	}
+
 	res, err := c.AdmobService.Accounts.AdUnits.List("accounts/" + c.Config.AccountId).Do()
 	if err != nil {
 		return nil, err
