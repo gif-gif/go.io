@@ -8,6 +8,7 @@ import (
 	gooauth "github.com/gif-gif/go.io/go-sso/go-oauth"
 	"github.com/gogf/gf/util/gconv"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/admob/v1"
 	"google.golang.org/api/option"
 	"math"
@@ -95,6 +96,16 @@ func New(ctx context.Context, config Config) (*GoAdmob, error) {
 	if len(config.AuthConfig.Scopes) <= 0 {
 		config.AuthConfig.Scopes = []string{"https://www.googleapis.com/auth/admob.readonly", "https://www.googleapis.com/auth/admob.report"}
 	}
+
+	if config.AuthConfig.Endpoint == nil {
+		config.AuthConfig.Endpoint = &gooauth.Endpoint{
+			TokenURL:      google.Endpoint.TokenURL,
+			AuthURL:       google.Endpoint.AuthURL,
+			DeviceAuthURL: google.Endpoint.DeviceAuthURL,
+			AuthStyle:     google.Endpoint.AuthStyle,
+		}
+	}
+
 	err := gooauth.Init(config.AuthConfig)
 	if err != nil {
 		return nil, err
