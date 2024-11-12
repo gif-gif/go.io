@@ -3,20 +3,21 @@ package gooauth
 import (
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
-	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"testing"
 )
 
 func TestAdmobAuthUrl(t *testing.T) {
 	Init(Config{
-		Name: "test",
-		OAuthConfig: oauth2.Config{
-			ClientID:     "123",
-			ClientSecret: "123",
-			RedirectURL:  "URL_ADDRESS",
-			Scopes:       []string{"URL_ADDRESS"},
-			Endpoint:     google.Endpoint,
+		Name:         "test",
+		ClientId:     "123",
+		ClientSecret: "123",
+		RedirectURL:  "URL_ADDRESS",
+		Scopes:       []string{"URL_ADDRESS"},
+		Endpoint: &Endpoint{
+			AuthURL:   google.Endpoint.AuthURL,
+			TokenURL:  google.Endpoint.TokenURL,
+			AuthStyle: google.Endpoint.AuthStyle,
 		},
 		State: "test",
 	})

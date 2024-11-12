@@ -6,16 +6,15 @@ import (
 	"github.com/gif-gif/go.io/go-db/gogorm"
 	golog "github.com/gif-gif/go.io/go-log"
 	gooauth "github.com/gif-gif/go.io/go-sso/go-oauth"
-	"golang.org/x/oauth2"
 	"google.golang.org/api/admob/v1"
 	"testing"
 	"time"
 )
 
 func init() {
-	gogorm.Init(gogorm.Config{
-		DataSource: "root:111111@tcp(127.0.0.1)/admob?charset=utf8mb4&parseTime=True&loc=Local",
-	})
+	//gogorm.Init(gogorm.Config{
+	//	DataSource: "root:111111@tcp(127.0.0.1)/admob?charset=utf8mb4&parseTime=True&loc=Local",
+	//})
 }
 
 func TestAdmobApps(t *testing.T) {
@@ -157,11 +156,9 @@ func TestAdmobAuthUrl(t *testing.T) {
 		Name:      "admob",
 		AccountId: "123",
 		AuthConfig: gooauth.Config{
-			State: "test",
-			OAuthConfig: oauth2.Config{
-				ClientSecret: "secret",
-				RedirectURL:  "https://test.com",
-			},
+			State:        "test",
+			ClientSecret: "secret",
+			RedirectURL:  "https://test.com",
 		},
 	})
 	url := Default().AuthUrl()

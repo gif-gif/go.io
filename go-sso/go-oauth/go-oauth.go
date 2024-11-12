@@ -3,44 +3,87 @@ package gooauth
 import (
 	"context"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
+type Endpoint struct {
+	TokenURL      string           `yaml:"TokenURL" json:"tokenURL,optional"`
+	AuthURL       string           `yaml:"AuthURL" json:"authURL,optional"`
+	DeviceAuthURL string           `yaml:"DeviceAuthURL" json:"deviceAuthURL,optional"`
+	AuthStyle     oauth2.AuthStyle `yaml:"AuthStyle" json:"authStyle,optional"`
+} // `yaml:"Endpoint" json:"endpoint"`
+
 type Config struct {
-	Name         string `yaml:"Name" json:"name,optional"`
-	AccessToken  string `yaml:"AccessToken" json:"accessToken"`
-	RefreshToken string `yaml:"RefreshToken" json:"refreshToken"`
-	State        string `yaml:"State" json:"state"`
-	OAuthConfig  oauth2.Config
+	Name string `yaml:"Name" json:"name,optional"`
+	// Token 信息
+	AccessToken  string `yaml:"AccessToken" json:"accessToken,optional"`
+	RefreshToken string `yaml:"RefreshToken" json:"refreshToken,optional"`
+	ExpiresIn    int64  `yaml:"ExpiresIn" json:"expiresIn,optional"` //秒s
+
+	// 授权参数 OAuthConfig oauth2.Config
+	ClientId     string    `yaml:"ClientId" json:"clientId,optional"`
+	ClientSecret string    `yaml:"ClientSecret" json:"clientSecret,optional"`
+	RedirectURL  string    `yaml:"RedirectURL" json:"redirectURL,optional"`
+	Endpoint     *Endpoint `yaml:"Endpoint" json:"endpoint"`
+	Scopes       []string  `yaml:"Scopes" json:"scopes,optional"`
+	State        string    `yaml:"State" json:"state,optional"`
 }
 
 type GoOAuth struct {
-	Config Config
-	Token  *oauth2.Token
+	Config      Config
+	Token       *oauth2.Token
+	OAuthConfig oauth2.Config
 }
 
 func New(config Config) *GoOAuth {
-	return &GoOAuth{
-		Token: &oauth2.Token{ //兼容处理，初始化的token不支持检查过期时间
-			AccessToken:  config.AccessToken,
-			RefreshToken: config.RefreshToken,
+	if config.Endpoint == nil { //默认google 平台
+		config.Endpoint = &Endpoint{
+			TokenURL:      google.Endpoint.TokenURL,
+			AuthURL:       google.Endpoint.AuthURL,
+			DeviceAuthURL: google.Endpoint.DeviceAuthURL,
+			AuthStyle:     google.Endpoint.AuthStyle,
+		}
+	}
+
+	oConfig := oauth2.Config{
+		ClientID:     config.ClientId,
+		ClientSecret: config.ClientSecret,
+		RedirectURL:  config.RedirectURL,
+		Endpoint: oauth2.Endpoint{
+			TokenURL:      config.Endpoint.TokenURL,
+			AuthURL:       config.Endpoint.AuthURL,
+			DeviceAuthURL: config.Endpoint.DeviceAuthURL,
+			AuthStyle:     config.Endpoint.AuthStyle,
 		},
-		Config: config,
+		Scopes: config.Scopes,
+	}
+
+	token := &oauth2.Token{ //兼容处理，初始化的token
+		AccessToken:  config.AccessToken,
+		RefreshToken: config.RefreshToken,
+		ExpiresIn:    config.ExpiresIn,
+	}
+
+	return &GoOAuth{
+		Token:       token,
+		OAuthConfig: oConfig,
+		Config:      config,
 	}
 }
 
 func (c *GoOAuth) TokenSource(ctx context.Context) oauth2.TokenSource {
-	return c.Config.OAuthConfig.TokenSource(ctx, c.Token)
+	return c.OAuthConfig.TokenSource(ctx, c.Token)
 }
 
 // 获取授权url
 func (c *GoOAuth) AuthUrl(opts ...oauth2.AuthCodeOption) string {
-	url := c.Config.OAuthConfig.AuthCodeURL(c.Config.State, opts...)
+	url := c.OAuthConfig.AuthCodeURL(c.Config.State, opts...)
 	return url
 }
 
 // 获取token
 func (c *GoOAuth) Exchange(ctx context.Context, authorizationCode string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
-	token, err := c.Config.OAuthConfig.Exchange(ctx, authorizationCode, opts...)
+	token, err := c.OAuthConfig.Exchange(ctx, authorizationCode, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +95,7 @@ func (c *GoOAuth) Exchange(ctx context.Context, authorizationCode string, opts .
 
 // 刷新token
 func (c *GoOAuth) RefreshToken(ctx context.Context) (*oauth2.Token, error) {
-	token, err := c.Config.OAuthConfig.TokenSource(ctx, &oauth2.Token{
+	token, err := c.OAuthConfig.TokenSource(ctx, &oauth2.Token{
 		RefreshToken: c.Config.RefreshToken,
 	}).Token()
 	if err != nil {

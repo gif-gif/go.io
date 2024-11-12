@@ -92,8 +92,8 @@ type GoAdmob struct {
 
 // 每次调用时都需要调用这个方法
 func New(ctx context.Context, config Config) (*GoAdmob, error) {
-	if len(config.AuthConfig.OAuthConfig.Scopes) <= 0 {
-		config.AuthConfig.OAuthConfig.Scopes = []string{"https://www.googleapis.com/auth/admob.readonly", "https://www.googleapis.com/auth/admob.report"}
+	if len(config.AuthConfig.Scopes) <= 0 {
+		config.AuthConfig.Scopes = []string{"https://www.googleapis.com/auth/admob.readonly", "https://www.googleapis.com/auth/admob.report"}
 	}
 	err := gooauth.Init(config.AuthConfig)
 	if err != nil {
