@@ -14,7 +14,7 @@ import (
 
 func init() {
 	gogorm.Init(gogorm.Config{
-		DataSource: "root:payda6b4eb0f3@tcp(test.gif-gif.com:30061)/admob?charset=utf8mb4&parseTime=True&loc=Local",
+		DataSource: "root:111111@tcp(127.0.0.1)/admob?charset=utf8mb4&parseTime=True&loc=Local",
 	})
 }
 
