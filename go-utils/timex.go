@@ -1,8 +1,10 @@
 package goutils
 
 import (
+	"errors"
 	"fmt"
 	"math"
+	"strings"
 	"time"
 )
 
@@ -236,4 +238,28 @@ func TimeRangeDates(startDate string, endDate string) []string {
 	}
 
 	return dates
+}
+
+// convertTo24HourFormat 将时间字符串转换为 0-23 小时制
+// timeStr: 时间字符串，例如 "3:04 PM"
+// 3:04 PM-->15:04 ,必须是这两个格式之一
+func ConvertAmPmHourTo24HourFormat(timeStr string, layout24Hour string) (string, error) {
+	// 定义时间解析格式
+	const layout12Hour = "3:04 PM"
+	if layout24Hour == "" {
+		layout24Hour = "15:04"
+	}
+
+	if !strings.HasPrefix(layout24Hour, "15") {
+		return "", errors.New("layout24Hour must start with 15 or 15:04")
+	}
+
+	// 解析时间字符串
+	t, err := time.Parse(layout12Hour, timeStr)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse time: %v", err)
+	}
+
+	// 格式化为 24 小时制
+	return t.Format(layout24Hour), nil
 }

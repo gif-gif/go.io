@@ -230,14 +230,22 @@ func fillMissingNumbers(nums []int64, max int64) []int64 {
 }
 
 func testTIme() {
-	a, b, c := goutils.LastHourStartAndEnd(true)
-	s := goutils.Ts2DateTime(b)
-	e := goutils.Ts2DateTime(c)
-	golog.WithTag("testTIme").Info(a, b, c)
-	golog.WithTag("testTIme").Info(s, e)
+	times := []string{
+		"9:00 PM", "9:00 PM", "10:00 PM", "10:00 PM", "8:00 PM", "8:00 PM",
+		"9:00 PM", "10:00 PM", "11:00 PM", "11:00 AM", "11:00 PM", "10:00 PM",
+		"12:00 AM", "11:00 AM", "9:00 PM", "11:00 PM", "6:00 PM", "1:00 PM",
+		"8:00 PM", "7:00 PM", "8:00 PM", "11:00 PM", "12:00 PM", "1:00 PM",
+		"12:00 PM", "5:00 PM", "3:00 PM", "12:00 AM", "3:00 PM", "7:00 PM",
+		"12:00 AM", "2:00 AM", "1:00 AM", "7:00 PM",
+	}
 
-	_, month, day := time.Now().Date()
-
-	golog.WithTag("testTIme").Info(int64(month), day)
+	for _, timeStr := range times {
+		converted, err := goutils.ConvertAmPmHourTo24HourFormat(timeStr, "15")
+		if err != nil {
+			fmt.Printf("Error converting time %s: %v\n", timeStr, err)
+			continue
+		}
+		fmt.Println(gconv.Int64(converted))
+	}
 
 }
