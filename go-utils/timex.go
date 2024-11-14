@@ -48,6 +48,11 @@ func Ts2Time(t int64) time.Time {
 	return time.Unix(t, 0)
 }
 
+func BeijingTimeLocation() *time.Location {
+	loc, _ := time.LoadLocation("Asia/Shanghai")
+	return loc
+}
+
 func GetChinaTomorrowAMSeconds(isBeijing bool) int64 {
 	now := GetTimeNow()
 	if isBeijing {

@@ -1,6 +1,7 @@
 package gofile
 
 import (
+	"bufio"
 	"fmt"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/go-utils"
@@ -156,6 +157,31 @@ func GetFileContent(filePath string) ([]byte, error) {
 	}
 
 	return body, nil
+}
+
+func ReadLines(filePath string, lineFunc func(line string) error) error {
+	// 打开文件
+	file, err := os.Open(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to open file: %v", err)
+	}
+	defer file.Close()
+	// 创建一个新的扫描器
+	scanner := bufio.NewScanner(file)
+	// 按行扫描文件
+	for scanner.Scan() {
+		line := scanner.Text()
+		e := lineFunc(line)
+		if e != nil {
+			return e
+		}
+	}
+	// 检查扫描过程中是否有错误
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("error while reading file: %v", err)
+	}
+
+	return nil
 }
 
 func GetFileContentString(filePath string) (string, error) {
