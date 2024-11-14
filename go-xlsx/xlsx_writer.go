@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// 扩展需要append to file 功能
 type XlsxWrite struct {
 	fh        *excelize.File
 	sheetName string
@@ -14,7 +15,7 @@ type XlsxWrite struct {
 	rows      []*[]interface{}
 }
 
-func New() *XlsxWrite {
+func NewWriter() *XlsxWrite {
 	return &XlsxWrite{
 		fh:        excelize.NewFile(),
 		sheetName: "Sheet1",
@@ -40,7 +41,11 @@ func (x *XlsxWrite) AppendRows(data [][]interface{}) *XlsxWrite {
 
 func (x *XlsxWrite) SetSheetName(sheetName string) *XlsxWrite {
 	x.sheetName = sheetName
-	x.fh.NewSheet(x.sheetName)
+	index, err := x.fh.NewSheet(x.sheetName)
+	if err != nil {
+		return nil
+	}
+	x.fh.SetActiveSheet(index)
 	return x
 }
 

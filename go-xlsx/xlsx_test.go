@@ -6,7 +6,7 @@ import (
 )
 
 func TestXlsxWrite(t *testing.T) {
-	w := New()
+	w := NewWriter()
 	w.SetSheetName("test")
 	w.titles = &[]string{"title1", "title2", "title3"}
 	var data [][]interface{}
@@ -17,5 +17,21 @@ func TestXlsxWrite(t *testing.T) {
 	err := w.Save2File("test.xlsx")
 	if err != nil {
 		golog.Error(err)
+	}
+}
+
+func TestCsvRead(t *testing.T) {
+	w, err := NewCsvReader("/Users/Jerry/Documents/my/test/data/all.csv")
+	if err != nil {
+		golog.Error(err)
+		return
+	}
+
+	err = w.ReadUTF16Line(func(record []string) {
+		golog.WithTag("record").Info(record)
+	})
+	if err != nil {
+		golog.Error(err)
+		return
 	}
 }
