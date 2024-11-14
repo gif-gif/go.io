@@ -156,7 +156,7 @@ func (c *CsvRead) ReadUTF16Line(lineDataFunc func(record []string)) error {
 	return nil
 }
 
-func (c *CsvRead) ReadGBKLine(lineDataFunc func(record []string)) error {
+func (c *CsvRead) ReadGBKLine(lineDataFunc func(record []string) error) error {
 	// 打开 CSV 文件
 	file, err := os.Open(c.FilePath)
 	if err != nil {
@@ -175,7 +175,10 @@ func (c *CsvRead) ReadGBKLine(lineDataFunc func(record []string)) error {
 			return fmt.Errorf("failed to read line: %v", err)
 		}
 		// 处理每一行数据
-		lineDataFunc(record)
+		e := lineDataFunc(record)
+		if e != nil {
+			return e
+		}
 	}
 
 	return nil
