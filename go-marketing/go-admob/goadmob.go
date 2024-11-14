@@ -68,6 +68,9 @@ type ReportReq struct {
 }
 
 type ResponseItem struct {
+	AppVersionName  string
+	Platform        string
+	Format          string
 	Date            string
 	AdUnit          string
 	Country         string
@@ -316,6 +319,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 		item := ResponseItem{}
 		row := response.Row
 		if row != nil {
+			//维度
 			for fieldName, value := range row.DimensionValues {
 				switch fieldName {
 				case FILTER_DATE:
@@ -327,9 +331,22 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 				case FILTER_COUNTRY:
 					item.Country = value.Value
 					break
+				case FILTER_APP_VERSION_NAME:
+					item.AppVersionName = value.Value
+					break
+				case FILTER_PLATFORM:
+					item.Platform = value.Value
+					break
+				case FILTER_AD_UNIT:
+					item.AdUnit = value.Value
+					break
+				case FILTER_FORMAT:
+					item.Format = value.Value
+					break
 				}
 			}
 
+			//指标
 			for fieldName, value := range row.MetricValues {
 				switch fieldName {
 				case AD_REQUESTS:
