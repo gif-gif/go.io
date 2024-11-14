@@ -49,6 +49,30 @@ func IsInArray[T any](arr []T, target T) bool {
 	return false
 }
 
+// 条件满足任意元素 exists func(target T) bool 返回true时返回true
+//
+// 适合判断数组中存储复杂对象，判断条件定义情况
+func IsInArrayX[T any](arr []T, exists func(target T) bool) bool {
+	for _, t := range arr {
+		if exists(t) {
+			return true
+		}
+	}
+	return false
+}
+
+// 条件满足任意元素 exists func(target *T) bool 返回true时返回true
+//
+// 适合判断数组中存储复杂对象，判断条件定义情况,数组元素是指针类型时用
+func IsInArrayXX[T any](arr []*T, exists func(target *T) bool) bool {
+	for _, t := range arr {
+		if exists(t) {
+			return true
+		}
+	}
+	return false
+}
+
 // 通用三目运算
 func IfNot[T any](isTrue bool, a, b T) T {
 	if isTrue {
