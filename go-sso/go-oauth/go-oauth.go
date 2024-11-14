@@ -76,12 +76,22 @@ func (c *GoOAuth) TokenSource(ctx context.Context) oauth2.TokenSource {
 }
 
 // 获取授权url
+//
+// 自定义参数
+//
+//	param1 := oauth2.SetAuthURLParam("param1", "value1")
+//	param2 := oauth2.SetAuthURLParam("param2", "value2")
 func (c *GoOAuth) AuthUrl(opts ...oauth2.AuthCodeOption) string {
 	url := c.OAuthConfig.AuthCodeURL(c.Config.State, opts...)
 	return url
 }
 
 // 获取token
+//
+// 自定义参数
+//
+//	param1 := oauth2.SetAuthURLParam("param1", "value1")
+//	param2 := oauth2.SetAuthURLParam("param2", "value2")
 func (c *GoOAuth) Exchange(ctx context.Context, authorizationCode string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
 	token, err := c.OAuthConfig.Exchange(ctx, authorizationCode, opts...)
 	if err != nil {
