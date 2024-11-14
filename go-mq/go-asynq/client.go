@@ -9,6 +9,7 @@ import (
 type ClientConfig struct {
 	goredis.Config
 	PoolSize int
+	Name     string
 }
 
 type GoAsynqClient struct {

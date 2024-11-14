@@ -10,6 +10,7 @@ import (
 )
 
 type ServerConfig struct {
+	Name string
 	goredis.Config
 	PoolSize    int
 	Concurrency int //default 10 指定要使用的并发工作线程数量
