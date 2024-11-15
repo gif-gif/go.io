@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	gofile "github.com/gif-gif/go.io/go-file"
+	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -11,13 +12,21 @@ import (
 	"os"
 )
 
-type CsvRead struct {
+type CsvReader struct {
 	FilePath string
 	Comma    rune //csv 列分割符 0 表示默认
+	file     *os.File
 }
 
+// 常用文件编码
+var (
+	UTF8  = simplifiedchinese.GBK
+	UTF16 = unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM)
+	GBK   = simplifiedchinese.GBK
+)
+
 // comma 默认传 ','
-func NewCsvReader(csvFile string, comma rune) (*CsvRead, error) {
+func NewCsvReader(csvFile string, comma rune) (*CsvReader, error) {
 	e, err := gofile.Exist(csvFile)
 	if err != nil {
 		return nil, err
@@ -25,72 +34,62 @@ func NewCsvReader(csvFile string, comma rune) (*CsvRead, error) {
 	if !e {
 		return nil, fmt.Errorf("file not exist")
 	}
-	return &CsvRead{
+	return &CsvReader{
 		FilePath: csvFile,
 		Comma:    comma,
 	}, nil
 }
 
-func (c *CsvRead) ReadGBKAll() ([][]string, error) {
+func (c *CsvReader) getReader(encoding encoding.Encoding) (*csv.Reader, error) {
 	// 打开 CSV 文件
 	file, err := os.Open(c.FilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file: %v", err)
 	}
-	defer file.Close()
 
-	reader := csv.NewReader(transform.NewReader(file, simplifiedchinese.GBK.NewDecoder()))
+	c.file = file
+
+	reader := csv.NewReader(transform.NewReader(file, encoding.NewDecoder()))
 	reader.Comma = c.Comma
-	// 读取所有记录
-	records, err := reader.ReadAll()
 
-	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %v", err)
-	}
-
-	return records, nil
+	return reader, nil
 }
 
-func (c *CsvRead) ReadUTF8All() ([][]string, error) {
+func (c *CsvReader) ReadGBKAll() ([][]string, error) {
 	// 打开 CSV 文件
-	file, err := os.Open(c.FilePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open file: %v", err)
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
-	reader.Comma = c.Comma
-	// 读取所有记录
-	records, err := reader.ReadAll()
-	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %v", err)
-	}
-
-	return records, nil
+	return c.ReadAll(GBK)
 }
 
-func (c *CsvRead) ReadUTF16All() ([][]string, error) {
+func (c *CsvReader) ReadUTF8All() ([][]string, error) {
 	// 打开 CSV 文件
-	file, err := os.Open(c.FilePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open file: %v", err)
-	}
-	defer file.Close()
+	return c.ReadAll(UTF8)
+}
 
+func (c *CsvReader) ReadUTF16All() ([][]string, error) {
+	return c.ReadAll(UTF16)
+}
+
+func (c *CsvReader) ReadUTF8Line(lineDataFunc func(record []string) error) error {
+	return c.ReadLine(UTF8, lineDataFunc)
+}
+
+func (c *CsvReader) ReadUTF16Line(lineDataFunc func(record []string) error) error {
 	// 创建 UTF-16 解码器
-	decoder := unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM).NewDecoder()
-	//utf16Reader := transform.NewReader(file, decoder)
+	return c.ReadLine(UTF16, lineDataFunc)
+}
 
-	// 读取所有内容到内存中
-	//utf8Data, err := ioutil.ReadAll(utf16Reader)
-	//if err != nil {
-	//	return nil, fmt.Errorf("failed to read file: %v", err)
-	//}
+func (c *CsvReader) ReadGBKLine(lineDataFunc func(record []string) error) error {
+	return c.ReadLine(GBK, lineDataFunc)
+}
 
-	// 创建 CSV 阅读器
-	reader := csv.NewReader(transform.NewReader(file, decoder))
-	reader.Comma = c.Comma
+func (c *CsvReader) ReadAll(encoding encoding.Encoding) ([][]string, error) {
+	// 打开 CSV 文件
+	// 创建 UTF-16 解码器
+	reader, err := c.getReader(encoding)
+	if err != nil {
+		return nil, err
+	}
+	defer c.file.Close()
 	// 读取所有记录
 	records, err := reader.ReadAll()
 	if err != nil {
@@ -99,84 +98,16 @@ func (c *CsvRead) ReadUTF16All() ([][]string, error) {
 	return records, nil
 }
 
-func (c *CsvRead) ReadUTF8Line(lineDataFunc func(record []string)) error {
+func (c *CsvReader) ReadLine(encoding encoding.Encoding, lineDataFunc func(record []string) error) error {
 	// 打开 CSV 文件
-	file, err := os.Open(c.FilePath)
+	reader, err := c.getReader(encoding)
 	if err != nil {
-		return fmt.Errorf("failed to open file: %v", err)
+		return err
 	}
-	defer file.Close()
-
-	// 创建 CSV 阅读器
-	reader := csv.NewReader(file)
-	reader.Comma = c.Comma
+	defer c.file.Close()
 	// 按行读取文件
 	for {
 		record, err := reader.Read()
-		if err != nil {
-			if err == io.EOF {
-				break // 文件读取完毕
-			}
-			return fmt.Errorf("failed to read line: %v", err)
-		}
-		// 处理每一行数据
-		lineDataFunc(record)
-	}
-
-	return nil
-}
-
-func (c *CsvRead) ReadUTF16Line(lineDataFunc func(record []string)) error {
-	// 打开 CSV 文件
-	file, err := os.Open(c.FilePath)
-	if err != nil {
-		return fmt.Errorf("failed to open file: %v", err)
-	}
-	defer file.Close()
-
-	// 创建 UTF-16 解码器
-	decoder := unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM).NewDecoder()
-	//utf16Reader := transform.NewReader(file, decoder)
-
-	// 读取所有内容到内存中
-	//utf8Data, err := ioutil.ReadAll(utf16Reader)
-	//if err != nil {
-	//	return nil, fmt.Errorf("failed to read file: %v", err)
-	//}
-
-	// 创建 CSV 阅读器
-	reader := csv.NewReader(transform.NewReader(file, decoder))
-	reader.Comma = c.Comma
-	// 按行读取文件
-	for {
-		record, err := reader.Read()
-		if err != nil {
-			if err == io.EOF {
-				break // 文件读取完毕
-			}
-			return fmt.Errorf("failed to read line: %v", err)
-		}
-		// 处理每一行数据
-		lineDataFunc(record)
-	}
-
-	return nil
-}
-
-func (c *CsvRead) ReadGBKLine(lineDataFunc func(record []string) error) error {
-	// 打开 CSV 文件
-	file, err := os.Open(c.FilePath)
-	if err != nil {
-		return fmt.Errorf("failed to open file: %v", err)
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(transform.NewReader(file, simplifiedchinese.GBK.NewDecoder()))
-	reader.Comma = c.Comma
-	// 按行读取文件
-	for {
-		record, err := reader.Read()
-
 		if err != nil {
 			if err == io.EOF {
 				break // 文件读取完毕
@@ -189,6 +120,84 @@ func (c *CsvRead) ReadGBKLine(lineDataFunc func(record []string) error) error {
 			return e
 		}
 	}
-
 	return nil
+}
+
+// 第一行作为字段名称，后续行数据转换为json数据,一行回调一个json数据
+func (c *CsvReader) ReadLineJson(encoding encoding.Encoding, lineDataFunc func(record map[string]string) error) error {
+	// 打开 CSV 文件
+	reader, err := c.getReader(encoding)
+	if err != nil {
+		return err
+	}
+	defer c.file.Close()
+	// 获取标题行
+	// 创建一个切片来保存 JSON 对象
+	// 遍历每一行（从第二行开始，因为第一行是标题）
+	record, err := reader.Read()
+	if err != nil {
+		return err
+	}
+	headers := record
+	// 遍历每一行（从第二行开始，因为第一行是标题）
+	// 按行读取文件
+	for {
+		record, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break // 文件读取完毕
+			}
+			return fmt.Errorf("failed to read line: %v", err)
+		}
+		// 处理每一行数据
+		row := make(map[string]string)
+		for i, value := range record {
+			row[headers[i]] = value
+		}
+
+		e := lineDataFunc(row)
+		if e != nil {
+			return e
+		}
+	}
+	return nil
+}
+
+// 第一行作为字段名称，后续行数据转换为json数据一次性返回所有数据
+func (c *CsvReader) ReadAllJson(encoding encoding.Encoding) ([]map[string]string, error) {
+	// 打开 CSV 文件
+	reader, err := c.getReader(encoding)
+	if err != nil {
+		return nil, err
+	}
+	defer c.file.Close()
+	// 读取 CSV 文件的所有内容
+	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read CSV file: %v", err)
+	}
+
+	// 检查 CSV 文件是否为空
+	if len(records) < 2 {
+		return nil, fmt.Errorf("CSV file does not contain enough data")
+	}
+
+	// 获取标题行
+	headers := records[0]
+
+	// 创建一个切片来保存 JSON 对象
+	var jsonData []map[string]string
+
+	// 遍历每一行（从第二行开始，因为第一行是标题）
+	for _, record := range records[1:] {
+		// 创建一个 map 来保存每一行的数据
+		row := make(map[string]string)
+		for i, value := range record {
+			row[headers[i]] = value
+		}
+		// 将 map 添加到 jsonData 切片中
+		jsonData = append(jsonData, row)
+	}
+
+	return jsonData, nil
 }
