@@ -41,7 +41,7 @@ func ReceiveFile(assetsDir string, file *multipart.FileHeader) (*FileReceiveResu
 	res := &FileReceiveResult{}
 	res.OriginalFile = originalPath
 	res.FileName = fullName
-
+	res.OriginalFileName = file.Filename
 	return res, nil
 }
 
@@ -78,6 +78,7 @@ func ReceiveChunkHandler(assetsDir string, chunkIndex int64, chunkMd5 string, fi
 	res := &FileReceiveResult{}
 	res.OriginalFile = chunkFilePath
 	res.FileName = fullName
+	res.OriginalFileName = file.Filename
 	return res, nil
 }
 

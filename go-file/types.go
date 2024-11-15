@@ -7,9 +7,10 @@ const (
 )
 
 type FileReceiveResult struct {
-	OriginalFile string
-	FileName     string
-	ChunkCount   int64
+	OriginalFile     string
+	FileName         string
+	OriginalFileName string
+	ChunkCount       int64
 }
 
 // fmt.Sprintf("%s.part%d", fileName, i)
