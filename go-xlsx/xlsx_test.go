@@ -21,7 +21,7 @@ func TestXlsxWrite(t *testing.T) {
 }
 
 func TestCsvRead(t *testing.T) {
-	w, err := NewCsvReader("/Users/Jerry/Documents/my/test/data/detail.csv")
+	w, err := NewCsvReader("/Users/Jerry/Documents/my/test/data/detail.csv", ',')
 	if err != nil {
 		golog.Error(err)
 		return
@@ -37,7 +37,7 @@ func TestCsvRead(t *testing.T) {
 }
 
 func TestCsvRead1(t *testing.T) {
-	w, err := NewCsvReader("/Users/Jerry/Documents/my/test/data/all.csv")
+	w, err := NewCsvReader("/Users/Jerry/Documents/my/test/data/all.csv", '\t')
 	if err != nil {
 		golog.Error(err)
 		return

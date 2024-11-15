@@ -13,9 +13,11 @@ import (
 
 type CsvRead struct {
 	FilePath string
+	Comma    rune //csv 列分割符 0 表示默认
 }
 
-func NewCsvReader(csvFile string) (*CsvRead, error) {
+// comma 默认传 ','
+func NewCsvReader(csvFile string, comma rune) (*CsvRead, error) {
 	e, err := gofile.Exist(csvFile)
 	if err != nil {
 		return nil, err
@@ -25,6 +27,7 @@ func NewCsvReader(csvFile string) (*CsvRead, error) {
 	}
 	return &CsvRead{
 		FilePath: csvFile,
+		Comma:    comma,
 	}, nil
 }
 
@@ -37,8 +40,10 @@ func (c *CsvRead) ReadGBKAll() ([][]string, error) {
 	defer file.Close()
 
 	reader := csv.NewReader(transform.NewReader(file, simplifiedchinese.GBK.NewDecoder()))
+	reader.Comma = c.Comma
 	// 读取所有记录
 	records, err := reader.ReadAll()
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %v", err)
 	}
@@ -55,6 +60,7 @@ func (c *CsvRead) ReadUTF8All() ([][]string, error) {
 	defer file.Close()
 
 	reader := csv.NewReader(file)
+	reader.Comma = c.Comma
 	// 读取所有记录
 	records, err := reader.ReadAll()
 	if err != nil {
@@ -84,6 +90,7 @@ func (c *CsvRead) ReadUTF16All() ([][]string, error) {
 
 	// 创建 CSV 阅读器
 	reader := csv.NewReader(transform.NewReader(file, decoder))
+	reader.Comma = c.Comma
 	// 读取所有记录
 	records, err := reader.ReadAll()
 	if err != nil {
@@ -102,7 +109,7 @@ func (c *CsvRead) ReadUTF8Line(lineDataFunc func(record []string)) error {
 
 	// 创建 CSV 阅读器
 	reader := csv.NewReader(file)
-
+	reader.Comma = c.Comma
 	// 按行读取文件
 	for {
 		record, err := reader.Read()
@@ -139,7 +146,7 @@ func (c *CsvRead) ReadUTF16Line(lineDataFunc func(record []string)) error {
 
 	// 创建 CSV 阅读器
 	reader := csv.NewReader(transform.NewReader(file, decoder))
-
+	reader.Comma = c.Comma
 	// 按行读取文件
 	for {
 		record, err := reader.Read()
@@ -165,9 +172,11 @@ func (c *CsvRead) ReadGBKLine(lineDataFunc func(record []string) error) error {
 	defer file.Close()
 
 	reader := csv.NewReader(transform.NewReader(file, simplifiedchinese.GBK.NewDecoder()))
+	reader.Comma = c.Comma
 	// 按行读取文件
 	for {
 		record, err := reader.Read()
+
 		if err != nil {
 			if err == io.EOF {
 				break // 文件读取完毕
