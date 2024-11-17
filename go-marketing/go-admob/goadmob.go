@@ -6,12 +6,10 @@ import (
 	gohttp "github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
 	gooauth "github.com/gif-gif/go.io/go-sso/go-oauth"
-	"github.com/gogf/gf/util/gconv"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/admob/v1"
 	"google.golang.org/api/option"
-	"math"
 	"time"
 )
 
@@ -76,10 +74,10 @@ type ResponseItem struct {
 	Country         string
 	AdRequest       int64
 	Clicks          int64
-	Earnings        int64 //美分
+	Earnings        int64 // 美分*10000. 这里如果 返回美分会损失精度
 	Impressions     int64
 	ImpressionCtr   float64
-	ImpressionRpm   int64 //美分
+	ImpressionRpm   float64 //美分
 	MatchedRequests int64
 	MatchRate       float64
 	ShowRate        float64
@@ -356,7 +354,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 					item.Clicks = value.IntegerValue
 					break
 				case ESTIMATED_EARNINGS:
-					item.Earnings = value.MicrosValue / 10000
+					item.Earnings = value.MicrosValue
 					break
 				case IMPRESSIONS:
 					item.Impressions = value.IntegerValue
@@ -365,7 +363,7 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 					item.ImpressionCtr = value.DoubleValue
 					break
 				case IMPRESSION_RPM:
-					item.ImpressionRpm = gconv.Int64(math.Floor(value.DoubleValue * 100))
+					item.ImpressionRpm = value.DoubleValue
 					break
 				case MATCHED_REQUESTS:
 					item.MatchedRequests = value.IntegerValue

@@ -33,11 +33,11 @@ func main() {
 }
 
 func TestCsvRead1(t *testing.T) {
-	dateTime := "2024-11-10" + " " + "1:59:59"
+	dateTime := "2024-11-10" + "   " + "1:59:59"
 	endTs := goutils.DateTime2TsLocal(dateTime, goutils.BeijingTimeLocation())
 	golog.Info(endTs)
 
-	dateTime = "2024-11-10" + " " + "01:59:59"
+	dateTime = "2024-11-10" + "       " + "01:59:59"
 	endTs = goutils.DateTime2TsLocal(dateTime, goutils.BeijingTimeLocation())
 	golog.Info(endTs)
 }
