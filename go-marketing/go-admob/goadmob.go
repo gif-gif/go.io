@@ -83,6 +83,11 @@ type ResponseItem struct {
 	ShowRate        float64
 }
 
+type ReportResponse struct {
+	Items         []*ResponseItem
+	NextPageToken string
+}
+
 // accessToken 会在60分钟后过期
 type GoAdmob struct {
 	ctx            context.Context
@@ -210,7 +215,7 @@ func (c *GoAdmob) RefreshToken() error {
 //
 // GROUP BY DATE, APP, COUNTRY
 // ORDER BY APP ASC, CLICKS DESC;
-func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
+func (c *GoAdmob) GetReport(req *ReportReq) (*ReportResponse, error) {
 	if req.MaxReportRows == 0 {
 		return nil, errors.New("MaxReportRows is empty")
 	}
@@ -379,12 +384,15 @@ func (c *GoAdmob) GetReport(req *ReportReq) ([]*ResponseItem, error) {
 			list = append(list, &item)
 		}
 	}
-
-	return list, nil
+	response := &ReportResponse{
+		Items:         list,
+		NextPageToken: "",
+	}
+	return response, nil
 }
 
 // 获取账号下所有APP信息
-func (c *GoAdmob) GetApps() (*admob.ListAppsResponse, error) {
+func (c *GoAdmob) GetApps(pageSize int64, nextPageToken string) (*admob.ListAppsResponse, error) {
 	if c.Config.AccountId == "" {
 		return nil, errors.New("GetApps accountId is empty")
 	}
@@ -400,7 +408,7 @@ func (c *GoAdmob) GetApps() (*admob.ListAppsResponse, error) {
 		return nil, errors.New("GetApps sAdmobService.Accounts.Apps is empty")
 	}
 
-	res, err := c.AdmobService.Accounts.Apps.List("accounts/" + c.Config.AccountId).Do()
+	res, err := c.AdmobService.Accounts.Apps.List("accounts/" + c.Config.AccountId).PageSize(pageSize).PageToken(nextPageToken).Do()
 	if err != nil {
 		return nil, err
 	}
@@ -409,7 +417,7 @@ func (c *GoAdmob) GetApps() (*admob.ListAppsResponse, error) {
 }
 
 // 获取当前appId下所有的广告信息
-func (c *GoAdmob) GetAdUnits() (*admob.ListAdUnitsResponse, error) {
+func (c *GoAdmob) GetAdUnits(pageSize int64, nextPageToken string) (*admob.ListAdUnitsResponse, error) {
 	if c.Config.AccountId == "" {
 		return nil, errors.New("accountId is empty")
 	}
@@ -425,7 +433,7 @@ func (c *GoAdmob) GetAdUnits() (*admob.ListAdUnitsResponse, error) {
 		return nil, errors.New("GetAdUnits sAdmobService.Accounts.AdUnits is empty")
 	}
 
-	res, err := c.AdmobService.Accounts.AdUnits.List("accounts/" + c.Config.AccountId).Do()
+	res, err := c.AdmobService.Accounts.AdUnits.List("accounts/" + c.Config.AccountId).PageSize(pageSize).PageToken(nextPageToken).Do()
 	if err != nil {
 		return nil, err
 	}
