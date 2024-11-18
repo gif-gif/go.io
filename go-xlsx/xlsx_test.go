@@ -27,8 +27,9 @@ func TestCsvRead(t *testing.T) {
 		return
 	}
 
-	err = w.ReadUTF16Line(func(record []string) {
+	err = w.ReadUTF16Line(func(record []string) error {
 		golog.WithTag("record").Info(record)
+		return nil
 	})
 	if err != nil {
 		golog.Error(err)
@@ -42,12 +43,15 @@ func TestCsvRead1(t *testing.T) {
 		golog.Error(err)
 		return
 	}
-
-	data, err := w.ReadUTF16All()
+	line := 0
+	err = w.ReadLineJson(UTF16, func(record map[string]string) error {
+		golog.WithTag("record").Info(record)
+		line++
+		return nil
+	})
 	if err != nil {
 		golog.Error(err)
 		return
 	}
-
-	golog.WithTag("data").Info(data)
+	golog.Info(line)
 }
