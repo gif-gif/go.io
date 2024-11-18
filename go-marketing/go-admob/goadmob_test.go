@@ -24,7 +24,7 @@ func TestAdmobApps(t *testing.T) {
 		return
 	}
 
-	apps, err := Default().GetApps()
+	apps, err := Default().GetApps(100, "")
 	if err != nil {
 		golog.WithTag("goadmob").Error(err.Error())
 		return
@@ -84,7 +84,7 @@ func TestAdmobAdUnits(t *testing.T) {
 		return
 	}
 
-	apps, err := Default().GetAdUnits()
+	apps, err := Default().GetAdUnits(1000, "")
 	if err != nil {
 		golog.WithTag("goadmob").Error(err.Error())
 		return

@@ -66,21 +66,21 @@ type ReportReq struct {
 }
 
 type ResponseItem struct {
-	AppVersionName  string
-	Platform        string
-	Format          string
-	Date            string
-	AdUnit          string
-	Country         string
-	AdRequest       int64
-	Clicks          int64
-	Earnings        int64 // 美分*10000. 这里如果 返回美分会损失精度
-	Impressions     int64
-	ImpressionCtr   float64
-	ImpressionRpm   float64 //美分
-	MatchedRequests int64
-	MatchRate       float64
-	ShowRate        float64
+	AppVersionName  string  `json:"app_version_name"`
+	Platform        string  `json:"platform"`
+	Format          string  `json:"format"`
+	Date            string  `json:"date"`
+	AdUnit          string  `json:"ad_unit"`
+	Country         string  `json:"country"`
+	AdRequest       int64   `json:"ad_requests"`
+	Clicks          int64   `json:"clicks"`
+	Earnings        int64   `json:"earnings"` // 美分*10000. 这里如果 返回美分会损失精度
+	Impressions     int64   `json:"impressions"`
+	ImpressionCtr   float64 `json:"impression_ctr"`
+	ImpressionRpm   float64 `json:"Impression_rpm"` //美分
+	MatchedRequests int64   `json:"matched_requests"`
+	MatchRate       float64 `json:"match_rate"`
+	ShowRate        float64 `json:"show_rate"`
 }
 
 type ReportResponse struct {
