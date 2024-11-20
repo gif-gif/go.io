@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	goxlsx "github.com/gif-gif/go.io/go-xlsx"
 	"testing"
+	"time"
 )
 
 // readCSVAndConvertToJSON 读取 CSV 文件并转换为 JSON 数据
@@ -33,11 +33,16 @@ func main() {
 }
 
 func TestCsvRead1(t *testing.T) {
-	dateTime := "2024-11-10" + "   " + "1:59:59"
-	endTs := goutils.DateTime2TsLocal(dateTime, goutils.BeijingTimeLocation())
-	golog.Info(endTs)
+	tt, err := goutils.ConvertToGMTTime("2021-08-06T07:00:00+0000")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// 将时间对象转换为 UTC 时区
+	utcTime := tt.UTC()
 
-	dateTime = "2024-11-10" + "       " + "01:59:59"
-	endTs = goutils.DateTime2TsLocal(dateTime, goutils.BeijingTimeLocation())
-	golog.Info(endTs)
+	// 格式化为 GMT 时间字符串
+	gmtTimeStr := utcTime.Format(time.DateOnly)
+
+	fmt.Println("当前时间的 GMT 时间:", gmtTimeStr, utcTime.Hour())
 }

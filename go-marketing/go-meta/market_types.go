@@ -45,25 +45,6 @@ const (
 	ApiRefreshToken     = "/oauth/access_token"
 )
 
-type Paging struct {
-	Limit  int    `json:"limit,optional"`
-	Before string `json:"before,optional"`
-	After  string `json:"after,optional"`
-}
-
-// 通用返回数据结构
-type BaseResponse[T any] struct {
-	Paging struct {
-		Cursors struct {
-			Before string `json:"before,optional"`
-			After  string `json:"after,optional"`
-		} `json:"cursors,optional"`
-		Next string `json:"next,optional"`
-	} `json:"paging,optional"`
-
-	Data T `json:"data,optional"`
-}
-
 // 简要数据项（冗余：如：获取广告系列数据时 CampaignId，AdsetId 都为空 ）
 type AllDataItem struct {
 	Name            string `json:"name,optional"`

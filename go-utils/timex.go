@@ -268,3 +268,9 @@ func ConvertAmPmHourTo24HourFormat(timeStr string, layout24Hour string) (string,
 	// 格式化为 24 小时制
 	return t.Format(layout24Hour), nil
 }
+
+// 格式为： 2021-08-06T07:00:00+0000 To time.Time
+func ConvertToGMTTime(gmtTime string) (time.Time, error) {
+	t, err := time.Parse("2006-01-02T15:04:05-0700", gmtTime)
+	return t, err
+}

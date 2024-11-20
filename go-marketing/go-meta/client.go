@@ -6,7 +6,7 @@ import (
 	golog "github.com/gif-gif/go.io/go-log"
 )
 
-var __clients = map[string]*Market{}
+var __clients = map[string]*GoMeta{}
 
 // 可以一次初始化多个实例或者 多次调用初始化多个实例
 func Init(ctx context.Context, configs ...Config) (err error) {
@@ -17,7 +17,7 @@ func Init(ctx context.Context, configs ...Config) (err error) {
 		}
 
 		if __clients[name] != nil {
-			return errors.New("Market [" + name + "] already exists")
+			return errors.New("GoMeta [" + name + "] already exists")
 		}
 
 		__clients[name] = New(conf)
@@ -26,7 +26,7 @@ func Init(ctx context.Context, configs ...Config) (err error) {
 	return
 }
 
-func GetClient(names ...string) *Market {
+func GetClient(names ...string) *GoMeta {
 	name := "default"
 	if l := len(names); l > 0 {
 		name = names[0]
@@ -48,7 +48,7 @@ func DelClient(names ...string) {
 	}
 }
 
-func Default() *Market {
+func Default() *GoMeta {
 	if cli, ok := __clients["default"]; ok {
 		return cli
 	}
@@ -59,7 +59,7 @@ func Default() *Market {
 		}
 	}
 
-	golog.WithTag("Market").Error("no default Market client")
+	golog.WithTag("GoMeta").Error("no default GoMeta client")
 
 	return nil
 }

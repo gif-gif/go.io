@@ -1,4 +1,4 @@
 .idea
 logs
 .pid
-go-test/test1
+go-test

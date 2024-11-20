@@ -1,5 +1,9 @@
 # Google admob data Api
 
+## 文档地址
+- https://developers.google.com/admob/api/release-notes?hl=zh-cn
+- https://developers.google.com/admob/api/v1/how-tos/authorizing?hl=zh-cn
+
 ## Admob API 授权
 官方调试平台（授权 获取Token 访问）
 ```json 

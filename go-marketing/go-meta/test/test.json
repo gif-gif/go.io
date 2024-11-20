@@ -1,0 +1,137 @@
+{
+  "data": [
+    {
+      "query_id": "531234567890123456789012345683d6",
+      "results": [
+        {
+          "time": "2021-08-06T07:00:00+0000",
+          "metric": "fb_ad_network_imp",
+          "breakdowns": [
+            {
+              "key": "placement",
+              "value": "123456789012345"
+            },
+            {
+              "key": "country",
+              "value": "AE"
+            }
+          ],
+          "value": "1200"
+        },
+        {
+          "time": "2021-08-06T07:00:00+0000",
+          "metric": "fb_ad_network_imp",
+          "breakdowns": [
+            {
+              "key": "placement",
+              "value": "123456789012345"
+            },
+            {
+              "key": "country",
+              "value": "AU"
+            }
+          ],
+          "value": "35"
+        },
+        {
+          "time": "2021-08-06T07:00:00+0000",
+          "metric": "fb_ad_network_revenue",
+          "breakdowns": [
+            {
+              "key": "placement",
+              "value": "123456789012345"
+            },
+            {
+              "key": "country",
+              "value": "AE"
+            }
+          ],
+          "value": "21.212345"
+        },
+        {
+          "time": "2021-08-06T07:00:00+0000",
+          "metric": "fb_ad_network_request",
+          "breakdowns": [
+            {
+              "key": "placement",
+              "value": "123456789012345"
+            },
+            {
+              "key": "country",
+              "value": "AD"
+            }
+          ],
+          "value": "1"
+        },
+        {
+          "time": "2021-08-06T07:00:00+0000",
+          "metric": "fb_ad_network_request",
+          "breakdowns": [
+            {
+              "key": "placement",
+              "value": "123456789012345"
+            },
+            {
+              "key": "country",
+              "value": "AE"
+            }
+          ],
+          "value": "12"
+        },
+        {
+          "time": "2021-08-06T07:00:00+0000",
+          "metric": "fb_ad_network_click",
+          "breakdowns": [
+            {
+              "key": "placement",
+              "value": "123456789012345"
+            },
+            {
+              "key": "country",
+              "value": "AE"
+            }
+          ],
+          "value": "1"
+        },
+        {
+          "time": "2021-08-06T07:00:00+0000",
+          "metric": "fb_ad_network_click",
+          "breakdowns": [
+            {
+              "key": "placement",
+              "value": "123456789012345"
+            },
+            {
+              "key": "country",
+              "value": "CA"
+            }
+          ],
+          "value": "2"
+        }
+      ],
+      "omitted_results": [
+        {
+          "time": "2021-08-06T07:00:00+0000",
+          "metric": "fb_ad_network_revenue",
+          "breakdowns": [
+            {
+              "key": "placement",
+              "value": "123456789012345"
+            },
+            {
+              "key": "country",
+              "value": "AU"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "paging": {
+    "cursors": {
+      "before": "MAZDZD",
+      "after": "MQZDZD"
+    },
+    "next": "https://graph.facebook.com/v10.0/142440604406900/adnetworkanalytics?access_token=<ACCESS_TOKEN>&since=2021-08-06&until=2021-08-06&breakdowns=%5B%22placement%22%2C%22country%22%5D&limit=2&metrics=%5B%22fb_ad_network_request%22%2C%22fb_ad_network_imp%22%2C%22fb_ad_network_click%22%2C%22fb_ad_network_revenue%22%5D&after=MQZDZD"
+  }
+}
