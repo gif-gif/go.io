@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type ResponseItem struct {
+type AudienceResponseItem struct {
 	AppVersionName  string  `json:"app_version_name"`
 	Platform        string  `json:"platform"`
 	Format          string  `json:"format"`
@@ -30,13 +30,13 @@ type ResponseItem struct {
 	ShowRate        float64 `json:"show_rate"`
 }
 
-type ReportResponse struct {
-	Items         []*ResponseItem
+type AudienceReportResponse struct {
+	Items         []*AudienceResponseItem
 	NextPageToken string
 }
 
 // <ID> 是您的 Meta 企业编号、资产编号或应用编号
-func (m *GoMeta) GetMetaReport(req *AudienceDataRequest, ID string) (*AudienceDataResponse, error) {
+func (m *GoMeta) GetMetaAudienceReport(req *AudienceDataRequest, ID string) (*AudienceDataResponse, error) {
 	if req.Limit > limitMax {
 		return nil, fmt.Errorf("最大查询不能超过：" + gconv.String(limitMax) + "条")
 	}
@@ -56,12 +56,12 @@ func (m *GoMeta) GetMetaReport(req *AudienceDataRequest, ID string) (*AudienceDa
 	return result, nil
 }
 
-func (m *GoMeta) GetReport(req *AudienceDataRequest, ID string) (*ReportResponse, error) {
-	rst, err := m.GetMetaReport(req, ID)
+func (m *GoMeta) GetAudienceReport(req *AudienceDataRequest, ID string) (*AudienceReportResponse, error) {
+	rst, err := m.GetMetaAudienceReport(req, ID)
 	if err != nil {
 		return nil, err
 	}
-	res := ReportResponse{}
+	res := AudienceReportResponse{}
 	rowsData := make(map[string]map[string]string) //一行数据, 列转行
 	for _, item := range rst.Data {
 		for _, result := range item.Results {
@@ -83,7 +83,7 @@ func (m *GoMeta) GetReport(req *AudienceDataRequest, ID string) (*ReportResponse
 	}
 
 	for rowsKey, value := range rowsData {
-		vo := ResponseItem{}
+		vo := AudienceResponseItem{}
 		keys := strings.Split(rowsKey, "-")
 		for i, key := range keys {
 			if i == 0 {

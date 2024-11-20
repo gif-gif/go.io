@@ -48,7 +48,7 @@ func (m *GoMeta) DecryptEcpms(appId string, encryptedEcpms []string) (*Encrypted
 }
 
 // 某个商户下所有账号信息 账号余额，状态等等
-func (m *GoMeta) GetAccountsByBusinessId(businessId string, pageSize int) (*AccountResponse, error) {
+func (m *GoMeta) GetMarketAccountsByBusinessId(businessId string, pageSize int) (*AccountResponse, error) {
 	if pageSize == 0 {
 		pageSize = 10000
 	}
@@ -76,7 +76,7 @@ func (m *GoMeta) GetAccountsByBusinessId(businessId string, pageSize int) (*Acco
 }
 
 // all data -------------------------------
-func (m *GoMeta) GetAllDataByAccountId(req *RequestData, accountId string) (*AllDataResponse, error) {
+func (m *GoMeta) GetMarketAllDataByAccountId(req *RequestData, accountId string) (*AllDataResponse, error) {
 	api := m.Config.currentVersionBaseApi + ApiAccountAdsets
 	api = fmt.Sprintf(api, accountId)
 	req = m.handleRequest(req)
@@ -96,7 +96,7 @@ func (m *GoMeta) GetAllDataByAccountId(req *RequestData, accountId string) (*All
 }
 
 // 根据数据类型获取某个详情，如：广告组详情 广告详情  -------------------------------
-func (m *GoMeta) GetDetailByDataId(req *RequestData, dataId string) (*DataDetailResponse, error) {
+func (m *GoMeta) GetMarketDetailByDataId(req *RequestData, dataId string) (*DataDetailResponse, error) {
 	api := m.Config.currentVersionBaseApi + ApiDataDetails
 	api = fmt.Sprintf(api, dataId)
 
@@ -120,7 +120,7 @@ func (m *GoMeta) GetDetailByDataId(req *RequestData, dataId string) (*DataDetail
 
 // 某个计划或者广告组所有详情数据以 国家小时为纬度的数据
 // res.Paging.Cursors.After 通过这个参数重新请求下一页数据
-func (m *GoMeta) GetDetailsDataForCountry(outlineItem *AllDataItem, startDate, endDate string, pageSize int) (*DataDetailResponse, error) {
+func (m *GoMeta) GetMarketDetailsDataForCountry(outlineItem *AllDataItem, startDate, endDate string, pageSize int) (*DataDetailResponse, error) {
 	req := &RequestData{
 		Fields:      adFields,
 		AccessToken: m.Config.AccessToken,
@@ -130,7 +130,7 @@ func (m *GoMeta) GetDetailsDataForCountry(outlineItem *AllDataItem, startDate, e
 		Breakdowns:  "['country']", //默认以国家纬度数据请求
 	}
 
-	res, err := m.GetDetailByDataId(req, outlineItem.Id)
+	res, err := m.GetMarketDetailByDataId(req, outlineItem.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (m *GoMeta) GetDetailsDataForCountry(outlineItem *AllDataItem, startDate, e
 }
 
 // 概要数据加载，下一页数据 res.Paging.Cursors.After
-func (m *GoMeta) GetAccountAdSetsOutline(accountId string, startDate, endDate string, pageSize int) (*AllDataResponse, error) {
+func (m *GoMeta) GetMarketAccountAdSetsOutline(accountId string, startDate, endDate string, pageSize int) (*AllDataResponse, error) {
 	req := &RequestData{
 		Fields:      allDataFields,
 		AccessToken: m.Config.AccessToken,
@@ -148,7 +148,7 @@ func (m *GoMeta) GetAccountAdSetsOutline(accountId string, startDate, endDate st
 		Limit:       pageSize,
 	}
 
-	res, err := m.GetAllDataByAccountId(req, accountId)
+	res, err := m.GetMarketAllDataByAccountId(req, accountId)
 	if err != nil {
 		return nil, err
 	}

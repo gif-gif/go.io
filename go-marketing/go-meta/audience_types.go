@@ -55,6 +55,23 @@ const (
 	Metrics_AD_NETWORK_SHOW_RATE        = "fb_ad_network_show_rate"        // 展示数除以填充请求数
 )
 
+var DefaultAudienceMetrics = []string{
+	Metrics_AD_NETWORK_IMP,
+	Metrics_AD_NETWORK_REQUEST,
+	Metrics_AD_NETWORK_CLICK,
+	Metrics_AD_NETWORK_CPM,
+	Metrics_AD_NETWORK_CTR,
+	Metrics_AD_NETWORK_REVENUE,
+	Metrics_AD_NETWORK_FILL_RATE,
+	Metrics_AD_NETWORK_SHOW_RATE,
+	Metrics_AD_NETWORK_BIDDING_REQUEST,
+	Metrics_AD_NETWORK_BIDDING_RESPONSE,
+	Metrics_AD_NETWORK_BIDDING_WIN_RATE,
+	Metrics_AD_NETWORK_BIDDING_BID_RATE,
+	Metrics_AD_NETWORK_NO_FILL,
+	Metrics_AD_NETWORK_NO_BID,
+}
+
 // ResponseData 数据
 type AudienceData struct {
 	QueryId string `json:"query_id"`
