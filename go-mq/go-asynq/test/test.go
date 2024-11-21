@@ -7,7 +7,6 @@ import (
 	golog "github.com/gif-gif/go.io/go-log"
 	goasynq "github.com/gif-gif/go.io/go-mq/go-asynq"
 	"github.com/gif-gif/go.io/go-mq/go-asynq/test/tasks"
-	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/hibiken/asynq"
 	"log"
 	"time"
@@ -16,9 +15,7 @@ import (
 const redisAddr = "127.0.0.1:6379"
 
 func main() {
-	goutils.AsyncFunc(func() {
-		serverTest()
-	})
+	serverTest()
 	clientAsynq()
 	<-gocontext.Cancel().Done()
 }
@@ -54,6 +51,9 @@ func clientAsynq() {
 	cron.SecondX(nil, 1, func() { //for test time
 		n++
 		golog.WithTag("SecondX").Info(n)
+		if n > 10 {
+			cron.Stop()
+		}
 	})
 }
 

@@ -62,10 +62,10 @@ func New(config Config) *GoMeta {
 }
 
 // 刷新token接口
-func (m *GoMeta) RefreshToken(clientId string, clientSecret string) (*TokenResponse, error) {
+func (m *GoMeta) RefreshToken() (*TokenResponse, error) {
 	req := &ApiRefreshTokenRequest{
-		ClientId:        clientId,
-		ClientSecret:    clientSecret,
+		ClientId:        m.Config.ClientId,
+		ClientSecret:    m.Config.ClientSecret,
 		GrantType:       "fb_exchange_token",
 		FbExchangeToken: m.Config.AccessToken,
 	}
