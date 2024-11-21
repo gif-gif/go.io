@@ -7,6 +7,11 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
+// 1美元=1000000微分
+const (
+	DOLLAR_UNIT = 1000000
+)
+
 type Paging struct {
 	Limit  int    `json:"limit,optional"`
 	Before string `json:"before,optional"`

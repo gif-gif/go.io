@@ -21,7 +21,7 @@ type AudienceResponseItem struct {
 	Country         string  `json:"country"`
 	AdRequest       int64   `json:"ad_requests"`
 	Clicks          int64   `json:"clicks"`
-	Earnings        int64   `json:"earnings"` // 美分*10000. 这里如果 返回美分会损失精度
+	Earnings        int64   `json:"earnings"` // 1美元=1000000微分,美分*10000. 这里如果 返回美分会损失精度
 	Impressions     int64   `json:"impressions"`
 	ImpressionCtr   float64 `json:"impression_ctr"`
 	ImpressionRpm   float64 `json:"Impression_rpm"` //美元
@@ -117,7 +117,7 @@ func (m *GoMeta) GetAudienceReport(req *AudienceDataRequest, ID string) (*Audien
 		for metric, v := range value {
 			switch metric {
 			case Metrics_AD_NETWORK_REVENUE:
-				vo.Earnings = gconv.Int64(gconv.Float64(v) * 1000000) //1美元=1000000微分, market api 统一返回格式
+				vo.Earnings = gconv.Int64(gconv.Float64(v) * DOLLAR_UNIT) //1美元=1000000微分, market api 统一返回格式
 				break
 			case Metrics_AD_NETWORK_CPM:
 				vo.ImpressionRpm = gconv.Float64(v)
