@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/rand"
 	"reflect"
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -269,4 +270,19 @@ func BeforePage(page int64) int64 {
 		before = -1
 	}
 	return before
+}
+
+// 是不是数字
+func IsNumeric(str string) bool {
+	re := regexp.MustCompile(`^[0-9]+(\.[0-9]+)?$`)
+	// 使用正则表达式匹配字符串
+	ok := re.MatchString(str)
+	return ok
+}
+
+func IsInt(str string) bool {
+	re := regexp.MustCompile("^[0-9]+$")
+	// 使用正则表达式匹配字符串
+	ok := re.MatchString(str)
+	return ok
 }

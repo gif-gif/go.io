@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -273,4 +274,13 @@ func ConvertAmPmHourTo24HourFormat(timeStr string, layout24Hour string) (string,
 func ConvertToGMTTime(gmtTime string) (time.Time, error) {
 	t, err := time.Parse("2006-01-02T15:04:05-0700", gmtTime)
 	return t, err
+}
+
+// 判断是不是 2024-11-22 4 格式的时间串
+func IsValidDateTime(str string) bool {
+	// 定义日期时间格式的正则表达式，忽略多余空格
+	re := regexp.MustCompile(`^\d{4}-\d{2}-\d{2}\s*\d$`)
+	// 使用正则表达式匹配字符串
+	isValidFormat := re.MatchString(strings.TrimSpace(str))
+	return isValidFormat
 }
