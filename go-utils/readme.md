@@ -7,7 +7,6 @@
 - SHA1、SHA256、HMacMd5、HMacSha1、SHAWithRSA
 - Base64Encode、Base64Decode
 - SHAWithRSA
-- AESECBEncrypt、AESECBDecrypt、AESCBCEncrypt、AESCBCDecrypt
 
 #### email
 - HideEmail
@@ -59,7 +58,7 @@
 #### password
 - func BcryptHash(password string) string // BcryptHash 使用 bcrypt 对密码进行加密
 - func BcryptCheck(password, hash string) bool  // BcryptCheck 对比明文密码和数据库的哈希值
--func ValidPassword(str string) (msg string, matched bool) { //至少一位数字、大小字母,且长度6-20位
+- func ValidPassword(str string) (msg string, matched bool) { //至少一位数字、大小字母,且长度6-20位
 - func ValidPasswordV2(str string) (msg string, matched bool) { //至少一位数字、大小字母和特殊字符,且长度6-20位
 
 #### time 时间
