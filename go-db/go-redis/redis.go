@@ -40,21 +40,6 @@ func GetClient(names ...string) *GoRedis {
 		return cli
 	}
 	return nil
-
-	//if l := len(names); l > 0 {
-	//	name := names[0]
-	//	if cli, ok := __clients[name]; ok {
-	//		return cli
-	//	}
-	//	return nil
-	//} else {
-	//	if l := len(__clients); l == 1 {
-	//		for _, cli := range __clients {
-	//			return cli
-	//		}
-	//	}
-	//	return nil
-	//}
 }
 
 func DelClient(names ...string) {
