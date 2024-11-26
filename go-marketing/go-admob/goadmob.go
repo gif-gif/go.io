@@ -440,3 +440,18 @@ func (c *GoAdmob) GetAdUnits(pageSize int64, nextPageToken string) (*admob.ListA
 
 	return res, nil
 }
+
+func (c *GoAdmob) GetAccountInfo() (*admob.PublisherAccount, error) {
+	if c.Config.AccountId == "" {
+		return nil, errors.New("accountId is empty")
+	}
+	if c.AdmobService == nil {
+		return nil, errors.New("GetAccountInfo AdmobService is empty")
+	}
+
+	if c.AdmobService.Accounts == nil {
+		return nil, errors.New("GetAccountInfo AdmobService.Accounts is empty")
+	}
+
+	return c.AdmobService.Accounts.Get("accounts/" + c.Config.AccountId).Do()
+}

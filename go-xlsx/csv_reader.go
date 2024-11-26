@@ -14,15 +14,22 @@ import (
 
 type CsvReader struct {
 	FilePath string
-	Comma    rune //csv 列分割符 0 表示默认
+	Comma    rune //csv 列分割符
 	file     *os.File
 }
 
 // 常用文件编码
+// unicode.UTF8,
+// unicode.UTF16(BigEndian, UseBOM),
+// unicode.UTF16(BigEndian, IgnoreBOM),
+// unicode.UTF16(LittleEndian, IgnoreBOM),
+// 常用文件编码需要用
 var (
-	UTF8  = simplifiedchinese.GBK
+	UTF8    = unicode.UTF8
+	UTF8BOM = unicode.UTF8BOM
+	GBK     = simplifiedchinese.GBK
+	//UTF16 有很多种 参考 unicode包
 	UTF16 = unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM)
-	GBK   = simplifiedchinese.GBK
 )
 
 // comma 默认传 ','

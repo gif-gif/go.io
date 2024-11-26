@@ -38,13 +38,13 @@ func TestCsvRead(t *testing.T) {
 }
 
 func TestCsvRead1(t *testing.T) {
-	w, err := NewCsvReader("/Users/Jerry/Documents/my/test/data/all.csv", '\t')
+	w, err := NewCsvReader("/Users/Jerry/Documents/my/test/meta/meta.csv", ',')
 	if err != nil {
 		golog.Error(err)
 		return
 	}
 	line := 0
-	err = w.ReadLineJson(UTF16, func(record map[string]string) error {
+	err = w.ReadLineJson(UTF8, func(record map[string]string) error {
 		golog.WithTag("record").Info(record)
 		line++
 		return nil
