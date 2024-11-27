@@ -8,12 +8,12 @@ import (
 	"github.com/olivere/elastic/v7"
 )
 
-type client struct {
+type GoEs struct {
 	cli *elastic.Client
 	ctx context.Context
 }
 
-func New(conf Config, options ...elastic.ClientOptionFunc) (cli *client, err error) {
+func New(conf Config, options ...elastic.ClientOptionFunc) (cli *GoEs, err error) {
 	options = append(options,
 		// 将sniff设置为false后，便不会自动转换地址
 		elastic.SetSniff(false),
@@ -28,7 +28,7 @@ func New(conf Config, options ...elastic.ClientOptionFunc) (cli *client, err err
 		options = append(options, elastic.SetInfoLog(eslog.Logger{golog.INFO}))
 	}
 
-	cli = &client{
+	cli = &GoEs{
 		ctx: context.Background(),
 	}
 
@@ -57,6 +57,6 @@ func New(conf Config, options ...elastic.ClientOptionFunc) (cli *client, err err
 	return
 }
 
-func (cli *client) Client() *elastic.Client {
+func (cli *GoEs) Client() *elastic.Client {
 	return cli.cli
 }

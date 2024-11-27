@@ -9,12 +9,12 @@ import (
 	"time"
 )
 
-type client struct {
+type GoKafka struct {
 	conf Config
 	sarama.Client
 }
 
-func (cli *client) init() (err error) {
+func (cli *GoKafka) init() (err error) {
 	id := strconv.Itoa(os.Getpid())
 	config := sarama.NewConfig()
 	config.ClientID = id
@@ -81,7 +81,7 @@ func (cli *client) init() (err error) {
 	return
 }
 
-func (cli *client) CreateTopicsRequest(topicName string, partitions int, replicationFactors int) error {
+func (cli *GoKafka) CreateTopicsRequest(topicName string, partitions int, replicationFactors int) error {
 	request := &sarama.CreateTopicsRequest{}
 	request.TopicDetails = make(map[string]*sarama.TopicDetail)
 	request.TopicDetails[topicName] = &sarama.TopicDetail{
@@ -106,16 +106,16 @@ func (cli *client) CreateTopicsRequest(topicName string, partitions int, replica
 	}
 }
 
-func (cli *client) Close() {
+func (cli *GoKafka) Close() {
 	if !cli.Client.Closed() {
 		cli.Client.Close()
 	}
 }
 
-func (cli *client) Producer() iProducer {
-	return &producer{client: cli, msg: &sarama.ProducerMessage{}}
+func (cli *GoKafka) Producer() iProducer {
+	return &producer{GoKafka: cli, msg: &sarama.ProducerMessage{}}
 }
 
-func (cli *client) Consumer() iConsumer {
-	return &consumer{client: cli}
+func (cli *GoKafka) Consumer() iConsumer {
+	return &consumer{GoKafka: cli}
 }

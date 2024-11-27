@@ -3,6 +3,7 @@ package goclickhouse
 import (
 	"crypto/tls"
 	"database/sql"
+	"database/sql/driver"
 	"github.com/ClickHouse/clickhouse-go/v2"
 	gojob "github.com/gif-gif/go.io/go-job"
 	golog "github.com/gif-gif/go.io/go-log"
@@ -16,7 +17,6 @@ type GoClickHouse struct {
 }
 
 func New(conf Config) (cli *GoClickHouse, err error) {
-
 	if conf.DialTimeout == 0 {
 		conf.DialTimeout = 60
 	}
@@ -94,6 +94,10 @@ func New(conf Config) (cli *GoClickHouse, err error) {
 
 func (cli *GoClickHouse) DB() *sql.DB {
 	return cli.db
+}
+
+func (cli *GoClickHouse) Driver() driver.Driver {
+	return cli.db.Driver()
 }
 
 func (cli *GoClickHouse) ping() {

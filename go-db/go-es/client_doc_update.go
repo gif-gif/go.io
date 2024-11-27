@@ -7,7 +7,7 @@ import (
 )
 
 // 文档 - 修改
-func (cli *client) DocUpdate(index, id string, body interface{}) (response *elastic.UpdateResponse, err error) {
+func (cli *GoEs) DocUpdate(index, id string, body interface{}) (response *elastic.UpdateResponse, err error) {
 	return cli.cli.Update().
 		Index(index).
 		Id(id).
@@ -17,7 +17,7 @@ func (cli *client) DocUpdate(index, id string, body interface{}) (response *elas
 }
 
 // 文档 - 修改 - 不存在就插入
-func (cli *client) DocUpset(index, id string, body interface{}) (response *elastic.UpdateResponse, err error) {
+func (cli *GoEs) DocUpset(index, id string, body interface{}) (response *elastic.UpdateResponse, err error) {
 	return cli.cli.Update().
 		Index(index).
 		Id(id).
@@ -28,7 +28,7 @@ func (cli *client) DocUpset(index, id string, body interface{}) (response *elast
 }
 
 // 文档 - 修改 - 根据条件
-func (cli *client) DocUpdateBy(index string, query elastic.Query, script *elastic.Script) (total int64, err error) {
+func (cli *GoEs) DocUpdateBy(index string, query elastic.Query, script *elastic.Script) (total int64, err error) {
 	var resp *elastic.BulkIndexByScrollResponse
 	resp, err = cli.cli.UpdateByQuery(index).Query(query).Script(script).Refresh("true").Do(cli.ctx)
 	if err != nil {
@@ -39,7 +39,7 @@ func (cli *client) DocUpdateBy(index string, query elastic.Query, script *elasti
 }
 
 // 文档 - 批量修改
-func (cli *client) DocBatchUpdate(index string, ids []string, docs []interface{}) (err error) {
+func (cli *GoEs) DocBatchUpdate(index string, ids []string, docs []interface{}) (err error) {
 	bs := cli.cli.Bulk().Index(index).Refresh("true")
 	for i := range ids {
 		bs.Add(elastic.NewBulkUpdateRequest().Id(ids[i]).Doc(docs[i]))
@@ -54,7 +54,7 @@ func (cli *client) DocBatchUpdate(index string, ids []string, docs []interface{}
 }
 
 // 文档 - 批量修改 - 不存在就插入
-func (cli *client) DocBatchUpset(index string, ids []string, docs []interface{}) (err error) {
+func (cli *GoEs) DocBatchUpset(index string, ids []string, docs []interface{}) (err error) {
 	bs := cli.cli.Bulk().Index(index).Refresh("true")
 	for i := range ids {
 		bs.Add(elastic.NewBulkUpdateRequest().Id(ids[i]).Doc(docs[i]).Upsert(docs[i]))
@@ -74,7 +74,7 @@ func (cli *client) DocBatchUpset(index string, ids []string, docs []interface{})
 // -----------------------------------------------------------------------
 
 // 1. 数组删除元素
-func (cli *client) DocArrayDelField(field string, value interface{}) *elastic.Script {
+func (cli *GoEs) DocArrayDelField(field string, value interface{}) *elastic.Script {
 	scriptStr := fmt.Sprintf(
 		`ctx._source.%s.remove(ctx._source.%s.indexOf(params.%s))`,
 		field, field, field,
@@ -87,7 +87,7 @@ func (cli *client) DocArrayDelField(field string, value interface{}) *elastic.Sc
 }
 
 // 2. 数组删除多个元素
-func (cli *client) DocArrayDelFields(field string, value []interface{}) *elastic.Script {
+func (cli *GoEs) DocArrayDelFields(field string, value []interface{}) *elastic.Script {
 	scriptStr := fmt.Sprintf(
 		`for (int i = 0; i < params.%s.length; i++) {
 					if (ctx._source.%s.contains(params.%s[i])) { 	
@@ -104,7 +104,7 @@ func (cli *client) DocArrayDelFields(field string, value []interface{}) *elastic
 }
 
 // 3. 数组追加元素
-func (cli *client) DocArrayAppendValue(field string, value interface{}) *elastic.Script {
+func (cli *GoEs) DocArrayAppendValue(field string, value interface{}) *elastic.Script {
 	scriptStr := fmt.Sprintf(
 		`ctx._source.%s.add(params.%s)`,
 		field, field,
@@ -117,7 +117,7 @@ func (cli *client) DocArrayAppendValue(field string, value interface{}) *elastic
 }
 
 // 4. 数组追加多个元素
-func (cli *client) DocArrayAppendValues(field string, value []interface{}) *elastic.Script {
+func (cli *GoEs) DocArrayAppendValues(field string, value []interface{}) *elastic.Script {
 	scriptStr := fmt.Sprintf(
 		`ctx._source.%s.addAll(params.%s)`,
 		field, field,
@@ -130,7 +130,7 @@ func (cli *client) DocArrayAppendValues(field string, value []interface{}) *elas
 }
 
 // 5. 数组修改元素
-func (cli *client) DocArrayUpdateValue(field string, old, new interface{}) *elastic.Script {
+func (cli *GoEs) DocArrayUpdateValue(field string, old, new interface{}) *elastic.Script {
 	scriptStr := fmt.Sprintf(
 		`ctx._source.%s[ctx._source.%s.indexOf(params.old)]=params.new`,
 		field, field,

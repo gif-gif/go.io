@@ -9,7 +9,7 @@ import (
 // index: 索引
 // id: 唯一标识
 // body: json格式的数据
-func (cli *client) DocCreate(index, id string, body interface{}) (*elastic.IndexResponse, error) {
+func (cli *GoEs) DocCreate(index, id string, body interface{}) (*elastic.IndexResponse, error) {
 	return cli.cli.Index().Type("_doc").
 		Index(index).
 		OpType("create").
@@ -20,7 +20,7 @@ func (cli *client) DocCreate(index, id string, body interface{}) (*elastic.Index
 }
 
 // 文档 - 批量添加
-func (cli *client) DocBatchCreate(index string, data map[string]interface{}) (resp *elastic.BulkResponse, err error) {
+func (cli *GoEs) DocBatchCreate(index string, data map[string]interface{}) (resp *elastic.BulkResponse, err error) {
 	bs := cli.cli.Bulk().Index(index).Refresh("true")
 	for id, doc := range data {
 		bs.Add(elastic.NewBulkIndexRequest().Id(id).Doc(doc)).Index(index)

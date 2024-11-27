@@ -8,7 +8,7 @@ import (
 	goutils "github.com/gif-gif/go.io/go-utils"
 )
 
-var __clients = map[string]*client{}
+var __clients = map[string]*GoKafka{}
 
 func Init(configs ...Config) (err error) {
 	for _, conf := range configs {
@@ -17,7 +17,7 @@ func Init(configs ...Config) (err error) {
 			conf.Name = "default"
 		}
 		if __clients[name] != nil {
-			return errors.New("client already exists")
+			return errors.New("GoKafka already exists")
 		}
 		__clients[name], err = New(conf)
 		if err != nil {
@@ -28,8 +28,8 @@ func Init(configs ...Config) (err error) {
 	return nil
 }
 
-func New(conf Config) (*client, error) {
-	__client := &client{conf: conf}
+func New(conf Config) (*GoKafka, error) {
+	__client := &GoKafka{conf: conf}
 	goutils.AsyncFunc(func() {
 		select {
 		case <-gocontext.Cancel().Done():
@@ -41,7 +41,7 @@ func New(conf Config) (*client, error) {
 	return __client, err
 }
 
-func GetClient(names ...string) *client {
+func GetClient(names ...string) *GoKafka {
 	name := "default"
 	if l := len(names); l > 0 {
 		name = names[0]
@@ -64,7 +64,7 @@ func DelClient(names ...string) {
 }
 
 // default or 只有一个kafka实例直接返回
-func Client() *client {
+func Client() *GoKafka {
 	if cli, ok := __clients["default"]; ok {
 		return cli
 	}
@@ -75,15 +75,15 @@ func Client() *client {
 		}
 	}
 
-	golog.WithTag("gokafka").Error("no default kafka client")
+	golog.WithTag("gokafka").Error("no default kafka GoKafka")
 
 	return nil
 }
 
 func Producer() iProducer {
-	return &producer{client: Client(), msg: &sarama.ProducerMessage{}}
+	return &producer{GoKafka: Client(), msg: &sarama.ProducerMessage{}}
 }
 
 func Consumer() iConsumer {
-	return &consumer{client: Client()}
+	return &consumer{GoKafka: Client()}
 }

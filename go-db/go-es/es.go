@@ -5,7 +5,7 @@ import (
 	"github.com/olivere/elastic/v7"
 )
 
-var __clients = map[string]*client{}
+var __clients = map[string]*GoEs{}
 
 // 可以多次调用初始化多个实例
 func Init(conf Config, options ...elastic.ClientOptionFunc) (err error) {
@@ -15,7 +15,7 @@ func Init(conf Config, options ...elastic.ClientOptionFunc) (err error) {
 	}
 
 	if __clients[name] != nil {
-		return errors.New("client already exists")
+		return errors.New("GoEs already exists")
 	}
 
 	__clients[name], err = New(conf, options...)
@@ -26,7 +26,7 @@ func Init(conf Config, options ...elastic.ClientOptionFunc) (err error) {
 	return nil
 }
 
-func GetClient(names ...string) *client {
+func GetClient(names ...string) *GoEs {
 	name := "default"
 	if l := len(names); l > 0 {
 		name = names[0]
@@ -48,7 +48,7 @@ func DelClient(names ...string) {
 	}
 }
 
-func Default() *client {
+func Default() *GoEs {
 	if cli, ok := __clients["default"]; ok {
 		return cli
 	}

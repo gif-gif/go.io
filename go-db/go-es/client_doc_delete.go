@@ -5,13 +5,13 @@ import (
 )
 
 // 文档 - 删除 - 根据ID
-func (cli *client) DocDelete(index, id string) (*elastic.IndexResponse, error) {
+func (cli *GoEs) DocDelete(index, id string) (*elastic.IndexResponse, error) {
 	return cli.cli.Index().Index(index).Id(id).Refresh("true").Do(cli.ctx)
 }
 
 // 文档 - 删除 - 根据条件
 // 即时没有符合条件的文档，也不会报404错误
-func (cli *client) DocDeleteBy(index string, query elastic.Query) (total int64, err error) {
+func (cli *GoEs) DocDeleteBy(index string, query elastic.Query) (total int64, err error) {
 	var resp *elastic.BulkIndexByScrollResponse
 	resp, err = cli.cli.DeleteByQuery(index).Query(query).Refresh("true").Do(cli.ctx)
 	if err != nil {
@@ -22,7 +22,7 @@ func (cli *client) DocDeleteBy(index string, query elastic.Query) (total int64, 
 }
 
 // 文档 - 批量删除
-func (cli *client) DocBatchDelete(index string, ids []string) (total int64, err error) {
+func (cli *GoEs) DocBatchDelete(index string, ids []string) (total int64, err error) {
 	if l := len(ids); l == 0 {
 		return
 	}

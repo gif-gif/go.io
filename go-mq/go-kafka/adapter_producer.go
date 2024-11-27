@@ -5,13 +5,13 @@ import (
 )
 
 type producer struct {
-	*client
+	*GoKafka
 
 	msg *sarama.ProducerMessage
 }
 
 func (p *producer) Client() sarama.Client {
-	return p.client.Client
+	return p.GoKafka.Client
 }
 
 // 指定分区

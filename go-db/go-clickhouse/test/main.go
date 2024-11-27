@@ -23,6 +23,7 @@ func main() {
 		golog.Fatal(err)
 		return
 	}
+
 	rows, err := goclickhouse2.Default().DB().Query("SELECT oaid FROM xzdsp.clickcb limit 10")
 	if err != nil {
 		golog.Fatal(err)

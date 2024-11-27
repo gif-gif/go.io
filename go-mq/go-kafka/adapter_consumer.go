@@ -10,7 +10,7 @@ import (
 )
 
 type consumer struct {
-	*client
+	*GoKafka
 
 	hasSetPartition bool  // 是否设置分区
 	partition       int32 // 分区
@@ -19,7 +19,7 @@ type consumer struct {
 }
 
 func (c *consumer) Client() sarama.Client {
-	return c.client.Client
+	return c.GoKafka.Client
 }
 
 // 设置 分区

@@ -7,7 +7,8 @@ import (
 )
 
 type Config struct {
-	Name     string `yaml:"Name" json:"name,optional"`
+	Name string `yaml:"Name" json:"name,optional"`
+	//NamePrefix string `yaml:"NamePrefix" json:"namePrefix,optional"`
 	Addr     string `yaml:"Addr" json:"addr,optional"`
 	Password string `yaml:"Password" json:"password,optional"`
 	DB       int    `yaml:"DB" json:"db,optional"`
