@@ -8,11 +8,11 @@ type Config struct {
 	Password          string   `json:"password,optional"  yaml:"Password"`
 	Addrs             []string `json:"addrs,optional"  yaml:"Addrs"`
 	Timeout           int      `json:"timeout,optional"  yaml:"Timeout"`
-	HeartbeatInterval int      `json:"heartbeatInterval" yaml:"HeartbeatInterval"`
-	SessionTimeout    int      `json:"sessionTimeout" yaml:"SessionTimeout"`
-	RebalanceTimeout  int      `json:"rebalanceTimeout" yaml:"RebalanceTimeout"`
-	OffsetNewest      bool     `json:"offsetNewest" yaml:"OffsetNewest"`
-	GroupId           string   `json:"groupId" yaml:"GroupId"`
+	HeartbeatInterval int      `json:"heartbeatInterval,optional" yaml:"HeartbeatInterval"`
+	SessionTimeout    int      `json:"sessionTimeout,optional" yaml:"SessionTimeout"`
+	RebalanceTimeout  int      `json:"rebalanceTimeout,optional" yaml:"RebalanceTimeout"`
+	OffsetNewest      bool     `json:"offsetNewest,optional" yaml:"OffsetNewest"`
+	GroupId           string   `json:"groupId,optional" yaml:"GroupId"`
 
-	RedisConfig goredis.Config `json:"redisConfig" yaml:"RedisConfig"`
+	RedisConfig goredis.Config `json:"redisConfig,optional" yaml:"RedisConfig"`
 }

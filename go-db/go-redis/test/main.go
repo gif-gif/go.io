@@ -20,7 +20,7 @@ func main() {
 		golog.WithTag("goredis").Error(err)
 	}
 
-	cmd := goredis.Default().Set("goredis", "goredis")
+	cmd := goredis.GetClient("aa").Set("goredis", "goredis")
 	if cmd.Err() != nil {
 		golog.WithTag("goredis").Error(cmd.Err())
 	}

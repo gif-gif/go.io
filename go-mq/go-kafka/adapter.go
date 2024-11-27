@@ -3,8 +3,6 @@ package gokafka
 import "github.com/IBM/sarama"
 
 // 生产者
-
-// 生产者
 type IProducer interface {
 	Client() sarama.Client
 

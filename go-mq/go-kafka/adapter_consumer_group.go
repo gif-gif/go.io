@@ -76,6 +76,11 @@ func (g group) doHandler(msg *sarama.ConsumerMessage, session sarama.ConsumerGro
 	ctx := gocontext.WithLog()
 	ctx.Log.WithTag("gokafka-consumer-group", g.id).WithField("msg", m)
 
+	if g.redis == nil {
+		ctx.Log.WithField("msg", m)
+		g.handleMsg(ctx, msg, session)
+		return nil
+	}
 	// uniq key
 	{
 		var uniqKey string
@@ -103,7 +108,7 @@ func (g group) doHandler(msg *sarama.ConsumerMessage, session sarama.ConsumerGro
 
 	// 建立缓存
 	if g.redis != nil && key != "" {
-		g.redis.SetEx(key, goutils.M{
+		g.redis.Set1(key, goutils.M{
 			"topic":     msg.Topic,
 			"body":      m["body"],
 			"headers":   m["headers"],
@@ -136,4 +141,14 @@ func (g group) doHandler(msg *sarama.ConsumerMessage, session sarama.ConsumerGro
 	}
 
 	return
+}
+
+func (g group) handleMsg(ctx *gocontext.Context, msg *sarama.ConsumerMessage, session sarama.ConsumerGroupSession) {
+	// 执行业务方法
+	if err := g.handler(ctx, &ConsumerMessage{ConsumerMessage: msg, GroupSession: session}, nil); err != nil {
+		return
+	}
+
+	// 提交
+	session.MarkMessage(msg, "")
 }

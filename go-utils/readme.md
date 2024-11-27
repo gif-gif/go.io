@@ -30,7 +30,7 @@
 - func CheckSignSha1(secret, nonce string, linkSignTimeout int64, ts int64, sign string) bool {
 - func IsInArray[T any](arr []T, target T) bool // 元素都转换成字符串比较
 - func IsInArrayX[T any](arr []T, exists func(target T) bool) bool 
--func IsInArrayXX[T any](arr []*T, exists func(target *T) bool) bool 
+- func IsInArrayXX[T any](arr []*T, exists func(target *T) bool) bool 
 - func IfNot[T any](isTrue bool, a, b T) T  // 通用三目运算
 - func IfString(isTrue bool, a, b string) string 
 - func IfInt(isTrue bool, a, b int) int 
@@ -67,3 +67,4 @@
 
 #### xml
 - xml.go
+-https://github.com/samber/lo

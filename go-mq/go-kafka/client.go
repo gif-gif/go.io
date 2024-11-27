@@ -22,7 +22,7 @@ func (cli *GoKafka) init() (err error) {
 	config := sarama.NewConfig()
 	config.ClientID = id
 	config.ChannelBufferSize = 1024
-	config.Version = sarama.V3_0_0_0
+	config.Version = sarama.V3_6_0_0
 	if cli.conf.User != "" {
 		config.Net.SASL.Enable = true
 		config.Net.SASL.User = cli.conf.User

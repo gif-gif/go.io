@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"regexp"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -40,19 +41,19 @@ func CheckSign(secret string, linkSignTimeout int64, ts int64, sign string) bool
 }
 
 // 元素都转换成字符串比较
-func IsInArray[T any](arr []T, target T) bool {
-	for _, t := range arr {
-		tt := gconv.String(target)
-		if gconv.String(t) == tt {
-			return true
-		}
-	}
-	return false
+func IsInArray[T comparable](arr []T, target T) bool {
+	return slices.Contains(arr, target)
 }
 
 // 条件满足任意元素 exists func(target T) bool 返回true时返回true
 //
 // 适合判断数组中存储复杂对象，判断条件定义情况
+//
+// 用以下代替
+//
+//	slices.ContainsFunc(arr, func(t T) bool {
+//
+//	})
 func IsInArrayX[T any](arr []T, exists func(target T) bool) bool {
 	for _, t := range arr {
 		if exists(t) {
@@ -65,6 +66,12 @@ func IsInArrayX[T any](arr []T, exists func(target T) bool) bool {
 // 条件满足任意元素 exists func(target *T) bool 返回true时返回true
 //
 // 适合判断数组中存储复杂对象，判断条件定义情况,数组元素是指针类型时用
+//
+// 用以下代替
+//
+//	slices.ContainsFunc(arr, func(t T) bool {
+//
+//	})
 func IsInArrayXX[T any](arr []*T, exists func(target *T) bool) bool {
 	for _, t := range arr {
 		if exists(t) {

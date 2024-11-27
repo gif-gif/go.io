@@ -63,7 +63,7 @@ func (p *producer) SendMessage(msg IMessage) (partition int32, offset int64, err
 			err = errors.New("KEY已存在")
 			return
 		}
-		p.redis.SetEx(msg.Key(), goutils.M{
+		p.redis.Set1(msg.Key(), goutils.M{
 			"topic":     msg.Topic(),
 			"body":      msg,
 			"headers":   msg.Headers(),
@@ -130,7 +130,7 @@ func (p *producer) SendAsyncMessage(msg IMessage, cb MessageHandler) (err error)
 			err = errors.New("KEY已存在")
 			return
 		}
-		p.redis.SetEx(msg.Key(), goutils.M{
+		p.redis.Set1(msg.Key(), goutils.M{
 			"topic":     msg.Topic(),
 			"body":      msg,
 			"headers":   msg.Headers(),

@@ -353,6 +353,10 @@ func (s *GoRedis) Set(key, value string) *redis.StatusCmd {
 	return s.Redis.Set(s.Ctx, s.WrapKey(key), value, 0)
 }
 
+func (s *GoRedis) Set1(key, value string, expiration time.Duration) *redis.StatusCmd {
+	return s.Redis.Set(s.Ctx, s.WrapKey(key), value, expiration)
+}
+
 // Setex is the implementation of redis setex command.
 func (s *GoRedis) SetEx(key, value string, expiration time.Duration) *redis.StatusCmd {
 	return s.Redis.SetEx(s.Ctx, s.WrapKey(key), value, expiration)
