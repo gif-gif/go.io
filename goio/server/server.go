@@ -45,7 +45,7 @@ func (s *Server) Run(addr string) {
 
 	// 性能分析
 	if defaultOptions.pprofEnable {
-		pprof.Register(s.Engine, "/goo/pprof")
+		pprof.Register(s.Engine, "/goio/pprof")
 	}
 
 	endless.NewServer(addr, s.Engine).ListenAndServe()
@@ -155,7 +155,7 @@ func (s *Server) log(c *gin.Context) {
 		req["body"] = v
 	}
 
-	l := golog.WithTag("goo-api").
+	l := golog.WithTag("goio-api").
 		WithField("request", req)
 
 	c.Next()

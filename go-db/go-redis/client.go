@@ -358,6 +358,10 @@ func (s *GoRedis) SetEx(key, value string, expiration time.Duration) *redis.Stat
 	return s.Redis.SetEx(s.Ctx, s.WrapKey(key), value, expiration)
 }
 
+func (s *GoRedis) SetNX(key, value string, expiration time.Duration) *redis.BoolCmd {
+	return s.Redis.SetNX(s.Ctx, s.WrapKey(key), value, expiration)
+}
+
 // Sismember is the implementation of redis sismember command.
 func (s *GoRedis) SIsMember(key string, value interface{}) *redis.BoolCmd {
 	return s.Redis.SIsMember(s.Ctx, s.WrapKey(key), value)

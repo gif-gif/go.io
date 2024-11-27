@@ -3,7 +3,9 @@ package gokafka
 import (
 	"fmt"
 	"github.com/IBM/sarama"
+	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	golog "github.com/gif-gif/go.io/go-log"
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"os"
 	"strconv"
 	"time"
@@ -12,12 +14,15 @@ import (
 type GoKafka struct {
 	conf Config
 	sarama.Client
+	redis *goredis.GoRedis
 }
 
 func (cli *GoKafka) init() (err error) {
 	id := strconv.Itoa(os.Getpid())
 	config := sarama.NewConfig()
 	config.ClientID = id
+	config.ChannelBufferSize = 1024
+	config.Version = sarama.V3_0_0_0
 	if cli.conf.User != "" {
 		config.Net.SASL.Enable = true
 		config.Net.SASL.User = cli.conf.User
@@ -49,9 +54,6 @@ func (cli *GoKafka) init() (err error) {
 		sarama.NewBalanceStrategyRange(),
 	}
 
-	config.ChannelBufferSize = 1024
-	//config.Version = sarama.V0_10_2_0
-
 	config.Consumer.Group.Heartbeat.Interval = 5 * time.Second
 	config.Consumer.Group.Session.Timeout = 15 * time.Second
 	config.Consumer.Group.Rebalance.Timeout = 12 * time.Second
@@ -71,11 +73,18 @@ func (cli *GoKafka) init() (err error) {
 		config.Consumer.Group.Rebalance.Timeout = time.Duration(cli.conf.RebalanceTimeout) * time.Second
 	}
 
-	//config.Consumer.Group.InstanceId = id
+	config.Consumer.Group.InstanceId = id
 
 	cli.Client, err = sarama.NewClient(cli.conf.Addrs, config)
 	if err != nil {
 		golog.WithTag("gokafka").Error(err)
+	}
+
+	if cfg := cli.conf.RedisConfig; cfg.Addr != "" {
+		cli.redis, err = goredis.New(cfg)
+		if err != nil {
+			golog.WithTag("gokafka").Error("Redis 初始化失败", err)
+		}
 	}
 
 	return
@@ -112,10 +121,116 @@ func (cli *GoKafka) Close() {
 	}
 }
 
-func (cli *GoKafka) Producer() iProducer {
-	return &producer{GoKafka: cli, msg: &sarama.ProducerMessage{}}
+// 消费者
+func (cli *GoKafka) Consumer() IConsumer {
+	return &consumer{GoKafka: cli}
 }
 
-func (cli *GoKafka) Consumer() iConsumer {
-	return &consumer{GoKafka: cli}
+// 生产者
+func (cli *GoKafka) Producer(opts ...Option) IProducer {
+	var focus bool
+	for _, opt := range opts {
+		switch opt.Name {
+		case FocusName:
+			focus = opt.Value.(bool)
+		}
+	}
+	return &producer{GoKafka: cli, focus: focus}
+}
+
+func (c *GoKafka) GetKey(topic, msg string) string {
+	return fmt.Sprintf("goio:mq:%s:%s", time.Now().Format("20060102"), goutils.MD5([]byte(topic+msg)))
+}
+
+func (c *GoKafka) Redis() *goredis.GoRedis {
+	return c.redis
+}
+
+// 主题列表
+func (c *GoKafka) Topics() []string {
+	if c.Client == nil {
+		return []string{}
+	}
+
+	topics, err := c.Client.Topics()
+	if err != nil {
+		golog.WithTag("gokafka").Error(err)
+		return []string{}
+	}
+
+	return topics
+}
+
+// 分区数量
+func (c *GoKafka) Partitions(topic string) []int32 {
+	if c.Client == nil {
+		return []int32{}
+	}
+
+	partitions, err := c.Client.Partitions(topic)
+	if err != nil {
+		golog.WithTag("gokafka").WithField("topic", topic).Error(err)
+		return []int32{}
+	}
+
+	return partitions
+}
+
+// 分区数量
+func (c *GoKafka) OffsetInfo(topic, groupId string) (data []map[string]int64) {
+	data = []map[string]int64{}
+
+	if c.Client == nil {
+		return
+	}
+
+	partitions := c.Partitions(topic)
+	if l := len(partitions); l == 0 {
+		return
+	}
+
+	var (
+		l = golog.WithTag("gokafka").WithField("groupId", groupId).WithField("topic", topic)
+	)
+
+	om, err := sarama.NewOffsetManagerFromClient(groupId, c.Client)
+	if err != nil {
+		l.Error(err)
+		return
+	}
+	defer om.Close()
+
+	for _, partition := range partitions {
+		offset, err := c.Client.GetOffset(topic, partition, -1)
+		if err != nil {
+			l.Error(err)
+			continue
+		}
+
+		pom, err := om.ManagePartition(topic, partition)
+		if err != nil {
+			l.Error(err)
+			continue
+		}
+
+		nextOffset, msg := pom.NextOffset()
+		if msg != "" {
+			l.Error(msg)
+			continue
+		}
+
+		backlog := offset
+		if nextOffset != -1 {
+			backlog -= nextOffset
+		}
+
+		data = append(data, map[string]int64{
+			"partition":  int64(partition),
+			"offset":     offset,
+			"nextOffset": nextOffset,
+			"backlog":    backlog,
+		})
+	}
+
+	return
 }

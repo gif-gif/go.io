@@ -1,30 +1,75 @@
 package gokafka
 
 import (
+	"errors"
 	"github.com/IBM/sarama"
+	golog "github.com/gif-gif/go.io/go-log"
+	goutils "github.com/gif-gif/go.io/go-utils"
+	"time"
 )
 
 type producer struct {
 	*GoKafka
-
-	msg *sarama.ProducerMessage
+	focus bool // 是否强制发送
 }
 
 func (p *producer) Client() sarama.Client {
 	return p.GoKafka.Client
 }
 
-// 指定分区
-func (p *producer) WithPartition(partition int32) iProducer {
-	p.msg.Partition = partition
-	return p
-}
-
 // 发送消息 - 同步
-func (p *producer) SendMessage(topic string, message []byte) (partition int32, offset int64, err error) {
-	p.msg.Topic = topic
-	p.msg.Value = sarama.ByteEncoder(message)
-	p.msg.Key = sarama.StringEncoder(topic)
+func (p *producer) SendMessage(msg IMessage) (partition int32, offset int64, err error) {
+	m := &sarama.ProducerMessage{
+		Topic: msg.Topic(),
+		Value: sarama.ByteEncoder(msg.Serialize()),
+	}
+
+	if v := msg.Key(); v != "" {
+		m.Key = sarama.StringEncoder(v)
+	}
+	if data := msg.Headers(); data != nil {
+		var headers []sarama.RecordHeader
+		for k, v := range data {
+			headers = append(headers, sarama.RecordHeader{
+				Key:   []byte(k),
+				Value: []byte(v),
+			})
+		}
+		m.Headers = headers
+	}
+
+	defer func() {
+		log := golog.WithTag("gokafka-producer").WithField("msg", goutils.M{
+			"topic":     msg.Topic(),
+			"key":       msg.Key(),
+			"headers":   msg.Headers(),
+			"body":      msg,
+			"partition": m.Partition,
+			"offset":    m.Offset,
+		})
+		if err != nil {
+			log.Error("消息发送失败", err)
+			return
+		}
+		log.Debug("消息发送成功")
+	}()
+
+	// 添加缓存
+	if p.redis != nil && len(msg.Key()) > 0 {
+		if p.focus {
+			p.redis.Del(msg.Key())
+		}
+		if p.redis.Exists(msg.Key()).Val() > 0 {
+			err = errors.New("KEY已存在")
+			return
+		}
+		p.redis.SetEx(msg.Key(), goutils.M{
+			"topic":     msg.Topic(),
+			"body":      msg,
+			"headers":   msg.Headers(),
+			"timestamp": time.Now().Format("2006-01-02 15:04:05"),
+		}.String(), time.Hour)
+	}
 
 	var producer sarama.SyncProducer
 
@@ -34,14 +79,64 @@ func (p *producer) SendMessage(topic string, message []byte) (partition int32, o
 	}
 	defer producer.Close()
 
-	return producer.SendMessage(p.msg)
+	partition, offset, err = producer.SendMessage(m)
+
+	return
 }
 
 // 发送消息 - 异步
-func (p *producer) SendAsyncMessage(topic string, message []byte, cb MessageHandler) (err error) {
-	p.msg.Topic = topic
-	p.msg.Value = sarama.ByteEncoder(message)
-	p.msg.Key = sarama.StringEncoder(topic)
+func (p *producer) SendAsyncMessage(msg IMessage, cb MessageHandler) (err error) {
+	m := &sarama.ProducerMessage{
+		Topic: msg.Topic(),
+		Value: sarama.ByteEncoder(msg.Serialize()),
+	}
+
+	if v := msg.Key(); v != "" {
+		m.Key = sarama.StringEncoder(v)
+	}
+	if data := msg.Headers(); data != nil {
+		var headers []sarama.RecordHeader
+		for k, v := range data {
+			headers = append(headers, sarama.RecordHeader{
+				Key:   []byte(k),
+				Value: []byte(v),
+			})
+		}
+		m.Headers = headers
+	}
+
+	defer func() {
+		log := golog.WithTag("gokafka-producer").WithField("msg", goutils.M{
+			"topic":     msg.Topic(),
+			"key":       msg.Key(),
+			"headers":   msg.Headers(),
+			"body":      msg,
+			"partition": m.Partition,
+			"offset":    m.Offset,
+		})
+		if err != nil {
+			log.Error("消息发送失败", err)
+			return
+		}
+		log.Debug("消息发送成功")
+	}()
+
+	// 添加缓存
+	if p.redis != nil && len(msg.Key()) > 0 {
+		if p.focus {
+			p.redis.Del(msg.Key())
+		}
+		if p.redis.Exists(msg.Key()).Val() > 0 {
+			err = errors.New("KEY已存在")
+			return
+		}
+		p.redis.SetEx(msg.Key(), goutils.M{
+			"topic":     msg.Topic(),
+			"body":      msg,
+			"headers":   msg.Headers(),
+			"timestamp": time.Now().Format("2006-01-02 15:04:05"),
+		}.String(), time.Hour)
+	}
 
 	var producer sarama.AsyncProducer
 
@@ -51,12 +146,13 @@ func (p *producer) SendAsyncMessage(topic string, message []byte, cb MessageHand
 	}
 	defer producer.Close()
 
-	producer.Input() <- p.msg
+	producer.Input() <- m
 
 	select {
 	case msg := <-producer.Successes():
 		cb(&ProducerMessage{msg}, nil)
 	case e := <-producer.Errors():
+		err = e.Err
 		cb(&ProducerMessage{e.Msg}, e.Err)
 	}
 

@@ -2,11 +2,12 @@ package gokafka
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"github.com/IBM/sarama"
 	gocontext "github.com/gif-gif/go.io/go-context"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
+	"time"
 )
 
 type consumer struct {
@@ -23,38 +24,44 @@ func (c *consumer) Client() sarama.Client {
 }
 
 // 设置 分区
-func (c *consumer) WithPartition(partition int32) iConsumer {
+func (c *consumer) WithPartition(partition int32) IConsumer {
 	c.hasSetPartition = true
 	c.partition = partition
 	return c
 }
 
 // 设置 起始位置
-func (c *consumer) WithOffset(offset int64) iConsumer {
+func (c *consumer) WithOffset(offset int64) IConsumer {
 	c.offset = offset
 	return c
 }
 
 // 设置 起始位置 = 最新位置
-func (c *consumer) WithOffsetNewest() iConsumer {
+func (c *consumer) WithOffsetNewest() IConsumer {
 	c.offset = sarama.OffsetNewest
 	return c
 }
 
 // 设置 起始位置 = 从头开始
-func (c *consumer) WithOffsetOldest() iConsumer {
+func (c *consumer) WithOffsetOldest() IConsumer {
 	c.offset = sarama.OffsetOldest
 	return c
 }
 
 // 消费消息，默认处理最新消息
 func (c *consumer) Consume(topic string, handler ConsumerHandler) {
+	log := golog.WithTag("gokafka-consumer").WithField("topic", topic)
+
 	consumer, err := sarama.NewConsumerFromClient(c.Client())
 	if err != nil {
-		golog.WithTag("gokafka-consumer").Error(err)
+		log.Error(err)
 		return
 	}
-	defer consumer.Close()
+	defer func() {
+		if err := consumer.Close(); err != nil {
+			log.Error(err)
+		}
+	}()
 
 	if c.offset == 0 {
 		c.offset = sarama.OffsetNewest
@@ -62,77 +69,105 @@ func (c *consumer) Consume(topic string, handler ConsumerHandler) {
 
 	pc, err := consumer.ConsumePartition(topic, c.partition, c.offset)
 	if err != nil {
-		golog.WithTag("gokafka-consumer").Error(err)
+		log.Error(err)
 		return
 	}
-	defer pc.Close()
+	defer func() {
+		if err := pc.Close(); err != nil {
+			log.Error(err)
+		}
+	}()
 
 	for {
 		select {
 		case <-gocontext.WithCancel().Done():
+			log.Debug("Context被取消,停止消费")
 			return
 
-		case msg := <-pc.Messages():
-			handler(&ConsumerMessage{msg}, nil)
-
 		case err := <-pc.Errors():
-			handler(nil, &ConsumerError{err})
+			if err != nil {
+				log.Error(err)
+			}
+
+		case msg, ok := <-pc.Messages():
+			if !ok {
+				log.Debug("消息通道被关闭,停止消费")
+				return
+			}
+
+			ctx := gocontext.WithLog()
+			ctx.Log.WithTag("gokafka-consumer").WithField("msg", msg)
+
+			if err = handler(ctx, &ConsumerMessage{ConsumerMessage: msg}, nil); err != nil {
+				log.Error(err)
+			}
+
+			// 删除缓存
+			key := string(msg.Key)
+			if c.redis != nil {
+				c.redis.Del(key)
+			}
 		}
 	}
 }
 
 // 分组
 func (c *consumer) ConsumeGroup(groupId string, topics []string, handler ConsumerHandler) {
-	cg, err := sarama.NewConsumerGroupFromClient(groupId, c.Client())
+	l := golog.WithTag("gokafka-consumer-group").
+		WithField("groupId", groupId).
+		WithField("topics", topics)
+
+	cg, err := sarama.NewConsumerGroupFromClient(groupId, c.GoKafka.Client)
 	if err != nil {
-		golog.WithTag("gokafka-consumer-group").Error(err)
+		l.Error(err)
 		return
 	}
+	defer func() {
+		if c.GoKafka.Client != nil {
+			c.GoKafka.Client.Close()
+			l.Debug("client 退出")
+		}
+	}()
+	defer func() {
+		cg.Close()
+		l.Debug("consumer-group 退出")
+	}()
 
-	g := group{handler: handler}
+	var (
+		done = make(chan struct{})
+		flag bool
+	)
+
+	ctx, cancel := context.WithCancel(context.Background())
+
 	goutils.AsyncFunc(func() {
-		defer cg.Close()
 		for {
 			select {
-			case <-gocontext.WithCancel().Done():
-				return
-
 			case err := <-cg.Errors():
-				golog.WithTag("gokafka-consumer-group").Error(err)
-				return
+				if err != nil {
+					l.Error(err)
+				}
+
+			default:
+				err := cg.Consume(ctx, topics, group{id: groupId, handler: handler, GoKafka: c.GoKafka})
+				if err != nil && !errors.Is(err, sarama.ErrClosedConsumerGroup) {
+					l.Error(err)
+				}
+				if flag {
+					done <- struct{}{}
+					return
+				}
 			}
 		}
 	})
 
-	if err := cg.Consume(gocontext.WithCancel().Context, topics, g); err != nil {
-		golog.WithTag("gokafka-consumer-group").Error(err)
+	select {
+	case <-gocontext.WithCancel().Done():
+		flag = true
+		cancel()
 	}
-}
 
-func (c *consumer) ConsumeGroup1(groupId string, topics []string, handler ConsumerHandler) {
-	g, err := sarama.NewConsumerGroup(c.conf.Addrs, groupId, c.Client().Config())
-	if err != nil {
-		panic(err)
-	}
-	defer func() { _ = g.Close() }()
+	<-done
 
-	// Track errors
-	go func() {
-		for err := range g.Errors() {
-			fmt.Println("ERROR", err)
-		}
-	}()
-
-	// Iterate over consumer sessions.
-	ctx := context.Background()
-	for {
-		ghandler := group{handler: handler}
-		// `Consume` should be called inside an infinite loop, when a
-		// server-side rebalance happens, the consumer session will need to be
-		// recreated to get the new claims
-		err := g.Consume(ctx, topics, ghandler)
-		if err != nil {
-			panic(err)
-		}
-	}
+	time.Sleep(time.Second)
 }

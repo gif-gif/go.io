@@ -2,33 +2,31 @@ package gokafka
 
 import (
 	"errors"
-	"github.com/IBM/sarama"
 	gocontext "github.com/gif-gif/go.io/go-context"
+	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 )
 
 var __clients = map[string]*GoKafka{}
 
-func Init(configs ...Config) (err error) {
-	for _, conf := range configs {
-		name := conf.Name
-		if name == "" || name == "default" {
-			conf.Name = "default"
-		}
-		if __clients[name] != nil {
-			return errors.New("GoKafka already exists")
-		}
-		__clients[name], err = New(conf)
-		if err != nil {
-			return err
-		}
+func Init(conf Config, opts ...Option) (err error) {
+	name := conf.Name
+	if name == "" || name == "default" {
+		conf.Name = "default"
+	}
+	if __clients[name] != nil {
+		return errors.New("GoKafka already exists")
+	}
+	__clients[name], err = New(conf, opts...)
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func New(conf Config) (*GoKafka, error) {
+func New(conf Config, opts ...Option) (*GoKafka, error) {
 	__client := &GoKafka{conf: conf}
 	goutils.AsyncFunc(func() {
 		select {
@@ -37,6 +35,13 @@ func New(conf Config) (*GoKafka, error) {
 			return
 		}
 	})
+	for _, opt := range opts {
+		switch opt.Name {
+		case RedisName:
+			__client.redis = opt.Value.(*goredis.GoRedis)
+		}
+	}
+
 	err := __client.init()
 	return __client, err
 }
@@ -80,10 +85,10 @@ func Client() *GoKafka {
 	return nil
 }
 
-func Producer() iProducer {
-	return &producer{GoKafka: Client(), msg: &sarama.ProducerMessage{}}
+func Consumer() IConsumer {
+	return GetClient().Consumer()
 }
 
-func Consumer() iConsumer {
-	return &consumer{GoKafka: Client()}
+func Producer(opts ...Option) IProducer {
+	return GetClient().Producer(opts...)
 }
