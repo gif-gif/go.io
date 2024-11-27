@@ -40,6 +40,9 @@ func (env Environment) Tag() string {
 // 也可以不用这个方法，项目中可以自定义， golog.WithHook 多次调用不会覆盖，每次调用都会生效
 func Setup(feishu string) {
 	// 发送飞书消息
+	if feishu == "" {
+		return
+	}
 	golog.WithHook(func(msg *golog.Message) {
 		if msg.Level <= golog.WARN {
 			return

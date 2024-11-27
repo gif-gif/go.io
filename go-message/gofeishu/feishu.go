@@ -14,6 +14,9 @@ var (
 )
 
 func FeiShu(hookUrl string, text string) error {
+	if hookUrl == "" {
+		return nil
+	}
 	__feiShuOnce.Do(func() {
 		__fieShuCH = make(chan struct{}, runtime.NumCPU()*2)
 	})

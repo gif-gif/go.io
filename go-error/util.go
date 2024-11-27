@@ -6,6 +6,10 @@ import (
 	"runtime"
 )
 
+func IsDatabaseNoRowsError(err error) bool {
+	return err != nil && err.Error() == "sql: no rows in result set"
+}
+
 func GetStack() string {
 	var buf [4096]byte
 	n := runtime.Stack(buf[:], false)
