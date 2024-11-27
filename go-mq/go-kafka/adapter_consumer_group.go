@@ -128,12 +128,7 @@ func (g group) doHandler(msg *sarama.ConsumerMessage, session sarama.ConsumerGro
 	}()
 
 	// 执行业务方法
-	if err = g.handler(ctx, &ConsumerMessage{ConsumerMessage: msg, GroupSession: session}, nil); err != nil {
-		return
-	}
-
-	// 提交
-	session.MarkMessage(msg, "")
+	g.handleMsg(ctx, msg, session)
 
 	// 删除缓存
 	if g.redis != nil && key != "" {
