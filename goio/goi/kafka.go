@@ -1,4 +1,4 @@
-package goio
+package goi
 
 import (
 	gokafka "github.com/gif-gif/go.io/go-mq/go-kafka"

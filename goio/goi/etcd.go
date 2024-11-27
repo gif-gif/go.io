@@ -1,4 +1,4 @@
-package goio
+package goi
 
 import (
 	goetcd "github.com/gif-gif/go.io/go-etcd"

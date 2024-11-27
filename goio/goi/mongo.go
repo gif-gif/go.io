@@ -1,4 +1,4 @@
-package goio
+package goi
 
 import (
 	gomongo "github.com/gif-gif/go.io/go-db/go-mongo"
@@ -6,7 +6,11 @@ import (
 )
 
 func Mongo(names ...string) *mongo.Database {
-	return gomongo.GetClient(names...).DB()
+	client := MongoClient(names...)
+	if client == nil {
+		return nil
+	}
+	return client.DB()
 }
 
 func MongoClient(names ...string) *gomongo.GoMongo {

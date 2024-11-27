@@ -1,8 +1,8 @@
 package goclickhouse
 
 type Config struct {
-	Name               string `yaml:"Name" json:"name,optional"`
-	Driver             string `yaml:"Driver" json:"driver,optional"`
+	Name string `yaml:"Name" json:"name,optional"`
+	//Driver             string `yaml:"Driver" json:"driver,optional"`
 	Addr               string `yaml:"Addr" json:"addr,optional"`
 	User               string `yaml:"User" json:"user,optional"`
 	Password           string `yaml:"Password" json:"password,optional"`

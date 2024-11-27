@@ -6,7 +6,7 @@ import (
 )
 
 // 当前运行环境
-var Env Environment //string `json:",default=pro,options=dev|test|rt|pre|pro"`
+var Env Environment = "dev" //string `json:",default=pro,options=dev|test|rt|pre|pro"`
 
 func Init(env Environment) {
 	Env = env
