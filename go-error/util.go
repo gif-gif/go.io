@@ -3,7 +3,14 @@ package goerror
 import (
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/status"
+	"runtime"
 )
+
+func GetStack() string {
+	var buf [4096]byte
+	n := runtime.Stack(buf[:], false)
+	return string(buf[:n])
+}
 
 func IsErrCode(err error, code uint32) bool {
 	errCode, _ := GetErrCodeMsg(err)
