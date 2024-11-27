@@ -91,6 +91,6 @@ func simpleUseGoJob() {
 	//	golog.WithTag("gojob").Info("job.ID:" + job.ID().String())
 	//}
 
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 	golog.InfoF("end of gojob")
 }

@@ -16,7 +16,7 @@ func main() {
 	testSubscribe()
 	time.Sleep(time.Second * 2)
 
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func testSubscribe() {
@@ -94,7 +94,7 @@ func testPublish() {
 	}
 
 	publish(gomqtt.GetClient(conf.Name))
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func publish(client *gomqtt.GoMqttClient) {

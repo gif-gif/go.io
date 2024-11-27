@@ -15,7 +15,7 @@ func main() {
 	goio.Init(goio.DEVELOPMENT)
 	logx.DisableStat()
 	testRaceSpeed()
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func testRequest() {

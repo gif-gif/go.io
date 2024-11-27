@@ -9,7 +9,7 @@ func TestOsExit(t *testing.T) {
 	go func() {
 		for {
 			select {
-			case <-Cancel().Done():
+			case <-WithCancel().Done():
 				fmt.Println("---1---")
 				return
 			}
@@ -19,7 +19,7 @@ func TestOsExit(t *testing.T) {
 	go func() {
 		for {
 			select {
-			case <-Cancel().Done():
+			case <-WithCancel().Done():
 				fmt.Println("---2---")
 				return
 			}
@@ -27,6 +27,6 @@ func TestOsExit(t *testing.T) {
 	}()
 
 	fmt.Println("---3---")
-	<-Cancel().Done()
+	<-WithCancel().Done()
 	fmt.Println("---4---")
 }

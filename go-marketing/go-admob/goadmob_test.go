@@ -58,7 +58,7 @@ func TestAdmobApps(t *testing.T) {
 		golog.WithTag("admob").WithField("appId", app.AppId).Info("OK")
 	}
 
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 type AdApp struct {
@@ -102,7 +102,7 @@ func TestAdmobAdUnits(t *testing.T) {
 		golog.WithTag("admob").WithField("appId", app.AdUnitId).Info("OK")
 	}
 
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func TestAdmobReport(t *testing.T) {
@@ -150,7 +150,7 @@ func TestAdmobReport(t *testing.T) {
 
 	golog.WithTag("admob").Info(res)
 
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func TestAdmobAuthUrl(t *testing.T) {

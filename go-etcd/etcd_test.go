@@ -50,7 +50,7 @@ func TestRegisterService(t *testing.T) {
 	err := RegisterService("/xz/dsp/http-api/node-1", "192.168.1.101:15002")
 	fmt.Println(err)
 
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func TestWatch(t *testing.T) {

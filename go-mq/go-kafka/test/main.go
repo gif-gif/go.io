@@ -80,5 +80,5 @@ func main() {
 
 	golog.WithTag("gokafka").InfoF("send successfully")
 
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }

@@ -22,7 +22,7 @@ func TestEtcdConfigListener(t *testing.T) {
 		println(t.Name)
 	})
 
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func TestEtcdSaveConfig(t *testing.T) {

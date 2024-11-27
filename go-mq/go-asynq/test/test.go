@@ -17,7 +17,7 @@ const redisAddr = "127.0.0.1:6379"
 func main() {
 	serverTest()
 	clientAsynq()
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func clientAsynq() {

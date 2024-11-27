@@ -39,5 +39,5 @@ func main() {
 	}
 	glog.Info("Done2")
 
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }

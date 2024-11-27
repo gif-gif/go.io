@@ -69,7 +69,7 @@ func (c *consumer) Consume(topic string, handler ConsumerHandler) {
 
 	for {
 		select {
-		case <-gocontext.Cancel().Done():
+		case <-gocontext.WithCancel().Done():
 			return
 
 		case msg := <-pc.Messages():
@@ -94,7 +94,7 @@ func (c *consumer) ConsumeGroup(groupId string, topics []string, handler Consume
 		defer cg.Close()
 		for {
 			select {
-			case <-gocontext.Cancel().Done():
+			case <-gocontext.WithCancel().Done():
 				return
 
 			case err := <-cg.Errors():
@@ -104,7 +104,7 @@ func (c *consumer) ConsumeGroup(groupId string, topics []string, handler Consume
 		}
 	})
 
-	if err := cg.Consume(gocontext.Cancel(), topics, g); err != nil {
+	if err := cg.Consume(gocontext.WithCancel().Context, topics, g); err != nil {
 		golog.WithTag("gokafka-consumer-group").Error(err)
 	}
 }

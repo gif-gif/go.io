@@ -40,5 +40,5 @@ func TestAdmobApps(t *testing.T) {
 	}
 	res, err := gometa.Default().GetAudienceReport(&req, "")
 	golog.Info(res)
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }

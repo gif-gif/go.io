@@ -20,7 +20,7 @@ func (a *AccessTokenHandle) GetAccessToken() (string, error) {
 
 func main() {
 	testMiniProgram()
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func testMp() {

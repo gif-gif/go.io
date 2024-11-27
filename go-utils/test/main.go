@@ -48,7 +48,7 @@ func main() {
 	//golog.WithTag("a").Info(a)
 
 	testTIme()
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 type Person struct {

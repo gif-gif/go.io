@@ -24,7 +24,7 @@ type TestEvent struct {
 func main() {
 	goio.Init(goio.DEVELOPMENT)
 	simpleTest()
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func simpleTest() {

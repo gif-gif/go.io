@@ -14,7 +14,7 @@ var fileName = "test.apk"
 
 func main() {
 	cutLocalFile()
-	<-gocontext.Cancel().Done()
+	<-gocontext.WithCancel().Done()
 }
 
 func cutHttpFile() {

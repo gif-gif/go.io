@@ -32,7 +32,7 @@ func New(conf Config) (*GoKafka, error) {
 	__client := &GoKafka{conf: conf}
 	goutils.AsyncFunc(func() {
 		select {
-		case <-gocontext.Cancel().Done():
+		case <-gocontext.WithCancel().Done():
 			__client.Close()
 			return
 		}
