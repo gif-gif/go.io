@@ -3,7 +3,6 @@ package adapters
 import (
 	"github.com/gif-gif/go.io/go-log"
 	gokafka "github.com/gif-gif/go.io/go-mq/go-kafka"
-	"log"
 	"sync"
 )
 
@@ -35,13 +34,13 @@ func (fa *KafkaAdapter) Write(msg *golog.Message) {
 		return
 	}
 
-	err := client.Producer().SendAsyncMessage(fa.topic, msg.JSON(), func(msg *gokafka.ProducerMessage, err error) {
+	//err := client.Producer().SendAsyncMessage(msg.JSON(), func(msg *gokafka.ProducerMessage, err error) {
+	//
+	//})
 
-	})
-
-	if err != nil {
-		log.Println(err.Error())
-	}
+	//if err != nil {
+	//	log.Println(err.Error())
+	//}
 }
 
 func (fa *KafkaAdapter) CloseKafka() {
