@@ -14,5 +14,7 @@ type Config struct {
 	OffsetNewest      bool     `json:"offsetNewest,optional" yaml:"OffsetNewest"`
 	GroupId           string   `json:"groupId,optional" yaml:"GroupId"`
 
+	Version string `json:"version,optional" yaml:"Version"`
+
 	RedisConfig goredis.Config `json:"redisConfig,optional" yaml:"RedisConfig"`
 }
