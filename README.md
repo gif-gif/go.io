@@ -71,6 +71,11 @@ func main() {
 				c.Name, c.Mode, string(msg.JSON())))
 		}
 	})
+
+	// or 
+	//goio.Init(goio.Environment(c.Mode))
+	//goio.SetupLogDefault()
+	//goio.Setup(c.FeiShu)
 }
 
 ```
