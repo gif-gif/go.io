@@ -63,10 +63,7 @@ func New(conf Config) (cli *GoClickHouse, err error) {
 		Compression: &clickhouse.Compression{
 			Method: clickhouse.CompressionLZ4,
 		},
-		Debug: conf.Debug,
-		Debugf: func(format string, v ...any) {
-			golog.Debug(v...)
-		},
+		Debug:                conf.Debug,
 		BlockBufferSize:      10,
 		MaxCompressionBuffer: 10240,
 		ClientInfo: clickhouse.ClientInfo{ // optional, please see GoClickHouse info section in the README.md
@@ -79,6 +76,15 @@ func New(conf Config) (cli *GoClickHouse, err error) {
 		},
 		ConnOpenStrategy: clickhouse.ConnOpenInOrder,
 	}
+
+	if conf.Debugf == nil {
+		op.Debugf = func(format string, v ...any) {
+			golog.Debug(v...)
+		}
+	} else {
+		op.Debugf = conf.Debugf
+	}
+
 	cli.db = clickhouse.OpenDB(op)
 	conn, err := clickhouse.Open(op)
 	if err != nil {

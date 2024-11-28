@@ -3,6 +3,7 @@ package goio
 import (
 	"fmt"
 	golog "github.com/gif-gif/go.io/go-log"
+	"github.com/gif-gif/go.io/go-log/adapters"
 	gomessage "github.com/gif-gif/go.io/go-message"
 )
 
@@ -51,4 +52,10 @@ func Setup(feishu string) {
 			gomessage.FeiShu(feishu, fmt.Sprintf(">> %s/%s >> %s", Name, Env.String(), string(msg.JSON())))
 		}
 	})
+}
+
+func SetupLogDefault() {
+	if Env == TEST || Env == PRODUCTION {
+		golog.SetAdapter(adapters.NewFileAdapter())
+	}
 }
