@@ -76,14 +76,17 @@ func New(conf Config) (cli *GoClickHouse, err error) {
 		},
 		ConnOpenStrategy: clickhouse.ConnOpenInOrder,
 	}
-
-	if conf.Debugf == nil {
-		op.Debugf = func(format string, v ...any) {
-			golog.Debug(v...)
-		}
-	} else {
-		op.Debugf = conf.Debugf
+	op.Debugf = func(format string, v ...any) {
+		golog.Debug(v...)
 	}
+
+	//if conf.Debugf == nil {
+	//	op.Debugf = func(format string, v ...any) {
+	//		golog.Debug(v...)
+	//	}
+	//} else {
+	//	op.Debugf = conf.Debugf
+	//}
 
 	cli.db = clickhouse.OpenDB(op)
 	conn, err := clickhouse.Open(op)

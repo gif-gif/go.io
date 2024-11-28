@@ -16,5 +16,4 @@ type Config struct {
 	InsecureSkipVerify bool     `yaml:"InsecureSkipVerify" json:"insecureSkipVerify,optional"` // tls true 才会生效
 	AutoPing           bool     `yaml:"AutoPing" json:"autoPing,optional"`
 	Debug              bool     `yaml:"Debug" json:"debug,optional"`
-	Debugf             func(format string, v ...any)
 }
