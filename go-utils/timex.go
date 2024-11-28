@@ -246,7 +246,7 @@ func TimeRangeDates(startDate string, endDate string) []string {
 	return dates
 }
 
-func DatesForRangeTs(startTimestamp int64, endTimestamp int64) ([]string, error) {
+func DatesForRangeTs(startTimestamp int64, endTimestamp int64) []string {
 	// 转换为time.Time对象
 	startTime := time.Unix(startTimestamp, 0)
 	endTime := time.Unix(endTimestamp, 0)
@@ -267,7 +267,7 @@ func DatesForRangeTs(startTimestamp int64, endTimestamp int64) ([]string, error)
 		dates = append(dates, currentTime.Format("2006-01-02"))
 	}
 
-	return dates, nil
+	return dates
 }
 
 // convertTo24HourFormat 将时间字符串转换为 0-23 小时制
