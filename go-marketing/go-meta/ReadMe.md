@@ -21,5 +21,5 @@
 - https://developers.facebook.com/tools/explorer 短期口令（2个小时）
 - https://developers.facebook.com/tools/debug/accesstoken 延长口令(如果不访问60天，访问时自动延长)
 
-## 2 meta 开发工具
+- 2 meta 开发工具
 - https://developers.facebook.com/tools/

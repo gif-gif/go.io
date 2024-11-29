@@ -11,14 +11,13 @@ import (
 var __clients = map[string]*GoKafka{}
 
 func Init(conf Config, opts ...Option) (err error) {
-	name := conf.Name
-	if name == "" || name == "default" {
+	if conf.Name == "" {
 		conf.Name = "default"
 	}
-	if __clients[name] != nil {
+	if __clients[conf.Name] != nil {
 		return errors.New("GoKafka already exists")
 	}
-	__clients[name], err = New(conf, opts...)
+	__clients[conf.Name], err = New(conf, opts...)
 	if err != nil {
 		return err
 	}
