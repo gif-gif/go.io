@@ -246,7 +246,10 @@ func TimeRangeDates(startDate string, endDate string) []string {
 	return dates
 }
 
-func DatesForRangeTs(startTimestamp int64, endTimestamp int64) []string {
+func DatesForRangeTs(startTimestamp int64, endTimestamp int64, format string) []string {
+	if format == "" {
+		format = "2006-01-02"
+	}
 	// 转换为time.Time对象
 	startTime := time.Unix(startTimestamp, 0)
 	endTime := time.Unix(endTimestamp, 0)
@@ -257,14 +260,14 @@ func DatesForRangeTs(startTimestamp int64, endTimestamp int64) []string {
 	// 循环直到达到结束时间
 	for currentTime.Before(endTime) {
 		// 格式化输出日期
-		dates = append(dates, currentTime.Format("2006-01-02"))
+		dates = append(dates, currentTime.Format(format))
 		// 增加一天
 		currentTime = currentTime.AddDate(0, 0, 1)
 	}
 
 	// 输出最后一天（如果最后一天的时间戳在当天内）
-	if currentTime.Format("2006-01-02") == endTime.Format("2006-01-02") {
-		dates = append(dates, currentTime.Format("2006-01-02"))
+	if currentTime.Format(format) == endTime.Format(format) {
+		dates = append(dates, currentTime.Format(format))
 	}
 
 	return dates
