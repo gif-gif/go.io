@@ -336,3 +336,4 @@ func mysqlTest() {
 - https://github.com/apache/rocketmq-client-go
 - https://github.com/hibiken/asynq
 - https://github.com/xuri/excelize
+- https://github.com/samber/lo

@@ -1,4 +1,4 @@
-package goutils
+package gotime
 
 import (
 	"errors"
@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-// 这个包即将废弃，改用 gotime 包
 var (
 	TimeLayout string = "2006-01-02 15:04:05"
 	DateLayout        = "20060102"

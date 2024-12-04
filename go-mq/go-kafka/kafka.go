@@ -2,10 +2,8 @@ package gokafka
 
 import (
 	"errors"
-	gocontext "github.com/gif-gif/go.io/go-context"
 	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	golog "github.com/gif-gif/go.io/go-log"
-	goutils "github.com/gif-gif/go.io/go-utils"
 )
 
 var __clients = map[string]*GoKafka{}
@@ -27,21 +25,21 @@ func Init(conf Config, opts ...Option) (err error) {
 
 func New(conf Config, opts ...Option) (*GoKafka, error) {
 	__client := &GoKafka{conf: conf}
-	goutils.AsyncFunc(func() {
-		select {
-		case <-gocontext.WithCancel().Done():
-			__client.Close()
-			return
-		}
-	})
+	//goutils.AsyncFunc(func() {
+	//	select {
+	//	case <-gocontext.Cancel().Done():
+	//		__client.Close()
+	//		return
+	//	}
+	//})
+
+	err := __client.init()
 	for _, opt := range opts {
 		switch opt.Name {
 		case RedisName:
 			__client.redis = opt.Value.(*goredis.GoRedis)
 		}
 	}
-
-	err := __client.init()
 	return __client, err
 }
 

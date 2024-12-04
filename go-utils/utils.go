@@ -3,6 +3,7 @@ package goutils
 import (
 	"fmt"
 	"github.com/gogf/gf/util/gconv"
+	"github.com/samber/lo"
 	"golang.org/x/crypto/bcrypt"
 	"math"
 	"math/rand"
@@ -292,4 +293,8 @@ func IsInt(str string) bool {
 	// 使用正则表达式匹配字符串
 	ok := re.MatchString(str)
 	return ok
+}
+
+func Sum(list []int) int {
+	return lo.Sum(list)
 }
