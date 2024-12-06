@@ -96,7 +96,7 @@ func (c *CsvReader) ReadAll(encoding encoding.Encoding) ([][]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer c.file.Close()
+	defer c.Close()
 	// 读取所有记录
 	records, err := reader.ReadAll()
 	if err != nil {
@@ -111,7 +111,7 @@ func (c *CsvReader) ReadLine(encoding encoding.Encoding, lineDataFunc func(recor
 	if err != nil {
 		return err
 	}
-	defer c.file.Close()
+	defer c.Close()
 	// 按行读取文件
 	for {
 		record, err := reader.Read()
@@ -137,7 +137,7 @@ func (c *CsvReader) ReadLineJson(encoding encoding.Encoding, lineDataFunc func(r
 	if err != nil {
 		return err
 	}
-	defer c.file.Close()
+	defer c.Close()
 	// 获取标题行
 	// 创建一个切片来保存 JSON 对象
 	// 遍历每一行（从第二行开始，因为第一行是标题）
@@ -177,7 +177,7 @@ func (c *CsvReader) ReadAllJson(encoding encoding.Encoding) ([]map[string]string
 	if err != nil {
 		return nil, err
 	}
-	defer c.file.Close()
+	defer c.Close()
 	// 读取 CSV 文件的所有内容
 	records, err := reader.ReadAll()
 	if err != nil {
@@ -207,4 +207,27 @@ func (c *CsvReader) ReadAllJson(encoding encoding.Encoding) ([]map[string]string
 	}
 
 	return jsonData, nil
+}
+
+func (c *CsvReader) ReadTitles(encoding encoding.Encoding) ([]string, error) {
+	// 打开 CSV 文件
+	reader, err := c.getReader(encoding)
+	if err != nil {
+		return nil, err
+	}
+	defer c.Close()
+	// 获取标题行
+	// 第一行是标题视为 标题
+	record, err := reader.Read()
+	if err != nil {
+		return nil, err
+	}
+	headers := record
+	return headers, nil
+}
+
+func (c *CsvReader) Close() {
+	if c.file != nil {
+		c.file.Close()
+	}
 }

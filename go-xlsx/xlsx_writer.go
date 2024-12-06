@@ -111,6 +111,7 @@ func (x *XlsxWrite) Output(w http.ResponseWriter, filename string) (err error) {
 	header.Set("Content-Type", "application/octet-stream")
 	header.Set("Content-Disposition", "attachment; filename="+filename)
 	header.Set("Content-Transfer-Encoding", "binary")
+	header.Set("Expires", "0")
 
 	if err = x.fh.Write(w); err != nil {
 		return err
