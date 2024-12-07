@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	golog "github.com/gif-gif/go.io/go-log"
-	"github.com/gif-gif/go.io/go-log/adapters"
 	"github.com/gif-gif/go.io/go-utils/prometheusx"
 	"github.com/gif-gif/go.io/goio"
 	"github.com/gif-gif/go.io/goio/server"
@@ -43,20 +42,16 @@ func startSever() {
 		golog.WithTag("main").Error(err)
 		return
 	}
-
-	// 日志输出到文件
-	if confs.Env == goio.TEST || confs.Env == goio.PRODUCTION {
-		golog.SetAdapter(adapters.NewFileAdapter())
-	}
-
 	goio.Init(confs.Env)
+	goio.SetupLogDefault()
+	goio.Setup("")
 	prometheusx.Init(confs.Prometheus)
 	prometheusx.AlertErr(confs.Server.Name, "main start")
 
 	s := goserver.NewServer(
 		goserver.ServerNameOption("serverName"),
 		goserver.EnvOption(goio.Env),
-		goserver.EnableEncryptionOption("1a3295a2408d553a8458085e7435898e", "119f54388848cb4306f6d2067a4713fce4193504ca368d648196c840ba87da65"),
+		//goserver.EnableEncryptionOption("1a3295a2408d553a8458085e7435898e", "119f54388848cb4306f6d2067a4713fce4193504ca368d648196c840ba87da65"),
 		goserver.PProfEnableOption(false),
 		goserver.NoLogPathsOption("/captcha/get"),
 	)

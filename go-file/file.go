@@ -35,6 +35,15 @@ func DIR() string {
 	return path.Dir(file) + "/"
 }
 
+// GetFileInfo 获取文件信息
+func GetFileInfo(filename string) (size int64, mode os.FileMode, err error) {
+	info, err := os.Stat(filename)
+	if err != nil {
+		return 0, 0, err
+	}
+	return info.Size(), info.Mode(), nil
+}
+
 // 写文件，支持路径创建
 func WriteToFile(filename string, b []byte) error {
 	dirname := path.Dir(filename)
@@ -142,6 +151,7 @@ func GetFileHeaderMd5Name(fileHeader *multipart.FileHeader) (string, error) {
 	return name, nil //+ filepath.Ext(fileHeader.Filename)
 }
 
+// ReadEntireFile 读取整个文件到字节切片一样
 func GetFileContent(filePath string) ([]byte, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
