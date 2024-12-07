@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"
+	"io"
 	"net/http"
 )
 
@@ -70,48 +71,34 @@ func (x *XlsxWrite) Save2File(filename string) (err error) {
 }
 
 func (x *XlsxWrite) OutputForGin(ctx *gin.Context, filename string) (err error) {
-	err = x.fh.SetSheetRow(x.sheetName, "A1", x.titles)
-	if err != nil {
-		return err
-	}
-
-	for i := 0; i < len(x.rows); i++ {
-		err = x.fh.SetSheetRow(x.sheetName, fmt.Sprintf("A%d", i+2), x.rows[i])
-		if err != nil {
-			return err
-		}
-	}
-
 	ctx.Header("Content-Type", "application/octet-stream")
 	ctx.Header("Content-Disposition", "attachment; filename="+filename)
 	ctx.Header("Content-Transfer-Encoding", "binary")
-
-	if err = x.fh.Write(ctx.Writer); err != nil {
-		return err
-	}
-
-	return nil
+	ctx.Header("Expires", "0")
+	return x.Output(ctx.Writer)
 }
 
-func (x *XlsxWrite) Output(w http.ResponseWriter, filename string) (err error) {
-	err = x.fh.SetSheetRow(x.sheetName, "A1", x.titles)
-	if err != nil {
-		return err
-	}
-
-	for i := 0; i < len(x.rows); i++ {
-		err = x.fh.SetSheetRow(x.sheetName, fmt.Sprintf("A%d", i+2), x.rows[i])
-		if err != nil {
-			return err
-		}
-	}
-
+func (x *XlsxWrite) OutputResponseWriter(w http.ResponseWriter, filename string) (err error) {
 	header := w.Header()
-
 	header.Set("Content-Type", "application/octet-stream")
 	header.Set("Content-Disposition", "attachment; filename="+filename)
 	header.Set("Content-Transfer-Encoding", "binary")
 	header.Set("Expires", "0")
+	return x.Output(w)
+}
+
+func (x *XlsxWrite) Output(w io.Writer) (err error) {
+	err = x.fh.SetSheetRow(x.sheetName, "A1", x.titles)
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < len(x.rows); i++ {
+		err = x.fh.SetSheetRow(x.sheetName, fmt.Sprintf("A%d", i+2), x.rows[i])
+		if err != nil {
+			return err
+		}
+	}
 
 	if err = x.fh.Write(w); err != nil {
 		return err

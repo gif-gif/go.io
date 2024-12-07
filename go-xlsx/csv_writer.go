@@ -5,6 +5,7 @@ import (
 	"fmt"
 	gofile "github.com/gif-gif/go.io/go-file"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
 	"os"
 )
@@ -172,27 +173,12 @@ func (c *CsvWriter) Close() {
 }
 
 func (x *CsvWriter) OutputForGin(ctx *gin.Context, filename string) (err error) {
-	writer := csv.NewWriter(ctx.Writer)
-	defer writer.Flush()
-
 	ctx.Header("Content-Type", "application/octet-stream")
 	ctx.Header("Content-Disposition", "attachment; filename="+filename)
 	ctx.Header("Content-Transfer-Encoding", "binary")
 	ctx.Header("Expires", "0")
 	// 写入表头
-	if len(x.titles) > 0 {
-		if err := writer.Write(x.titles); err != nil {
-			return err
-		}
-	}
-	// 写入数据行
-	for _, row := range x.rows {
-		if err := writer.Write(row); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return x.Output(ctx.Writer)
 }
 
 func (x *CsvWriter) OutputResponseWriter(w http.ResponseWriter, filename string) (err error) {
@@ -201,9 +187,10 @@ func (x *CsvWriter) OutputResponseWriter(w http.ResponseWriter, filename string)
 	header.Set("Content-Disposition", "attachment; filename="+filename)
 	header.Set("Content-Transfer-Encoding", "binary")
 	header.Set("Expires", "0")
+	return x.Output(w)
+}
 
-	// 写入数据行
-	// 创建 CSV writer
+func (x *CsvWriter) Output(w io.Writer) (err error) {
 	writer := csv.NewWriter(w)
 	defer writer.Flush()
 
@@ -213,7 +200,6 @@ func (x *CsvWriter) OutputResponseWriter(w http.ResponseWriter, filename string)
 			return err
 		}
 	}
-
 	// 写入数据行
 	for _, row := range x.rows {
 		if err := writer.Write(row); err != nil {
