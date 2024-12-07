@@ -1,7 +1,6 @@
 package gofile
 
 import (
-	"bufio"
 	"io"
 	"os"
 )
@@ -17,31 +16,32 @@ func ReadEntireFile(filePath string) ([]byte, error) {
 }
 
 // ReadFileChunks 分块读取大文件，避免内存占用过大
-func ReadFileChunks(filePath string, chunkSize int, callback func(chunk []byte) error) error {
-	file, err := os.Open(filePath)
+func ReadFileChunks(filename string, chunkSize int, callback func(chunk []byte) error) error {
+	file, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	buffer := make([]byte, chunkSize)
-	reader := bufio.NewReader(file)
-
+	// 使用bytes.Buffer来读取文件
 	for {
-		n, err := reader.Read(buffer)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
+		// 每次创建新的buffer
+		chunk := make([]byte, chunkSize)
+		_, err := file.Read(chunk)
+		// 调用回调函数处理数据块
+		// 只传递实际读取的数据
+		if err := callback(chunk); err != nil {
 			return err
 		}
 
-		// 调用回调函数处理数据块
-		if err := callback(buffer[:n]); err != nil {
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 

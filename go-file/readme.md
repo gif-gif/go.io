@@ -6,19 +6,21 @@
 ```go
 func (this FileDownload) DoHandle(ctx *gin.Context) *goserver.Response {
     ds := gofile.NewGoDownload(ctx, "downloaded_file.csv", ctx.Writer, ctx.Request)
-    go ds.Run()
-    filePath := "file.csv"
-    err := gofile.ReadLines(filePath, func(chunk string) error {
-        ds.Write([]byte(chunk + "\n"))
+    err := ds.SetFileHeaders()
+    if err != nil {
         return nil
+    }
+    
+    filePath := "file.csv"
+    err = gofile.ReadLines(filePath, func(chunk string) error {
+    err = ds.Write([]byte(chunk + "\n"))
+        return err
     })
     
-    ds.Close()
     if err != nil {
         ds.Error(err)
         return nil
     }
-    ds.WaitDone()
     return nil
 }
 ```
@@ -27,13 +29,13 @@ func (this FileDownload) DoHandle(ctx *gin.Context) *goserver.Response {
 ```go
 func (this FileDownload) DoHandle(ctx *gin.Context) *goserver.Response {
 	ds := gofile.NewGoDownload(ctx, "downloaded_file.csv", ctx.Writer, ctx.Request)
-	go ds.Run()
+	err := ds.SetFileHeaders()
 	file := "file.csv"
-	err := ds.OutputByLine(file)
+	err = ds.Output(file)
 	if err != nil {
+		http.Error(ctx.Writer, "Streaming unsupported!", http.StatusInternalServerError)
 		return nil
 	}
-	ds.WaitDone()
 	return nil
 }
 ```
