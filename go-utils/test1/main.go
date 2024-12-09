@@ -1,43 +1,30 @@
 package main
 
 import (
-	gocontext "github.com/gif-gif/go.io/go-context"
-	gojob "github.com/gif-gif/go.io/go-job"
-	golog "github.com/gif-gif/go.io/go-log"
-	"github.com/go-co-op/gocron/v2"
-	"github.com/gogf/gf/os/glog"
-	"github.com/gogf/gf/util/gconv"
-	"time"
+	"fmt"
+	"github.com/shopspring/decimal"
 )
 
 func main() {
-	cron, _ := gojob.New()
-	cron.Start()
-	n := 0
-	job, _ := cron.SecondX(&[]gocron.JobOption{
-		gocron.WithSingletonMode(gocron.LimitModeWait)}, 1, func() {
-		golog.Info("Starting-" + gconv.String(n))
-		time.Sleep(5 * time.Second)
-		n++
-	})
-
-	time.Sleep(time.Second * 10)
-	err := cron.RemoveJob(job.ID())
+	price, err := decimal.NewFromString("136.02")
 	if err != nil {
-		glog.Error(err)
+		panic(err)
 	}
-	glog.Info("Done1")
 
-	job, _ = cron.SecondX(nil, 1, func() {
-		golog.Info("Starting1")
-	})
+	quantity := decimal.NewFromInt(3)
 
-	time.Sleep(time.Second * 10)
-	err = cron.RemoveJob(job.ID())
-	if err != nil {
-		glog.Error(err)
-	}
-	glog.Info("Done2")
+	fee, _ := decimal.NewFromString(".035")
+	taxRate, _ := decimal.NewFromString(".08875")
 
-	<-gocontext.WithCancel().Done()
+	subtotal := price.Mul(quantity)
+
+	preTax := subtotal.Mul(fee.Add(decimal.NewFromFloat(1)))
+
+	total := preTax.Mul(taxRate.Add(decimal.NewFromFloat(1)))
+
+	fmt.Println("Subtotal:", subtotal)                      // Subtotal: 408.06
+	fmt.Println("Pre-tax:", preTax)                         // Pre-tax: 422.3421
+	fmt.Println("Taxes:", total.Sub(preTax))                // Taxes: 37.482861375
+	fmt.Println("Total:", total)                            // Total: 459.824961375
+	fmt.Println("Tax rate:", total.Sub(preTax).Div(preTax)) // Tax rate: 0.08875
 }

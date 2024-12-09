@@ -6,9 +6,7 @@ import (
 	"github.com/gif-gif/go.io/go-db/gogorm"
 	golog "github.com/gif-gif/go.io/go-log"
 	gooauth "github.com/gif-gif/go.io/go-sso/go-oauth"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/admob/v1"
-	"log"
 	"testing"
 	"time"
 )
@@ -168,9 +166,5 @@ func TestAdmobAuthUrl(t *testing.T) {
 
 }
 func TestAdmobAuth(t *testing.T) {
-	client, err := google.DefaultClient(ctx, admob.AdMobReadonlyScope)
-	if err != nil {
-		log.Fatalf("Error creating HTTP client: %v", err)
-	}
 
 }
