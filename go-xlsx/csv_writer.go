@@ -29,6 +29,11 @@ func NewCsvWriter(csvFile string, comma rune) (*CsvWriter, error) {
 	}, nil
 }
 
+// 不需要创建本地文件， 只写入数据。如：网络IO
+func NewCsvWriterNoneFile(comma rune) (*CsvWriter, error) {
+	return NewCsvWriter("", comma)
+}
+
 func (c *CsvWriter) SetTitles(titles []string) {
 	c.titles = titles
 }
