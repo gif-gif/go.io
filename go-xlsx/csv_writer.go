@@ -3,7 +3,6 @@ package goxlsx
 import (
 	"encoding/csv"
 	"fmt"
-	gofile "github.com/gif-gif/go.io/go-file"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -23,14 +22,6 @@ type CsvWriter struct {
 }
 
 func NewCsvWriter(csvFile string, comma rune) (*CsvWriter, error) {
-	e := gofile.Exists(csvFile)
-	if !e {
-		file, err := os.Create(csvFile)
-		if err != nil {
-			return nil, err
-		}
-		file.Close() // 确保在函数结束时关闭文件
-	}
 	return &CsvWriter{
 		FilePath: csvFile,
 		Comma:    comma,

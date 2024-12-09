@@ -62,7 +62,10 @@ func WriteWithBuffer(w http.ResponseWriter, data []byte) error {
 
 func (g *GoDownload) Write(data []byte) error {
 	return WriteWithBuffer(g.w, data)
+}
 
+func (g *GoDownload) WriteString(data string) error {
+	return g.Write([]byte(data))
 }
 
 func (g *GoDownload) Error(err error) {
