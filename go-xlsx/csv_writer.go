@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 )
 
 type CsvWriter struct {
@@ -51,6 +52,11 @@ func (x *CsvWriter) AppendRows(data [][]string) *CsvWriter {
 func (c *CsvWriter) GetWriter() (*csv.Writer, error) {
 	// 打开 CSV 文件
 	// Open file in append mode
+	dirname := path.Dir(c.FilePath)
+	if _, err := os.Stat(dirname); err != nil {
+		os.MkdirAll(dirname, 0755)
+	}
+
 	file, err := os.OpenFile(c.FilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file: %v", err)
@@ -65,6 +71,10 @@ func (c *CsvWriter) GetWriter() (*csv.Writer, error) {
 // 一次性写入
 func (c *CsvWriter) WriteData(records [][]string) error {
 	// 写入记录到 CSV 文件
+	dirname := path.Dir(c.FilePath)
+	if _, err := os.Stat(dirname); err != nil {
+		os.MkdirAll(dirname, 0755)
+	}
 	file, err := os.OpenFile(c.FilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %v", err)
