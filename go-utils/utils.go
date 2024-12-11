@@ -298,3 +298,17 @@ func IsInt(str string) bool {
 func Sum(list []int) int {
 	return lo.Sum(list)
 }
+
+// 两个数组是否相等，判断长度一样的两个数组 元素是否完全相同，顺序可以不同
+func IsEqualArray[T comparable](arr1 []T, arr2 []T) bool {
+	if len(arr1) != len(arr2) {
+		return false
+	}
+
+	for _, v := range arr1 {
+		if !lo.Contains(arr2, v) {
+			return false
+		}
+	}
+	return true
+}

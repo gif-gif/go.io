@@ -7,23 +7,41 @@ func DateTime(format string) string {
 	return time.Now().Format(format)
 }
 
-func Today() string {
+func Today(format ...string) string {
+	if len(format) > 0 {
+		return DateTime(format[0])
+	}
 	return DateTime(time.DateOnly)
 }
 
-func Now() string {
+func Now(format ...string) string {
+	if len(format) > 0 {
+		return DateTime(format[0])
+	}
 	return DateTime(time.DateTime)
 }
 
-func NextDate(d int) string {
+func NextDate(d int, format ...string) string {
+	if len(format) > 0 {
+		return time.Now().AddDate(0, 0, d).Format(format[0])
+	}
 	return time.Now().AddDate(0, 0, d).Format(time.DateOnly)
 }
+func Yesterday(format ...string) string {
+	return NextDate(-1, format...)
+}
 
-func Ts2Date(ts int64) string {
+func Ts2Date(ts int64, format ...string) string {
+	if len(format) > 0 {
+		return time.Unix(ts, 0).Format(format[0])
+	}
 	return time.Unix(ts, 0).Format(time.DateOnly)
 }
 
-func Ts2DateTime(ts int64) string {
+func Ts2DateTime(ts int64, format ...string) string {
+	if len(format) > 0 {
+		return time.Unix(ts, 0).Format(format[0])
+	}
 	return time.Unix(ts, 0).Format(time.DateTime)
 }
 
