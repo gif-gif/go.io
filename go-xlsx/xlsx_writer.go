@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"
+	"golang.org/x/text/encoding"
 	"io"
 	"net/http"
 )
@@ -14,12 +15,18 @@ type XlsxWrite struct {
 	sheetName string
 	titles    *[]string
 	rows      []*[]interface{}
+	encoding.Encoding
 }
 
-func NewWriter() *XlsxWrite {
+func NewWriter(encoding ...encoding.Encoding) *XlsxWrite {
+	encode := UTF8
+	if len(encoding) > 0 {
+		encode = encoding[0]
+	}
 	return &XlsxWrite{
 		fh:        excelize.NewFile(),
 		sheetName: "Sheet1",
+		Encoding:  encode,
 	}
 }
 
@@ -88,6 +95,18 @@ func (x *XlsxWrite) OutputResponseWriter(w http.ResponseWriter, filename string)
 }
 
 func (x *XlsxWrite) Output(w io.Writer) (err error) {
+	//if x.Encoding == UTF8 {
+	//	_, err = w.Write(BOM_UTF8)
+	//	if err != nil {
+	//		return err
+	//	}
+	//} else if x.Encoding == UTF16 {
+	//	_, err = w.Write(BOM_UTF16)
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
+
 	err = x.fh.SetSheetRow(x.sheetName, "A1", x.titles)
 	if err != nil {
 		return err

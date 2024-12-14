@@ -8,7 +8,7 @@ import (
 func TestXlsxWrite(t *testing.T) {
 	w := NewWriter()
 	w.SetSheetName("test")
-	w.titles = &[]string{"title1", "title2", "title3"}
+	w.titles = &[]string{"测试", "title2", "title3"}
 	var data [][]interface{}
 	for i := 0; i < 10; i++ {
 		data = append(data, []interface{}{"1", "2", "3"})

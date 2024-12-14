@@ -4,6 +4,8 @@ import (
 	"encoding/csv"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/transform"
 	"io"
 	"net/http"
 	"os"
@@ -20,12 +22,18 @@ type CsvWriter struct {
 
 	titles []string
 	rows   [][]string
+	encoding.Encoding
 }
 
-func NewCsvWriter(csvFile string, comma rune) (*CsvWriter, error) {
+func NewCsvWriter(csvFile string, comma rune, encoding ...encoding.Encoding) (*CsvWriter, error) {
+	encode := UTF8
+	if len(encoding) > 0 {
+		encode = encoding[0]
+	}
 	return &CsvWriter{
 		FilePath: csvFile,
 		Comma:    comma,
+		Encoding: encode,
 	}, nil
 }
 
@@ -66,9 +74,24 @@ func (c *CsvWriter) GetWriter() (*csv.Writer, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file: %v", err)
 	}
+	// 写入 UTF-8 BOM
+	if c.Encoding == UTF8 {
+		_, err = file.Write(BOM_UTF8)
+		if err != nil {
+			file.Close()
+			return nil, err
+		}
+	} else if c.Encoding == UTF16 {
+		_, err = file.Write(BOM_UTF16)
+		if err != nil {
+			file.Close()
+			return nil, err
+		}
+	}
+
 	c.file = file
 	// 创建一个 CSV 写入器
-	writer := csv.NewWriter(file)
+	writer := csv.NewWriter(transform.NewWriter(file, c.Encoding.NewEncoder()))
 	writer.Comma = c.Comma // 使用分号作为分隔符
 	return writer, nil
 }
@@ -84,8 +107,21 @@ func (c *CsvWriter) WriteData(records [][]string) error {
 	if err != nil {
 		return fmt.Errorf("failed to open file: %v", err)
 	}
+
+	if c.Encoding == UTF8 {
+		_, err = file.Write(BOM_UTF8)
+		if err != nil {
+			return err
+		}
+	} else if c.Encoding == UTF16 {
+		_, err = file.Write(BOM_UTF16)
+		if err != nil {
+			return err
+		}
+	}
+
 	// 创建一个 CSV 写入器
-	writer := csv.NewWriter(file)
+	writer := csv.NewWriter(transform.NewWriter(file, c.Encoding.NewEncoder()))
 	writer.Comma = c.Comma // 使用分号作为分隔符
 	defer writer.Flush()   // 确保在函数结束时刷新写入器
 	// 写入记录到 CSV 文件
@@ -109,8 +145,21 @@ func (c *CsvWriter) AppendToCSV(data [][]string) error {
 	if err != nil {
 		return fmt.Errorf("failed to open file: %v", err)
 	}
+
+	//if c.Encoding == UTF8 {
+	//	_, err = file.Write(BOM_UTF8)
+	//	if err != nil {
+	//		return err
+	//	}
+	//} else if c.Encoding == UTF16 {
+	//	_, err = file.Write(BOM_UTF16)
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
+
 	// 创建一个 CSV 写入器
-	writer := csv.NewWriter(file)
+	writer := csv.NewWriter(transform.NewWriter(file, c.Encoding.NewEncoder()))
 	writer.Comma = c.Comma // 使用分号作为分隔符
 
 	defer writer.Flush()
@@ -156,7 +205,6 @@ func (c *CsvWriter) WriteLine(record []string) error {
 			return err
 		}
 		c.writer = w
-
 		// 写入记录到 CSV 文件
 		if err := c.writer.Write(c.titles); err != nil { //如果有titles 则自动写入
 			return err
@@ -183,7 +231,6 @@ func (x *CsvWriter) OutputForGin(ctx *gin.Context, filename string) (err error) 
 	ctx.Header("Content-Disposition", "attachment; filename="+filename)
 	ctx.Header("Content-Transfer-Encoding", "binary")
 	ctx.Header("Expires", "0")
-	// 写入表头
 	return x.Output(ctx.Writer)
 }
 
@@ -197,9 +244,21 @@ func (x *CsvWriter) OutputResponseWriter(w http.ResponseWriter, filename string)
 }
 
 func (x *CsvWriter) Output(w io.Writer) (err error) {
+	// 写入 UTF-8 BOM
+	if x.Encoding == UTF8 {
+		_, err = w.Write(BOM_UTF8)
+		if err != nil {
+			return err
+		}
+	} else if x.Encoding == UTF16 {
+		_, err = w.Write(BOM_UTF16)
+		if err != nil {
+			return err
+		}
+	}
+
 	writer := csv.NewWriter(w)
 	defer writer.Flush()
-
 	// 写入表头
 	if len(x.titles) > 0 {
 		if err := writer.Write(x.titles); err != nil {

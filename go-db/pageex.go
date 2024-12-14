@@ -16,9 +16,10 @@ type Page struct {
 	SortBy      []*OrderItem `json:"sort_by,optional"`
 	GroupBy     []string     `json:"group_by,optional"`
 	IgnoreTotal bool         `json:"ignore_total,optional"`
+	IgnoreList  bool         `json:"need_list,optional"`
 	OnlyTotal   bool         `json:"only_total,optional"`
 	Ids         []int64      `json:"ids,optional"`
-	States      []int64      `json:"ids,optional"`
+	States      []int64      `json:"states,optional"`
 }
 
 func (p *Page) OrderBy() string {

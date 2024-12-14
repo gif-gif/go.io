@@ -2,6 +2,7 @@ package goutils
 
 import (
 	"bytes"
+	"golang.org/x/text/encoding/simplifiedchinese"
 	"strings"
 	"unicode"
 )
@@ -41,4 +42,24 @@ func Case2Camel(str string) string {
 	str = strings.Replace(str, "_", " ", -1)
 	str = strings.Title(str)
 	return strings.Replace(str, " ", "", -1)
+}
+
+// 如果只需要转换单个字符串为 GBK
+func UTF8ToGBK(text string) (string, error) {
+	encoder := simplifiedchinese.GBK.NewEncoder()
+	gbkBytes, err := encoder.Bytes([]byte(text))
+	if err != nil {
+		return "", err
+	}
+	return string(gbkBytes), nil
+}
+
+// GBK 转 UTF8
+func GBKToUTF8(text string) (string, error) {
+	decoder := simplifiedchinese.GBK.NewDecoder()
+	bytes, err := decoder.Bytes([]byte(text))
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }

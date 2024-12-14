@@ -5,8 +5,6 @@ import (
 	"fmt"
 	gofile "github.com/gif-gif/go.io/go-file"
 	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/simplifiedchinese"
-	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 	"io"
 	"os"
@@ -17,20 +15,6 @@ type CsvReader struct {
 	Comma    rune //csv 列分割符
 	file     *os.File
 }
-
-// 常用文件编码
-// unicode.UTF8,
-// unicode.UTF16(BigEndian, UseBOM),
-// unicode.UTF16(BigEndian, IgnoreBOM),
-// unicode.UTF16(LittleEndian, IgnoreBOM),
-// 常用文件编码需要用
-var (
-	UTF8    = unicode.UTF8
-	UTF8BOM = unicode.UTF8BOM
-	GBK     = simplifiedchinese.GBK
-	//UTF16 有很多种 参考 unicode包
-	UTF16 = unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM)
-)
 
 // comma 默认传 ','
 func NewCsvReader(csvFile string, comma rune) (*CsvReader, error) {

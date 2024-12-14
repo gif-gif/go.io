@@ -135,3 +135,25 @@ func (c *NumberRangeController[T]) Where(column string) (string, []any) {
 
 	return whereString, args
 }
+
+// 返回没有order by 前缀
+func (p *Page) ClickHouseOrderByExt() string {
+	size := len(p.SortBy)
+	if size == 0 {
+		return ""
+	}
+
+	order := ""
+	for i, v := range p.SortBy {
+		order = order + v.Column + " "
+		if !v.Asc {
+			order = order + " desc "
+		}
+		if size-1 == i {
+
+		} else {
+			order = order + ","
+		}
+	}
+	return order
+}
