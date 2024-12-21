@@ -3,6 +3,14 @@ package goutils
 import "time"
 
 // 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
 
 // 当前时区相关日期函数
 func DateTime(format string) string {

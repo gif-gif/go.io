@@ -60,7 +60,7 @@ func Client() *GoMqttClient {
 		}
 	}
 
-	golog.WithTag("gokafka").Error("no default kafka client")
+	golog.WithTag("gomqtt").Error("no default mqtt client")
 
 	return nil
 }

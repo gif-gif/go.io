@@ -8,11 +8,6 @@ import (
 	"net/http"
 )
 
-type Belt struct {
-	DataChan  chan []byte
-	CloseChan chan interface{}
-}
-
 type GoDownload struct {
 	w        http.ResponseWriter
 	r        *http.Request
