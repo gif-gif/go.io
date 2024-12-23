@@ -10,6 +10,14 @@ import (
 )
 
 // 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
+// 这个包即将废弃，改用 gotime 包
 var (
 	TimeLayout string = "2006-01-02 15:04:05"
 	DateLayout        = "20060102"

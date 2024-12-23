@@ -1,4 +1,4 @@
-package goutils
+package gocrypto
 
 import (
 	"bytes"
@@ -11,11 +11,13 @@ import (
 	"crypto/rsa"
 	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/sha512"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"hash"
 	"io"
 	"math/big"
 	"net/url"
@@ -23,11 +25,62 @@ import (
 	"strings"
 )
 
-// 这个包即将废弃 用gocrpto包
-// 这个包即将废弃 用gocrpto包
-// 这个包即将废弃 用gocrpto包
-// 这个包即将废弃 用gocrpto包
-// 这个包即将废弃 用gocrpto包
+//md5
+//sha1
+//sha256
+//sha512
+
+const (
+	HashingAlgorithmMd5    = "md5"
+	HashingAlgorithmSha1   = "sha1"
+	HashingAlgorithmSha256 = "sha256"
+	HashingAlgorithmSha512 = "sha512"
+)
+
+//hex（十六进制）
+//base64
+
+const (
+	EncodingHex    = "hex"
+	EncodingBase64 = "base64"
+)
+
+// CreateHash 计算文件的哈希值
+// data: 输入数据
+// hashingAlgorithm: 哈希算法名称 ("md5", "sha1", "sha256", "sha512" 等)
+// encoding: 编码方式 ("hex" 或 "base64")
+func CreateHash(data []byte, hashingAlgorithm string, encoding string) (string, error) {
+	// 选择哈希算法
+	var h hash.Hash
+	switch hashingAlgorithm {
+	case HashingAlgorithmMd5:
+		h = md5.New()
+	case HashingAlgorithmSha1:
+		h = sha1.New()
+	case HashingAlgorithmSha256:
+		h = sha256.New()
+	case HashingAlgorithmSha512:
+		h = sha512.New()
+	default:
+		return "", fmt.Errorf("unsupported hashing algorithm: %s", hashingAlgorithm)
+	}
+
+	// 写入数据
+	h.Write(data)
+
+	// 获取哈希值
+	hashBytes := h.Sum(nil)
+
+	// 根据指定编码格式返回结果
+	switch encoding {
+	case EncodingHex:
+		return hex.EncodeToString(hashBytes), nil
+	case EncodingBase64:
+		return base64.StdEncoding.EncodeToString(hashBytes), nil
+	default:
+		return "", fmt.Errorf("unsupported encoding: %s", encoding)
+	}
+}
 
 // 生成 AES 密钥
 func GenerateAESKey() (string, error) {
