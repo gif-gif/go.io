@@ -5,7 +5,13 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
+
+func isValidFile(name string) bool {
+	return !strings.HasPrefix(name, "__MACOSX") &&
+		!strings.HasPrefix(filepath.Base(name), "._")
+}
 
 func UnzipFile(zipFile, destDir string) error {
 	// 打开 zip 文件
@@ -23,6 +29,11 @@ func UnzipFile(zipFile, destDir string) error {
 	// 遍历 zip 文件内容
 	for _, file := range reader.File {
 		// 构建完整路径
+		// 跳过 __MACOSX 目录和 ._ 开头的文件
+		if !isValidFile(file.Name) {
+			continue
+		}
+
 		path := filepath.Join(destDir, file.Name)
 
 		// 如果是目录，创建它
