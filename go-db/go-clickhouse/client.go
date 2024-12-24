@@ -52,13 +52,15 @@ func New(conf Config) (cli *GoClickHouse, err error) {
 		Protocol: clickhouse.HTTP,
 		TLS:      getTls,
 		Settings: clickhouse.Settings{
-			"max_execution_time": conf.MaxExecutionTime, //60,
+			//"max_execution_time": conf.MaxExecutionTime, //60,
+			"max_query_size": 104857600, //100M
 		},
 		//Settings: clickhouse.Settings{
 		//	"max_memory_usage":                 "10000000000",  // 增加内存使用限制
 		//	"max_bytes_before_external_group_by": "20000000000", // 增加分组操作前的字节限制
 		//	"max_block_size":                   "100000",       // 调整块大小
 		//},
+
 		DialTimeout: time.Second * time.Duration(conf.DialTimeout),
 		Compression: &clickhouse.Compression{
 			Method: clickhouse.CompressionLZ4,
