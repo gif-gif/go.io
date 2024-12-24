@@ -42,6 +42,12 @@ func ReceiveFile(assetsDir string, file *multipart.FileHeader) (*FileReceiveResu
 	res.OriginalFile = originalPath
 	res.FileName = fullName
 	res.FileMd5 = fileMd5
+	lastIndex := strings.LastIndex(file.Filename, ".")
+	if lastIndex >= 0 {
+		res.OriginalShortName = file.Filename[:lastIndex]
+	} else {
+		res.OriginalShortName = file.Filename
+	}
 	res.OriginalFileName = file.Filename
 	return res, nil
 }

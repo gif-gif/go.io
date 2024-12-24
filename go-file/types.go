@@ -7,11 +7,12 @@ const (
 )
 
 type FileReceiveResult struct {
-	OriginalFile     string
-	FileName         string
-	FileMd5          string
-	OriginalFileName string
-	ChunkCount       int64
+	OriginalFile      string //最终文件路径
+	FileName          string //最终文件名
+	FileMd5           string //最终文件Md5
+	OriginalFileName  string //原始文件名
+	OriginalShortName string //没有后缀的原始文件名
+	ChunkCount        int64
 }
 
 // fmt.Sprintf("%s.part%d", fileName, i)
