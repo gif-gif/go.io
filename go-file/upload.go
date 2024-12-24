@@ -41,6 +41,7 @@ func ReceiveFile(assetsDir string, file *multipart.FileHeader) (*FileReceiveResu
 	res := &FileReceiveResult{}
 	res.OriginalFile = originalPath
 	res.FileName = fullName
+	res.FileMd5 = fileMd5
 	res.OriginalFileName = file.Filename
 	return res, nil
 }

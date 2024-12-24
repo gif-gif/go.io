@@ -9,6 +9,7 @@ const (
 type FileReceiveResult struct {
 	OriginalFile     string
 	FileName         string
+	FileMd5          string
 	OriginalFileName string
 	ChunkCount       int64
 }
