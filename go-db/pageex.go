@@ -20,6 +20,7 @@ type Page struct {
 	OnlyTotal   bool         `json:"only_total,optional"`
 	Ids         []int64      `json:"ids,optional"`
 	States      []int64      `json:"states,optional"`
+	Statuses    []int64      `json:"statutes,optional"`
 }
 
 func (p *Page) OrderBy() string {

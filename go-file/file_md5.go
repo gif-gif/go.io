@@ -5,8 +5,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	golog "github.com/gif-gif/go.io/go-log"
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"os"
 )
 
@@ -85,4 +87,20 @@ func CalculateFileMD5(filePath string) (string, error) {
 	hashInString := fmt.Sprintf("%x", hashInBytes)
 
 	return hashInString, nil
+}
+
+func GetFileHeaderMd5Name(fileHeader *multipart.FileHeader) (string, error) {
+	file, err := fileHeader.Open()
+	if err != nil {
+		return "", err
+	}
+
+	body, err := io.ReadAll(file)
+	if err != nil {
+		return "", err
+	}
+
+	name := goutils.Md5(body)
+
+	return name, nil //+ filepath.Ext(fileHeader.Filename)
 }

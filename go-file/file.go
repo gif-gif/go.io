@@ -3,7 +3,6 @@ package gofile
 import (
 	"bufio"
 	"fmt"
-	"github.com/gif-gif/go.io/go-utils"
 	"io"
 	"mime/multipart"
 	"os"
@@ -132,22 +131,6 @@ func SaveFile(file *multipart.FileHeader, dst string) error {
 
 	_, err = io.Copy(out, src)
 	return err
-}
-
-func GetFileHeaderMd5Name(fileHeader *multipart.FileHeader) (string, error) {
-	file, err := fileHeader.Open()
-	if err != nil {
-		return "", err
-	}
-
-	body, err := io.ReadAll(file)
-	if err != nil {
-		return "", err
-	}
-
-	name := goutils.Md5(body)
-
-	return name, nil //+ filepath.Ext(fileHeader.Filename)
 }
 
 // ReadEntireFile 读取整个文件到字节切片一样
