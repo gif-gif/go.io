@@ -1,7 +1,10 @@
 package godb
 
 //简单的分布组件
-import "github.com/gogf/gf/util/gconv"
+import (
+	"github.com/gogf/gf/util/gconv"
+	"strconv"
+)
 
 type OrderItem struct {
 	Column string `json:"column"`
@@ -92,4 +95,15 @@ func (p *Page) GroupByStr() string {
 		}
 	}
 	return order
+}
+
+func (p *Page) PageTimeRange(filed string) string {
+	where := " "
+	if p.StartTime > 0 {
+		where += " and " + filed + " >= " + strconv.Itoa(int(p.StartTime))
+	}
+	if p.EndTime > 0 {
+		where += " and " + filed + " < " + strconv.Itoa(int(p.EndTime))
+	}
+	return where
 }

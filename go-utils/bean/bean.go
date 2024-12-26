@@ -44,6 +44,7 @@ type IOperationMethod[T any] interface {
 	GetValue() T
 }
 
+// 大于，大于等于，小于，小于等于，等于
 func CheckValue(r IOperationMethod[int64], val int64) bool {
 	method := r.GetMethod()
 	value := r.GetValue()
