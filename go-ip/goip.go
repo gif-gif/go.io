@@ -119,6 +119,7 @@ func (g *GoIp) IsLocalIP(ip net.IP) bool {
 	return ip.IsPrivate()
 }
 
+// 获取IP地址的地理位置信息 需要提供IpServiceUrl
 func (g *GoIp) GetIpLocation(ctx context.Context, ip string) (*IpLocation, error) {
 	netIP := net.ParseIP(ip)
 	if g.IsLocalIP(netIP) {
