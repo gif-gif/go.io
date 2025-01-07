@@ -7,7 +7,7 @@ import (
 
 func main() {
 	c := gojwt.Config{
-		AccessSecret:       "ad879037-c7a4-4063-9236-6bfc35d54b7d",
+		AccessSecret:       "111",
 		AccessExpire:       86400 * 360 * 10,
 		RefreshTokenExpire: 86400 * 360 * 10,
 	}
