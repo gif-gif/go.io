@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	ipRange *IpRange
+	ipRange    *IpRange
+	IpRangeUrl = "https://ip-ranges.amazonaws.com/ip-ranges.json"
 )
 
 type AmazonIp4 struct {
@@ -31,9 +32,8 @@ type IpRange struct {
 }
 
 func LoadRangeIps() (*IpRange, error) {
-	url := "https://ip-ranges.amazonaws.com/ip-ranges.json"
 	req := &gohttp.Request{
-		Url:     url,
+		Url:     IpRangeUrl,
 		Method:  gohttp.GET,
 		Headers: map[string]string{"User-Agent": "github.com/gif-gif/go.io"},
 	}
@@ -47,10 +47,11 @@ func LoadRangeIps() (*IpRange, error) {
 	return res, nil
 }
 
+// 缓存ipRange信息
+// GetCacheIpRanges 方法获取
 func LoadRangeIpsAndCache() error {
-	url := "https://ip-ranges.amazonaws.com/ip-ranges.json"
 	req := &gohttp.Request{
-		Url:     url,
+		Url:     IpRangeUrl,
 		Method:  gohttp.GET,
 		Headers: map[string]string{"User-Agent": "github.com/gif-gif/go.io"},
 	}
