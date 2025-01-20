@@ -48,8 +48,7 @@ type Request struct {
 	RetryWaitTime time.Duration
 	proxyURL      string
 
-	//IsAll         bool //一次性并发，默认false, IsConcurrency=true时生效，isAll=true时，一开始url+urls 并行请求，否则先请求url,再并行请求urls
-	//IsConcurrency bool //并行处理，默认false，url--> urls 一个一个串行请求
+	SetCloseConnection bool //是否关闭连接
 
 	//gotrace infos
 	TraceInfo     resty.TraceInfo

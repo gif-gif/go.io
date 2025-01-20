@@ -61,7 +61,7 @@ func AsyncFuncPanic(fn func(), errFn func(err any)) {
 	}()
 }
 
-// 异步执行（安全）
+// 异步执行（安全） RunSafe
 func AsyncFunc(fn func()) {
 	go func() {
 		defer Recovery(nil)

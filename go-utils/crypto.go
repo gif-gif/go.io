@@ -23,11 +23,13 @@ import (
 	"strings"
 )
 
-// 这个包即将废弃 用gocrpto包
-// 这个包即将废弃 用gocrpto包
-// 这个包即将废弃 用gocrpto包
-// 这个包即将废弃 用gocrpto包
-// 这个包即将废弃 用gocrpto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
 
 // 生成 AES 密钥
 func GenerateAESKey() (string, error) {
