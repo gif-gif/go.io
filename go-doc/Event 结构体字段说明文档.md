@@ -38,8 +38,6 @@
 ## 地理位置和网络信息
 | 字段名 | 类型 | 说明 |
 |--------|------|------|
-
-
 | Ip | string | 广告的 IP（IsVpn=1 时为 漂移国家ip，否则为 用户国家 ip）|
 | VpnIp | string | VPN 节点 IP |
 | VpnIsp | string | VPN IP 对应的运营商（使用客户端上报的 VpnIdc）|
