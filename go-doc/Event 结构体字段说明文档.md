@@ -65,25 +65,30 @@
 | IsVpnAd | uint8 | 是否为 VPN 广告 |
 
 ## 广告相关字段
-| 字段名 | 类型 | 说明 |
-|--------|------|------|
-| Ecpm | float64 | 每次展示的广告价值（没有时用 0）|
-| Platform | string | 广告平台（如 AdMob,Meta, Applovin, Pangle 等）|
-| AdType | string | 广告位类型（app_open/rewarded_video/interstitial/banner/native）|
-| AdCountryCode | string | 广告的国家（漂移国家-小写国家code,如：美国-》us） |
-| PlatformAccountCode | string | 广告平台账号 code |
-| PlatformAccountName | string | 广告平台账号名称 |
-| PlatformAccountAppId | string | 平台账号下的 AppId |
-| AdPlacementCode | string | 广告位 code |
-| AdPlacementName | string | 广告位名称 |
-| AdSegmentCode | string | 广告分组 code |
-| AdSegmentName | string | 广告分组名称 |
-| MediaPlatform | string | 第三方聚合平台（如 TopOn, Max 等）|
-| MediaSlotId | string | 第三方聚合平台广告位 ID(TopOnID) |
-| SlotId | string | 实际的广告位 ID（如 AdMob 的广告位 ID）|
-| LoadTime | int64 | 请求加载时间（单位：秒）|
-| PagePos | string | 页面位置 |
-| CacheAd | uint8 | 缓存广告标识 |
+| 字段名 | 类型 | 说明                                                        |
+|--------|------|-----------------------------------------------------------|
+| Ecpm | float64 | 每次展示的广告价值（没有时用 0）                                         |
+| Platform | string | 广告平台（如 AdMob,Meta, Applovin, Pangle 等）                    |
+| AdType | string | 广告位类型（app_open/rewarded_video/interstitial/banner/native） |
+| AdCountryCode | string | 广告的国家（漂移国家-小写国家code,如：美国-》us）                             |
+| PlatformAccountCode | string | 广告平台账号 code                                               |
+| PlatformAccountName | string | 广告平台账号名称                                                  |
+| PlatformAccountAppId | string | 平台账号下的 AppId                                              |
+| AdPlacementCode | string | 广告位 code                                                  |
+| AdPlacementName | string | 广告位名称                                                     |
+| AdSegmentCode | string | 广告分组 code                                                 |
+| AdSegmentName | string | 广告分组名称                                                    |
+| MediaPlatform | string | 第三方聚合平台（如 TopOn, Max 等）                                   |
+| MediaSlotId | string | 第三方聚合平台广告位 ID(TopOnID)                                    |
+| SlotId | string | 实际的广告位 ID（如 AdMob 的广告位 ID）                                |
+| LoadTime | int64 | 请求加载时间（单位：秒）                                              |
+| PagePos | string | 页面位置                                                      |
+| CacheAd | uint8 | 缓存广告标识                                                    |
+
+| TimeSlot60 | uint8 | 小时60分钟纬度                                                  |
+| AdShowSuccessCount | uint8 | 广告展示                                                      |
+| AvgIpAdShowSuccessCount | uint8 | 广告展示/每Ip                                                  |
+| AdIpCount | uint8 | 独立IP数量                                                    |
 
 ## 其他字段
 | 字段名 | 类型 | 说明 |
@@ -97,6 +102,21 @@
 | MergeVersion | uint32 | 日志合并版本号（值为：MaxUint32-RequestTime，目的：合并时使用 RequestTime 最小值）|
 
 
+
+## 自定义相关字段
+| 字段名 | 类型 | 说明       |
+|--------|------|----------|
+| TimeSlot60 | uint8 | 小时60分钟纬度 |
+| AdShowSuccessCount | uint8 | 广告展示     |
+| AvgIpAdShowSuccessCount | uint8 | 广告展示/每Ip |
+| AdIpCount | uint8 | 独立IP数量   |
+| AdLastNodeIdCount | uint8 | 独立节点数量   |
+| AvgIpAdUserCount | uint8 | 独立用户/每Ip |
+| NewUserCount | uint8 | 新用户数     |
+| AdUserIpu | uint8 | 广告数量/用户  |
+| AdUserCount | uint8 | 广告用户     |
+| AvgEcpm | uint8 | 平均Ecpm   |
+| income | uint8 | 收入       |
 
 
 
