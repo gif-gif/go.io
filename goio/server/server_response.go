@@ -3,8 +3,10 @@ package goserver
 import (
 	"encoding/json"
 	"fmt"
+	goerror "github.com/gif-gif/go.io/go-error"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-playground/validator/v10"
+	"github.com/gogf/gf/util/gconv"
 	"github.com/samber/lo"
 
 	"strings"
@@ -90,12 +92,23 @@ func SuccessResponse(data any) *Response {
 }
 
 // 便捷方法: 快速创建错误响应
-func ErrorResponse(errorCode string, errorMessage string, showType ...uint32) *Response {
+func ErrorResponseX(errorCode string, errorMessage string, showType ...uint32) *Response {
 	return NewResponseBuilder().
 		WithSuccess(false).
 		WithErrorCode(errorCode).
 		WithErrorMessage(errorMessage).
 		WithShowType(lo.If[uint32](len(showType) == 0, 0).Else(showType[0])).
+		Build()
+}
+
+func ErrorResponse(err *goerror.CodeError) *Response {
+	return NewResponseBuilder().
+		WithSuccess(false).
+		WithErrorCode(gconv.String(err.GetErrCode())).
+		WithErrorMessage(err.GetErrMsg()).
+		WithShowType(err.GetShowType()).
+		WithTraceId(err.GetTraceId()).
+		WithHost(err.GetHost()).
 		Build()
 }
 
