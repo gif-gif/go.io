@@ -45,7 +45,8 @@ func (e *CodeError) GetHost() string {
 }
 
 func (e *CodeError) Error() string {
-	return fmt.Sprintf("ErrCode:%d，ErrMsg:%s", e.errCode, e.errMsg)
+	//return fmt.Sprintf("ErrCode:%d，ErrMsg:%s", e.errCode, e.errMsg)
+	return fmt.Sprintf("ErrCode:%d，ErrMsg:%s，ShowType:%d，TraceId:%s，Host:%s", e.errCode, e.errMsg, e.showType, e.traceId, e.host)
 }
 
 func NewErrCodeMsg(errCode uint32, errMsg string) *CodeError {

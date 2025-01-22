@@ -58,10 +58,10 @@ func GetErrCodeMsg(err error) (errCode uint32, errMsg string) {
 // CodeErrorBuilder.build() 构建 CodeError
 //
 // 返回错误码 CodeErrorBuilder
-func GetCodeError(err error) CodeErrorBuilder {
+func GetCodeError(err error) *CodeErrorBuilder {
 	codeErr := NewCodeErrorBuilder()
 	if err == nil {
-		return *codeErr
+		return codeErr
 	}
 	errCode := uint32(500)
 	errMsg := "server error"
@@ -90,5 +90,5 @@ func GetCodeError(err error) CodeErrorBuilder {
 	}
 
 	codeErr.WithErrCode(errCode).WithErrMsg(errMsg)
-	return *codeErr
+	return codeErr
 }
