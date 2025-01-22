@@ -1,5 +1,6 @@
 package goerror
 
+// 常用错误码
 // 成功返回
 const OK uint32 = 0
 
@@ -22,4 +23,10 @@ const DB_ERROR uint32 = 555
 const REDIS_ERROR uint32 = 666
 const ETCD_ERROR uint32 = 777
 
-//用户模块
+// 错误处理枚举
+// showType?: number; // error display type： 0 silent; 1 message.warn; 2 message.error; 4 notification; 9 page
+const ShowTypeSilent uint32 = 0
+const ShowTypeMessageWarn uint32 = 1
+const ShowTypeMessageError uint32 = 2
+const ShowTypeNotification uint32 = 4
+const ShowTypePage uint32 = 9

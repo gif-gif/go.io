@@ -21,6 +21,7 @@ func IsErrCode(err error, code uint32) bool {
 	return code == errCode
 }
 
+// 建议用 GetCodeError
 func GetErrCodeMsg(err error) (errCode uint32, errMsg string) {
 	if err == nil {
 		return 0, ""
@@ -36,7 +37,7 @@ func GetErrCodeMsg(err error) (errCode uint32, errMsg string) {
 	} else {
 		if gstatus, ok := status.FromError(causeErr); ok { // grpc err错误
 			grpcCode := uint32(gstatus.Code())
-			if IsCodeErr(grpcCode) { //区分自定义错误跟系统底层、db等错误，底层、db错误不能返回给前端
+			if IsCodeErr(grpcCode) { //区分自定义错误跟系统底层、db等错误，底层、db错误
 				errCode = grpcCode
 				errMsg = gstatus.Message()
 			} else {
@@ -52,4 +53,42 @@ func GetErrCodeMsg(err error) (errCode uint32, errMsg string) {
 	}
 
 	return
+}
+
+// CodeErrorBuilder.build() 构建 CodeError
+//
+// 返回错误码 CodeErrorBuilder
+func GetCodeError(err error) CodeErrorBuilder {
+	codeErr := NewCodeErrorBuilder()
+	if err == nil {
+		return *codeErr
+	}
+	errCode := uint32(500)
+	errMsg := "server error"
+
+	causeErr := errors.Cause(err)           // err类型
+	if e, ok := causeErr.(*CodeError); ok { //自定义错误类型
+		//自定义CodeError
+		errCode = e.GetErrCode()
+		errMsg = e.GetErrMsg()
+	} else {
+		if gstatus, ok := status.FromError(causeErr); ok { // grpc err错误
+			grpcCode := uint32(gstatus.Code())
+			if IsCodeErr(grpcCode) { //区分自定义错误跟系统底层、db等错误，底层、db错误
+				errCode = grpcCode
+				errMsg = gstatus.Message()
+			} else {
+				if errorsx != nil {
+					if _, ok := errorsx[grpcCode]; ok {
+						errCode = grpcCode
+						errMsg = gstatus.Message()
+					}
+				}
+			}
+
+		}
+	}
+
+	codeErr.WithErrCode(errCode).WithErrMsg(errMsg)
+	return *codeErr
 }

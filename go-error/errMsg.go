@@ -33,7 +33,8 @@ var (
 	ErrEtcdError         = NewErrCode(ETCD_ERROR)
 )
 
-// 扩展的错误类型这里初始化
+// 扩展的错误类型这里初始化, GetErrCodeMsg 中自动处理
+// 优先使用自定义错误类型，然后再使用扩展错误类型
 func Init(errs map[uint32]string) {
 	errorsx = errs
 }
