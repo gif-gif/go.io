@@ -47,7 +47,7 @@ func (lu LocalUpload) Upload(c *gin.Context, uploadDir string) *Response {
 		return Error(7005, fmt.Sprintf("上传失败，原因：%s", err.Error()))
 	}
 
-	return Success(gin.H{
+	return SuccessResponse(gin.H{
 		"url": filename,
 	})
 }

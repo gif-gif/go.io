@@ -18,5 +18,5 @@ func (this Captcha) DoHandle(ctx *gin.Context) *goserver.Response {
 		return goserver.Error(7001, err.Error())
 	}
 	rsp := goutils.CaptchaGet(this.request.Width, this.request.Height)
-	return goserver.Success(rsp)
+	return goserver.SuccessResponse(rsp)
 }

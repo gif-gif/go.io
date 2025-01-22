@@ -10,19 +10,104 @@ import (
 )
 
 type Response struct {
-	Code    int32         `json:"code"`
-	Message string        `json:"message"`
-	Data    interface{}   `json:"data"`
-	Errors  []interface{} `json:"-"`
+	Success      bool   `json:"success"`
+	Data         any    `json:"data"`
+	ErrorCode    string `json:"errorCode"`
+	ErrorMessage string `json:"errorMessage"`
+	ShowType     uint32 `json:"showType"`
+	TraceId      string `json:"traceId"`
+	Host         string `json:"host"`
+}
+
+// ResponseBuilder 是 Response 的构建器
+type ResponseBuilder struct {
+	response *Response
+}
+
+// NewResponseBuilder 创建一个新的 Response 构建器
+func NewResponseBuilder() *ResponseBuilder {
+	return &ResponseBuilder{
+		response: &Response{
+			Success: true, // 默认设置为成功
+		},
+	}
+}
+
+// WithSuccess 设置成功状态
+func (b *ResponseBuilder) WithSuccess(success bool) *ResponseBuilder {
+	b.response.Success = success
+	return b
+}
+
+// WithData 设置数据
+func (b *ResponseBuilder) WithData(data any) *ResponseBuilder {
+	b.response.Data = data
+	return b
+}
+
+// WithErrorCode 设置错误代码
+func (b *ResponseBuilder) WithErrorCode(errorCode string) *ResponseBuilder {
+	b.response.ErrorCode = errorCode
+	return b
+}
+
+// WithErrorMessage 设置错误信息
+func (b *ResponseBuilder) WithErrorMessage(errorMessage string) *ResponseBuilder {
+	b.response.ErrorMessage = errorMessage
+	return b
+}
+
+// WithShowType 设置显示类型
+func (b *ResponseBuilder) WithShowType(showType uint32) *ResponseBuilder {
+	b.response.ShowType = showType
+	return b
+}
+
+// WithTraceId 设置追踪ID
+func (b *ResponseBuilder) WithTraceId(traceId string) *ResponseBuilder {
+	b.response.TraceId = traceId
+	return b
+}
+
+// WithHost 设置主机信息
+func (b *ResponseBuilder) WithHost(host string) *ResponseBuilder {
+	b.response.Host = host
+	return b
+}
+
+// Build 构建并返回最终的 Response 对象
+func (b *ResponseBuilder) Build() *Response {
+	return b.response
+}
+
+// 便捷方法: 快速创建成功响应
+func SuccessResponse(data any) *Response {
+	return NewResponseBuilder().
+		WithSuccess(true).
+		WithData(data).
+		Build()
+}
+
+// 便捷方法: 快速创建错误响应
+func ErrorResponse(errorCode string, errorMessage string, showType uint32) *Response {
+	return NewResponseBuilder().
+		WithSuccess(false).
+		WithErrorCode(errorCode).
+		WithErrorMessage(errorMessage).
+		WithShowType(showType).
+		Build()
 }
 
 func (rsp *Response) Copy() *Response {
-	r := &Response{
-		Code:    rsp.Code,
-		Message: rsp.Message,
-		Data:    rsp.Data,
-		Errors:  rsp.Errors,
-	}
+	r := NewResponseBuilder().
+		WithSuccess(rsp.Success).
+		WithData(rsp.Data).
+		WithErrorCode(rsp.ErrorCode).
+		WithErrorMessage(rsp.ErrorMessage).
+		WithShowType(rsp.ShowType).
+		WithTraceId(rsp.TraceId).
+		WithHost(rsp.Host).
+		Build()
 	return r
 }
 
@@ -34,23 +119,13 @@ func (rsp *Response) String() string {
 	return string(buf)
 }
 
-func Success(data interface{}) *Response {
-	if data == nil {
-		data = map[string]interface{}{}
-	}
-	return &Response{
-		Code:    0,
-		Message: "ok",
-		Data:    data,
-	}
-}
-
+// Error 创建带格式化错误消息的错误响应
 func Error(code int32, message string, v ...interface{}) *Response {
-	return &Response{
-		Code:    code,
-		Message: message,
-		Errors:  v,
-	}
+	return NewResponseBuilder().
+		WithSuccess(false).
+		WithErrorCode(fmt.Sprintf("%d", code)).
+		WithErrorMessage(fmt.Sprintf(message, v...)).
+		Build()
 }
 
 func ErrorWithValidate(err error, messages map[string]string) *Response {

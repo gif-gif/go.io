@@ -60,5 +60,5 @@ func (this Login) DoHandle(ctx *gin.Context) *goserver.Response {
 	ctx.Set("user_id", userId)
 	ctx.Set("username", userName)
 
-	return goserver.Success(this.Response)
+	return goserver.SuccessResponse(this.Response)
 }

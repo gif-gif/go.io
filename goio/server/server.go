@@ -180,15 +180,11 @@ func (s *Server) log(c *gin.Context) {
 				return
 			}
 
-			if ll := len(r.Errors); r.Errors != nil && ll > 0 {
-				l.Error(r.Errors)
+			if r.Success {
 				return
 			}
 
-			if r.Code > 0 {
-				l.Warn()
-				return
-			}
+			l.Error(r.ErrorCode, r.ErrorMessage, r.ShowType, r.TraceId, r.Host)
 		}
 	}
 
