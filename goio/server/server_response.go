@@ -5,6 +5,7 @@ import (
 	"fmt"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-playground/validator/v10"
+	"github.com/samber/lo"
 
 	"strings"
 )
@@ -89,12 +90,12 @@ func SuccessResponse(data any) *Response {
 }
 
 // 便捷方法: 快速创建错误响应
-func ErrorResponse(errorCode string, errorMessage string, showType uint32) *Response {
+func ErrorResponse(errorCode string, errorMessage string, showType ...uint32) *Response {
 	return NewResponseBuilder().
 		WithSuccess(false).
 		WithErrorCode(errorCode).
 		WithErrorMessage(errorMessage).
-		WithShowType(showType).
+		WithShowType(lo.If[uint32](len(showType) == 0, 0).Else(showType[0])).
 		Build()
 }
 
