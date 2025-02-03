@@ -34,6 +34,9 @@ func simpleTest() {
 	})
 	event.Publish("test", "test")
 	time.Sleep(1 * time.Second)
+	for i := 0; i < 10; i++ {
+		event.Publish("test", "test-"+gconv.String(i))
+	}
 	event.UnSubscribe("test")
 }
 
