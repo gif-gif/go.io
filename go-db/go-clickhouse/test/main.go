@@ -9,7 +9,7 @@ import (
 
 func main() {
 	err := goclickhouse2.Init(goclickhouse2.Config{
-		Addr:               []string{"122.228.113.238:111"},
+		Addr:               []string{"122.28.113.238:111"},
 		User:               "default",
 		Password:           "111",
 		Database:           "xzdsp",

@@ -1,5 +1,10 @@
 package goclickhouse
 
+const (
+	MaxSizeToDelete   = 50 * 1024 * 1024 * 1024 // 50GB in bytes
+	BatchSizeToDelete = 10000000                // 每批删除的记录数
+)
+
 type Config struct {
 	Name string `yaml:"Name" json:"name,optional"`
 	//Driver             string `yaml:"Driver" json:"driver,optional"`
@@ -16,4 +21,10 @@ type Config struct {
 	InsecureSkipVerify bool     `yaml:"InsecureSkipVerify" json:"insecureSkipVerify,optional"` // tls true 才会生效
 	AutoPing           bool     `yaml:"AutoPing" json:"autoPing,optional"`
 	Debug              bool     `yaml:"Debug" json:"debug,optional"`
+}
+
+// 获取分区信息
+type PartitionInfo struct {
+	Partition string
+	Size      uint64
 }

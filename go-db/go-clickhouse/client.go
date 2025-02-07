@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"database/sql"
+	"fmt"
 	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	gojob "github.com/gif-gif/go.io/go-job"
@@ -124,6 +125,28 @@ func (cli *GoClickHouse) Conn() driver.Conn {
 	return cli.conn
 }
 
+func (cli *GoClickHouse) Close() error {
+	if cli.db != nil {
+		err := cli.db.Close()
+		if err != nil {
+			return err
+		}
+	}
+	if cli.cron != nil {
+		err := cli.cron.Stop()
+		if err != nil {
+			return err
+		}
+	}
+	if cli.conn != nil {
+		err := cli.conn.Close()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (cli *GoClickHouse) ping() {
 	if cli.db == nil {
 		return
@@ -140,6 +163,98 @@ func (cli *GoClickHouse) ping() {
 	}
 
 	golog.WithTag("goclickhouse").Error(err)
+}
+
+// OPTIMIZE
+func (cli *GoClickHouse) OptimizePartition(context context.Context, tableName string, isFinal bool, partitions ...string) error {
+	finalStr := ""
+	if isFinal {
+		finalStr = "FINAL"
+	}
+	s := "OPTIMIZE TABLE " + tableName + " " + finalStr + ";"
+	if len(partitions) > 0 {
+		for _, partition := range partitions {
+			s = "OPTIMIZE TABLE " + tableName + " PARTITION '" + partition + "' " + finalStr + ";"
+			err := cli.conn.Exec(context, s)
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+		err := cli.conn.Exec(context, s)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (cli *GoClickHouse) GetPartitions(ctx context.Context, tableName string) ([]PartitionInfo, error) {
+	query := `
+		SELECT 
+			partition,
+			sum(bytes) as size
+		FROM system.parts 
+		WHERE table = $1 
+		GROUP BY partition 
+		ORDER BY partition
+	`
+
+	rows, err := cli.conn.Query(ctx, query, tableName)
+	if err != nil {
+		return nil, fmt.Errorf("查询分区信息失败: %v", err)
+	}
+	defer rows.Close()
+
+	var partitions []PartitionInfo
+	for rows.Next() {
+		var p PartitionInfo
+		if err := rows.Scan(&p.Partition, &p.Size); err != nil {
+			return nil, fmt.Errorf("读取分区信息失败: %v", err)
+		}
+		partitions = append(partitions, p)
+	}
+
+	return partitions, nil
+}
+
+// 获取分区内的最小和最大ID
+func (cli *GoClickHouse) GetPartitionIDRange(ctx context.Context, tableName, partition string) (min, max uint64, err error) {
+	query := fmt.Sprintf(`
+		SELECT 
+			min(id) as min_id,
+			max(id) as max_id
+		FROM %s 
+		WHERE partition = $1
+	`, tableName)
+
+	row := cli.conn.QueryRow(ctx, query, partition)
+	if err := row.Scan(&min, &max); err != nil {
+		return 0, 0, fmt.Errorf("获取ID范围失败: %v", err)
+	}
+	return min, max, nil
+}
+
+// 删除分区内的部分数据
+func (cli *GoClickHouse) DeletePartitionData(ctx context.Context, tableName string, partition string, startID, endID uint64) error {
+	query := fmt.Sprintf(`
+		ALTER TABLE %s 
+		DELETE WHERE partition = $1 AND id >= $2 AND id < $3
+	`, tableName)
+
+	if err := cli.conn.Exec(ctx, query, partition, startID, endID); err != nil {
+		return fmt.Errorf("删除数据失败: %v", err)
+	}
+	return nil
+}
+
+// 删除整个分区
+func (cli *GoClickHouse) DropPartition(ctx context.Context, tableName, partition string) error {
+	query := fmt.Sprintf(`ALTER TABLE %s DROP PARTITION $1`, tableName)
+	if err := cli.conn.Exec(ctx, query, partition); err != nil {
+		return fmt.Errorf("删除分区失败: %v", err)
+	}
+	return nil
 }
 
 // BaseModel 注意T必须为指针类型
