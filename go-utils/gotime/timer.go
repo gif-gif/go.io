@@ -23,11 +23,12 @@ func NewTimer(duration time.Duration) *Timer {
 	return &Timer{
 		duration: duration,
 		// 使用buffered channels避免阻塞
-		stop:   make(chan struct{}, 1),
-		pause:  make(chan struct{}, 1),
-		resume: make(chan struct{}, 1),
-		reset:  make(chan time.Duration, 1),
-		force:  make(chan struct{}, 1),
+		stop:      make(chan struct{}, 1),
+		pause:     make(chan struct{}, 1),
+		resume:    make(chan struct{}, 1),
+		reset:     make(chan time.Duration, 1),
+		force:     make(chan struct{}, 1),
+		isStopped: true,
 	}
 }
 
