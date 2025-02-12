@@ -2,7 +2,6 @@ package goerror
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 )
 
 /**
@@ -76,13 +75,13 @@ func NewParamErrMsg(errMsg string) *CodeError {
 func NewErrorMsg(errCode uint32, errMsg string) error {
 	builder := NewCodeErrorBuilder()
 	builder.WithErrCode(errCode).WithErrMsg(errMsg)
-	return errors.Wrap(builder.Build(), "")
+	return builder.Build()
 }
 
 func NewError(errCode uint32) error {
 	builder := NewCodeErrorBuilder()
 	builder.WithErrCode(errCode).WithErrMsg(MapErrMsg(errCode))
-	return errors.Wrap(builder.Build(), "")
+	return builder.Build()
 }
 
 // NewCodeErrorBuilder 创建一个新的 CodeErrorBuilder

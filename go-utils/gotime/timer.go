@@ -17,6 +17,7 @@ type Timer struct {
 	isPaused  bool
 	isStopped bool
 	mu        sync.Mutex
+	ticker    *time.Ticker
 }
 
 func NewTimer(duration time.Duration) *Timer {
@@ -32,6 +33,7 @@ func NewTimer(duration time.Duration) *Timer {
 	}
 }
 
+// 不要重复调用Start方法
 func (t *Timer) Start(task func()) {
 	t.mu.Lock()
 	// 重置停止状态
@@ -39,13 +41,18 @@ func (t *Timer) Start(task func()) {
 	t.mu.Unlock()
 
 	t.wg.Add(1)
+	if t.ticker == nil {
+		t.ticker = time.NewTicker(t.duration)
+	}
+
 	goutils.AsyncFunc(func() {
 		defer t.wg.Done()
-		ticker := time.NewTicker(t.duration)
-		defer ticker.Stop()
 		for {
+			if t.ticker == nil {
+				return
+			}
 			select {
-			case <-ticker.C:
+			case <-t.ticker.C:
 				t.mu.Lock()
 				isPaused := t.isPaused
 				t.mu.Unlock()
@@ -61,7 +68,7 @@ func (t *Timer) Start(task func()) {
 				t.isPaused = false
 				t.mu.Unlock()
 			case newDuration := <-t.reset:
-				ticker.Reset(newDuration)
+				t.ticker.Reset(newDuration)
 				t.duration = newDuration
 			case <-t.force:
 				task()
@@ -76,9 +83,13 @@ func (t *Timer) Stop() {
 	t.mu.Lock()
 	if !t.isStopped {
 		t.isStopped = true
+		if t.ticker != nil {
+			t.ticker.Stop()
+		}
 		close(t.stop)
 		// 重新创建stop channel为下次使用准备
 		t.stop = make(chan struct{}, 1)
+		t.ticker = nil
 	}
 	t.mu.Unlock()
 	t.wg.Wait()

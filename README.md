@@ -245,30 +245,6 @@ func simpleUseGoJob() {
 }
 ```
 
-### gopool 模块
-```go
-func testDynamicSize() {
-	gp := gopool.NewDynamicSizePool(100, 10)
-	defer gp.StopAndWait()
-
-	cron, _ := gojob.New()
-	defer cron.Stop()
-	cron.Start()
-	cron.SecondX(nil, 1, func() {
-		gp.PrintPoolStats()
-	})
-
-	for i := 0; i < 1000; i++ {
-		n := i
-		gp.Submit(func() {
-			fmt.Printf("Running task #%d\n", n)
-			time.Sleep(1 * time.Second)
-		})
-	}
-
-	golog.InfoF("end of Submit")
-}
-```
 ### godb 模块
 - mysql
 - sqlite3
