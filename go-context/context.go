@@ -4,9 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	golog "github.com/gif-gif/go.io/go-log"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 // 应用程序全局上下文
@@ -75,30 +72,28 @@ func (ctx *Context) String() string {
 }
 
 func WithCancel() *Context {
-	sig := make(chan os.Signal)
-	ctx, cancel := context.WithCancel(context.TODO())
+	ctx, _ := context.WithCancel(context.TODO())
+	//sig := make(chan os.Signal)
 	//syscall.SIGUSR1, syscall.SIGUSR2,
-	signal.Notify(sig, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL)
-
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				golog.Error(r)
-			}
-		}()
-
-		for ch := range sig {
-			switch ch {
-			//case syscall.SIGUSR1: // kill -USR1
-			//case syscall.SIGUSR2: // kill -USR2
-
-			case syscall.SIGHUP: // kill -1
-
-			case syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL: // kill -9 or ctrl+c
-				cancel()
-			}
-		}
-	}()
+	//signal.Notify(sig, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGBREAK, syscall.SIGKILL)
+	//
+	//go func() {
+	//	defer func() {
+	//		if r := recover(); r != nil {
+	//			golog.Error(r)
+	//		}
+	//	}()
+	//
+	//	for ch := range sig {
+	//		switch ch {
+	//		case syscall.SIGUSR1: // kill -USR1
+	//		case syscall.SIGUSR2: // kill -USR2
+	//		case syscall.SIGHUP: // kill -1
+	//		case syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGKILL: // kill -9 or ctrl+c
+	//			cancel()
+	//		}
+	//	}
+	//}()
 
 	return WithParent(ctx)
 }
