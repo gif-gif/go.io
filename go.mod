@@ -1,6 +1,6 @@
 module github.com/gif-gif/go.io
 
-go 1.23
+go 1.24.0
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.30.0
