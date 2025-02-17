@@ -2,7 +2,6 @@ package gofile
 
 import (
 	"os"
-	"syscall"
 )
 
 type FileLock struct {
@@ -20,7 +19,7 @@ func (fl *FileLock) Lock() (err error) {
 		return
 	}
 
-	err = syscall.Flock(int(fl.fh.Fd()), syscall.LOCK_EX)
+	err = Flock(fl.fh.Fd())
 
 	return
 }
@@ -28,7 +27,7 @@ func (fl *FileLock) Lock() (err error) {
 func (fl *FileLock) UnLock() (err error) {
 	defer fl.release()
 
-	if err = syscall.Flock(int(fl.fh.Fd()), syscall.LOCK_UN); err != nil {
+	if err = Funlock(fl.fh.Fd()); err != nil {
 		return
 	}
 
