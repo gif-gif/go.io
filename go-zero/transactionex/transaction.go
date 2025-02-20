@@ -6,14 +6,10 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
-// type TransactionHandler[D, I any] interface {
-// 	InsertWithTx(ctx context.Context, session sqlx.Session, data D) error
-// 	DeleteWithTx(ctx context.Context, session sqlx.Session, id I) error
-// }
-
 type TransactionHandler interface {
 	InsertTransactions(ctx context.Context, session sqlx.Session, info string) error
 	DeleteTransactions(ctx context.Context, session sqlx.Session, info string) error
+	UpdateTransactions(ctx context.Context, session sqlx.Session, info string) error
 }
 
 var (

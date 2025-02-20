@@ -14,6 +14,9 @@ Golang Development Framework Continuously Developing and Updating
 [![Contributors](https://img.shields.io/github/contributors/gif-gif/go.io)](https://github.com/gif-gif/go.io/graphs/contributors)
 [![PullRequest](https://img.shields.io/github/issues-pr/gif-gif/go.io?color=117abe)](https://github.com/gif-gif/go.io/pulls)
 
+## 平台
+- 支持 Linux、MacOS、Windows 等主流操作系统；
+- 支持 32 位和 64 位 CPU 架构；
 
 ## 设计目标
 - goio 提供了常用库封装，支持必要的简洁使用功能，在其之上可以进二次开发，以提供更好的代码维护；

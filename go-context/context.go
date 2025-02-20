@@ -72,7 +72,7 @@ func (ctx *Context) String() string {
 }
 
 func WithCancel() *Context {
-	ctx, _ := context.WithCancel(context.TODO())
+	//ctx, _ := context.WithCancel(context.TODO())
 	//sig := make(chan os.Signal)
 	//syscall.SIGUSR1, syscall.SIGUSR2,
 	//signal.Notify(sig, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGBREAK, syscall.SIGKILL)
@@ -94,8 +94,7 @@ func WithCancel() *Context {
 	//		}
 	//	}
 	//}()
-
-	return WithParent(ctx)
+	return WithCancelx()
 }
 
 func WithLog() *Context {
