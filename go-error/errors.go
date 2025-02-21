@@ -4,10 +4,15 @@ import (
 	"fmt"
 )
 
-/**
-常用通用固定错误
-*/
-
+// 常用通用固定错误
+//
+//	codeError := NewCodeErrorBuilder().
+//		WithErrCode(1001).
+//		WithErrMsg("系统错误").
+//		WithShowType(1).
+//		WithTraceId("trace-123").
+//		WithHost("localhost").
+//		Build()
 type CodeError struct {
 	errCode  uint32
 	errMsg   string
@@ -51,6 +56,30 @@ func (e *CodeError) Error() string {
 func NewErrCodeMsg(errCode uint32, errMsg string) *CodeError {
 	builder := NewCodeErrorBuilder()
 	builder.WithErrCode(errCode).WithErrMsg(errMsg)
+	return builder.Build()
+}
+
+func NewErrCodeMsgForMessageError(errCode uint32, errMsg string) *CodeError {
+	builder := NewCodeErrorBuilder()
+	builder.WithErrCode(errCode).WithErrMsg(errMsg).WithShowType(ShowTypeMessageError)
+	return builder.Build()
+}
+
+func NewErrCodeMsgForNotification(errCode uint32, errMsg string) *CodeError {
+	builder := NewCodeErrorBuilder()
+	builder.WithErrCode(errCode).WithErrMsg(errMsg).WithShowType(ShowTypeNotification)
+	return builder.Build()
+}
+
+func NewErrCodeMsgForMessageWarn(errCode uint32, errMsg string) *CodeError {
+	builder := NewCodeErrorBuilder()
+	builder.WithErrCode(errCode).WithErrMsg(errMsg).WithShowType(ShowTypeMessageWarn)
+	return builder.Build()
+}
+
+func NewErrCodeMsgForPage(errCode uint32, errMsg string) *CodeError {
+	builder := NewCodeErrorBuilder()
+	builder.WithErrCode(errCode).WithErrMsg(errMsg).WithShowType(ShowTypePage)
 	return builder.Build()
 }
 
@@ -124,16 +153,4 @@ func (b *CodeErrorBuilder) WithHost(host string) *CodeErrorBuilder {
 // Build 构建并返回 CodeError 实例
 func (b *CodeErrorBuilder) Build() *CodeError {
 	return b.error
-}
-
-// 使用示例
-func example() {
-	//codeError := NewCodeErrorBuilder().
-	//	WithErrCode(1001).
-	//	WithErrMsg("系统错误").
-	//	WithShowType(1).
-	//	WithTraceId("trace-123").
-	//	WithHost("localhost").
-	//	Build()
-	// 使用构建好的 codeError...
 }

@@ -29,4 +29,4 @@ const ShowTypeSilent uint32 = 0
 const ShowTypeMessageWarn uint32 = 1
 const ShowTypeMessageError uint32 = 2
 const ShowTypeNotification uint32 = 4
-const ShowTypePage uint32 = 9
+const ShowTypePage uint32 = 9 // 页面跳转
