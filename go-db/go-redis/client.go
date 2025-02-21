@@ -53,6 +53,9 @@ func New(conf Config) (cli *GoRedis, err error) {
 }
 
 func (s *GoRedis) WrapKey(key string) string {
+	if s.Config.Prefix == "" {
+		return key
+	}
 	return s.Config.Prefix + ":" + key
 }
 
