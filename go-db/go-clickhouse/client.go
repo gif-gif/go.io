@@ -9,6 +9,7 @@ import (
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	gojob "github.com/gif-gif/go.io/go-job"
 	golog "github.com/gif-gif/go.io/go-log"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -189,6 +190,12 @@ func (cli *GoClickHouse) OptimizePartition(context context.Context, tableName st
 	return nil
 }
 
+// 注意：
+// 物化视图时需要表名特殊处理如下
+//
+// mvInnerTableName := ".inner_id.2f31ec0d-f667-487e-8b18-c13324c27bc7" 用于获取分组列表
+//
+// tableName := "`" + mvInnerTableName + "`" 用于处理具体的分区
 func (cli *GoClickHouse) GetPartitions(ctx context.Context, tableName string) ([]PartitionInfo, error) {
 	query := `
 		SELECT 
@@ -248,12 +255,54 @@ func (cli *GoClickHouse) DeletePartitionData(ctx context.Context, tableName stri
 	return nil
 }
 
-// 删除整个分区
-func (cli *GoClickHouse) DropPartition(ctx context.Context, tableName, partition string) error {
+// 删除整个分区(如果分区小于50GB，直接删除整个分区 时可以直接删除,否则用 DropPartition)
+func (cli *GoClickHouse) dropPartition(ctx context.Context, tableName, partition string) error {
 	query := fmt.Sprintf(`ALTER TABLE %s DROP PARTITION $1`, tableName)
 	if err := cli.conn.Exec(ctx, query, partition); err != nil {
 		return fmt.Errorf("删除分区失败: %v", err)
 	}
+	return nil
+}
+
+// 删除分区(支持大分区删除)
+//
+// 注意：
+// 物化视图时需要表名特殊处理如下
+//
+// mvInnerTableName := ".inner_id.2f31ec0d-f667-487e-8b18-c13324c27bc7" 用于获取分组列表
+//
+// tableName := "`" + mvInnerTableName + "`" 用于处理具体的分区
+func (cli *GoClickHouse) DropPartition(ctx context.Context, tableName string, p PartitionInfo) error {
+	if p.Size <= MaxSizeToDelete {
+		// 如果分区小于50GB，直接删除整个分区
+		if err := cli.dropPartition(ctx, tableName, p.Partition); err != nil {
+			return errors.Wrapf(err, "删除分区 %s 失败: %v", p.Partition)
+		}
+		return nil
+	} else {
+		// 如果分区大于50GB，分批删除数据
+		minID, maxID, err := cli.GetPartitionIDRange(ctx, tableName, p.Partition)
+		if err != nil {
+			return errors.Wrapf(err, "获取分区 %s 的ID范围失败: %v", p.Partition)
+		}
+
+		for startID := minID; startID < maxID; startID += BatchSizeToDelete {
+			endID := startID + BatchSizeToDelete
+			if endID > maxID {
+				endID = maxID
+			}
+
+			if err := cli.DeletePartitionData(ctx, tableName, p.Partition, startID, endID); err != nil {
+				return errors.Wrapf(err, "删除分区 %s 中的数据(ID范围: %d-%d)失败: %v", p.Partition, startID, endID)
+			}
+
+			//log.Printf("成功删除分区 %s 中的数据(ID范围: %d-%d)", p.Partition, startID, endID)
+			// 可选：添加一些延时避免过度占用系统资源
+			time.Sleep(time.Second * 1)
+			return nil
+		}
+	}
+
 	return nil
 }
 
