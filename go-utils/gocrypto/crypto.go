@@ -82,10 +82,10 @@ func CreateHash(data []byte, hashingAlgorithm string, encoding string) (string, 
 	}
 }
 
-// 生成 AES 密钥
-func GenerateAESKey() (string, error) {
+// 生成随机字符串，可用于生成随机密钥， len 为长度
+func GenerateKey(len int64) (string, error) {
 	// 生成32字节（256位）的密钥
-	key := make([]byte, 32)
+	key := make([]byte, len)
 	_, err := rand.Read(key)
 	if err != nil {
 		return "", err
@@ -93,23 +93,31 @@ func GenerateAESKey() (string, error) {
 	return hex.EncodeToString(key), nil
 }
 
+// 生成 AES 密钥
+func GenerateAESKey() (string, error) {
+	// 生成32字节（256位）的密钥
+	key, err := GenerateKey(32)
+	if err != nil {
+		return "", err
+	}
+	return key, nil
+}
+
 // 生成 AES 密钥和 IV
 func GenerateAESKeyAndIV() (string, string, error) {
 	// 生成 16 字节（128 位）的 Key
-	key := make([]byte, 16)
-	_, err := rand.Read(key)
+	key, err := GenerateKey(16)
 	if err != nil {
 		return "", "", err
 	}
 
 	// 生成 16 字节（128 位）的 IV
-	iv := make([]byte, 32)
-	_, err = rand.Read(iv)
+	iv, err := GenerateKey(32)
 	if err != nil {
 		return "", "", err
 	}
 
-	return hex.EncodeToString(key), hex.EncodeToString(iv), nil
+	return key, iv, nil
 }
 
 // 计算文件md5(支持超大文件)
