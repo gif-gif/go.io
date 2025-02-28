@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gogf/gf/util/gconv"
-	"strings"
 )
 
 const (
@@ -51,13 +50,10 @@ func ConvertValue(value string, valueType string, result ...interface{}) (interf
 	case ValueTypeUnknown:
 		return value, nil
 	default:
-		if strings.HasPrefix(valueType, ValueTypeSelect) {
-			return value, nil
-		}
-		return nil, fmt.Errorf("unsupported value type: %s", valueType)
+		return value, nil
 	}
 
-	return nil, nil
+	return value, nil
 }
 
 // Helper functions for converting string to specific types
