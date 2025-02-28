@@ -27,7 +27,7 @@ func New(config Config) *GoJwt {
 func GetJwtToken(secretKey string, iat, seconds int64, params map[string]any) (string, error) {
 	claims := make(jwt.MapClaims)
 	claims["exp"] = iat + seconds
-	// claims["iat"] = iat
+	claims["iat"] = iat
 	for key, val := range params {
 		claims[key] = val
 	}
