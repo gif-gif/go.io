@@ -27,7 +27,9 @@ func ConvertValue(value string, valueType string, result ...interface{}) (interf
 	case ValueTypeInt:
 		return gconv.Int64(value), nil
 	case ValueTypeString:
+		return value, nil
 	case ValueTypeSelect:
+		return value, nil
 	case ValueTypeText:
 		return value, nil
 	case ValueTypeDecimal:
@@ -52,8 +54,6 @@ func ConvertValue(value string, valueType string, result ...interface{}) (interf
 	default:
 		return value, nil
 	}
-
-	return value, nil
 }
 
 // Helper functions for converting string to specific types
