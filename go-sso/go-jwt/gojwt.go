@@ -78,7 +78,7 @@ func (c *GoJwt) ParseToken(tokenString string) (map[string]interface{}, error) {
 
 func (c *GoJwt) IsValidToken(tokenString string) bool {
 	if strings.Contains(tokenString, "Bearer ") {
-		tokenString = tokenString[7:]
+		tokenString = strings.TrimSpace(tokenString[7:])
 	}
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
