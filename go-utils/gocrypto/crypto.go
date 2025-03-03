@@ -103,16 +103,25 @@ func GenerateAESKey() (string, error) {
 	return key, nil
 }
 
+func GenerateAESIv() (string, error) {
+	// 生成 16 字节（128 位）的 IV
+	key, err := GenerateKey(16)
+	if err != nil {
+		return "", err
+	}
+	return key, nil
+}
+
 // 生成 AES 密钥和 IV
 func GenerateAESKeyAndIV() (string, string, error) {
-	// 生成 16 字节（128 位）的 Key
-	key, err := GenerateKey(16)
+	// 生成32字节（256位）的密钥
+	key, err := GenerateKey(32)
 	if err != nil {
 		return "", "", err
 	}
 
 	// 生成 16 字节（128 位）的 IV
-	iv, err := GenerateKey(32)
+	iv, err := GenerateKey(16)
 	if err != nil {
 		return "", "", err
 	}

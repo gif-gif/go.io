@@ -5,6 +5,7 @@ import (
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"strings"
 	"unicode"
+	"unsafe"
 )
 
 // 多字符切割，默认支持逗号，分号，\n
@@ -62,4 +63,13 @@ func GBKToUTF8(text string) (string, error) {
 		return "", err
 	}
 	return string(bytes), nil
+}
+
+// For Go 1.20 and higher
+func StringToBytes(s string) []byte {
+	return unsafe.Slice(unsafe.StringData(s), len(s))
+}
+
+func BytesToString(b []byte) string {
+	return unsafe.String(unsafe.SliceData(b), len(b))
 }
