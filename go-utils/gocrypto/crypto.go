@@ -82,6 +82,16 @@ func CreateHash(data []byte, hashingAlgorithm string, encoding string) (string, 
 	}
 }
 
+func GenerateByteKey(len int64) ([]byte, error) {
+	// 生成32字节（256位）的密钥
+	key := make([]byte, len)
+	_, err := rand.Read(key)
+	if err != nil {
+		return nil, err
+	}
+	return key, nil
+}
+
 // 生成随机字符串，可用于生成随机密钥， len 为长度
 func GenerateKey(len int64) (string, error) {
 	// 生成32字节（256位）的密钥
