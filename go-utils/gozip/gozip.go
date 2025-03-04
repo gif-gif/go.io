@@ -8,6 +8,12 @@ import (
 	"os"
 )
 
+// xNlContentEncoding: br, gzip
+const (
+	Gzip = "gzip"
+	Br   = "br"
+)
+
 func CompressData(data []byte) ([]byte, error) {
 	// 创建一个buffer用于存储压缩后的数据
 	var buf bytes.Buffer
