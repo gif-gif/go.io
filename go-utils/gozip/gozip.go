@@ -10,11 +10,11 @@ import (
 
 // xNlContentEncoding: br, gzip
 const (
-	Gzip = "gzip"
+	GZip = "gzip"
 	Br   = "br"
 )
 
-func CompressData(data []byte) ([]byte, error) {
+func GZipCompressData(data []byte) ([]byte, error) {
 	// 创建一个buffer用于存储压缩后的数据
 	var buf bytes.Buffer
 
@@ -36,7 +36,7 @@ func CompressData(data []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func DecompressData(compressedData []byte) ([]byte, error) {
+func GZipDecompressData(compressedData []byte) ([]byte, error) {
 	// 创建一个byte reader
 	bytesReader := bytes.NewReader(compressedData)
 
@@ -57,7 +57,7 @@ func DecompressData(compressedData []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func CompressFile(src, dst string) error {
+func GZipCompressFile(src, dst string) error {
 	// 打开源文件
 	sourceFile, err := os.Open(src)
 	if err != nil {
@@ -81,7 +81,7 @@ func CompressFile(src, dst string) error {
 	return err
 }
 
-func DecompressFile(src, dst string) error {
+func GZipDecompressFile(src, dst string) error {
 	// 打开源文件(gzip压缩文件)
 	sourceFile, err := os.Open(src)
 	if err != nil {
@@ -110,7 +110,7 @@ func DecompressFile(src, dst string) error {
 
 // BR 压缩
 // 压缩数据
-func CompressBrotli(data []byte, quality int) ([]byte, error) {
+func BrCompress(data []byte, quality int) ([]byte, error) {
 	var buf bytes.Buffer
 
 	// 创建brotli writer，quality参数范围为0-11，值越大压缩率越高但更慢
@@ -132,7 +132,7 @@ func CompressBrotli(data []byte, quality int) ([]byte, error) {
 }
 
 // 解压数据
-func DecompressBrotli(compressedData []byte) ([]byte, error) {
+func BrDecompress(compressedData []byte) ([]byte, error) {
 	// 创建brotli reader
 	brReader := brotli.NewReader(bytes.NewReader(compressedData))
 
@@ -146,7 +146,7 @@ func DecompressBrotli(compressedData []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func CompressFileBrotli(src, dst string, quality int) error {
+func BrCompressFile(src, dst string, quality int) error {
 	// 打开源文件
 	sourceFile, err := os.Open(src)
 	if err != nil {
@@ -170,7 +170,7 @@ func CompressFileBrotli(src, dst string, quality int) error {
 	return err
 }
 
-func DecompressFileBrotli(src, dst string) error {
+func BrDecompressFile(src, dst string) error {
 	// 打开源文件(brotli压缩文件)
 	sourceFile, err := os.Open(src)
 	if err != nil {
