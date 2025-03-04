@@ -10,11 +10,12 @@ import (
 
 // xNlContentEncoding: br, gzip
 const (
-	GZip = "gzip"
-	Br   = "br"
+	XNlContentEncoding = "X-NL-Content-Encoding" //默认Header 压缩标识
+	GZIP               = "gzip"
+	BR                 = "br"
 )
 
-func GZipCompressData(data []byte) ([]byte, error) {
+func GZip(data []byte) ([]byte, error) {
 	// 创建一个buffer用于存储压缩后的数据
 	var buf bytes.Buffer
 
@@ -36,7 +37,7 @@ func GZipCompressData(data []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func GZipDecompressData(compressedData []byte) ([]byte, error) {
+func UnGZip(compressedData []byte) ([]byte, error) {
 	// 创建一个byte reader
 	bytesReader := bytes.NewReader(compressedData)
 
@@ -57,7 +58,7 @@ func GZipDecompressData(compressedData []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func GZipCompressFile(src, dst string) error {
+func GZipFile(src, dst string) error {
 	// 打开源文件
 	sourceFile, err := os.Open(src)
 	if err != nil {
@@ -81,7 +82,7 @@ func GZipCompressFile(src, dst string) error {
 	return err
 }
 
-func GZipDecompressFile(src, dst string) error {
+func UnGZipFile(src, dst string) error {
 	// 打开源文件(gzip压缩文件)
 	sourceFile, err := os.Open(src)
 	if err != nil {
@@ -110,7 +111,7 @@ func GZipDecompressFile(src, dst string) error {
 
 // BR 压缩
 // 压缩数据
-func BrCompress(data []byte, quality int) ([]byte, error) {
+func BrZip(data []byte, quality int) ([]byte, error) {
 	var buf bytes.Buffer
 
 	// 创建brotli writer，quality参数范围为0-11，值越大压缩率越高但更慢
@@ -132,7 +133,7 @@ func BrCompress(data []byte, quality int) ([]byte, error) {
 }
 
 // 解压数据
-func BrDecompress(compressedData []byte) ([]byte, error) {
+func UnBrZip(compressedData []byte) ([]byte, error) {
 	// 创建brotli reader
 	brReader := brotli.NewReader(bytes.NewReader(compressedData))
 
@@ -146,7 +147,7 @@ func BrDecompress(compressedData []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func BrCompressFile(src, dst string, quality int) error {
+func BrZipFile(src, dst string, quality int) error {
 	// 打开源文件
 	sourceFile, err := os.Open(src)
 	if err != nil {
@@ -170,7 +171,7 @@ func BrCompressFile(src, dst string, quality int) error {
 	return err
 }
 
-func BrDecompressFile(src, dst string) error {
+func UnBrZipFile(src, dst string) error {
 	// 打开源文件(brotli压缩文件)
 	sourceFile, err := os.Open(src)
 	if err != nil {
