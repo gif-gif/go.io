@@ -12,9 +12,8 @@ type Config struct {
 	SessionTimeout    int      `json:"sessionTimeout,optional" yaml:"SessionTimeout"`
 	RebalanceTimeout  int      `json:"rebalanceTimeout,optional" yaml:"RebalanceTimeout"`
 	OffsetNewest      bool     `json:"offsetNewest,optional" yaml:"OffsetNewest"`
-	GroupId           string   `json:"groupId,optional" yaml:"GroupId"`
+	Version           string   `json:"version,optional" yaml:"Version"`
 
-	Version string `json:"version,optional" yaml:"Version"`
-
+	GroupId     string         `json:"groupId,optional" yaml:"GroupId"`
 	RedisConfig goredis.Config `json:"redisConfig,optional" yaml:"RedisConfig"`
 }

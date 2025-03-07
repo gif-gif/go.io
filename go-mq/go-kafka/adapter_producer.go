@@ -51,7 +51,7 @@ func (p *producer) SendMessage(msg IMessage) (partition int32, offset int64, err
 			log.Error("消息发送失败", err)
 			return
 		}
-		log.Debug("消息发送成功")
+		//log.Debug("消息发送成功")
 	}()
 
 	// 添加缓存
@@ -118,7 +118,7 @@ func (p *producer) SendAsyncMessage(msg IMessage, cb MessageHandler) (err error)
 			log.Error("消息发送失败", err)
 			return
 		}
-		log.Debug("消息发送成功")
+		//log.Debug("消息发送成功")
 	}()
 
 	// 添加缓存

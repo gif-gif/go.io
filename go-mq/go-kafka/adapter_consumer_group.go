@@ -124,7 +124,7 @@ func (g group) doHandler(msg *sarama.ConsumerMessage, session sarama.ConsumerGro
 			ctx.Log.Error("消息消费失败", err)
 			return
 		}
-		ctx.Log.Debug("消息消费成功")
+		//ctx.Log.Debug("消息消费成功")
 	}()
 
 	// 执行业务方法

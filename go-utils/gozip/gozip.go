@@ -13,6 +13,8 @@ const (
 	XNlContentEncoding = "X-NL-Content-Encoding" //默认Header 压缩标识
 	GZIP               = "gzip"
 	BR                 = "br"
+	GoZipType          = "__zip__"   //默认Header 压缩标识
+	UnGoZipType        = "__unzip__" //默认Header 压缩标识
 )
 
 func GZip(data []byte) ([]byte, error) {
@@ -113,7 +115,6 @@ func UnGZipFile(src, dst string) error {
 // 压缩数据
 func BrZip(data []byte, quality int) ([]byte, error) {
 	var buf bytes.Buffer
-
 	// 创建brotli writer，quality参数范围为0-11，值越大压缩率越高但更慢
 	brWriter := brotli.NewWriterLevel(&buf, quality)
 

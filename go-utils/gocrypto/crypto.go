@@ -219,15 +219,33 @@ func HMacSha256(buf, key []byte) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func Base64Encode(buf []byte) string {
+func Base64EncodeString(buf []byte) string {
 	return base64.StdEncoding.EncodeToString(buf)
 }
 
-func Base64Decode(str string) []byte {
+func Base64DecodeString(str string) []byte {
 	var count = (4 - len(str)%4) % 4
 	str += strings.Repeat("=", count)
 	buf, _ := base64.StdEncoding.DecodeString(str)
 	return buf
+}
+
+func Base64Encode(buf []byte) []byte {
+	dBuf := make([]byte, base64.StdEncoding.DecodedLen(len(buf)))
+	n, err := base64.StdEncoding.Decode(dBuf, buf)
+	if err != nil {
+		return nil
+	}
+	return dBuf[:n]
+}
+
+func Base64Decode(buf []byte) []byte {
+	dBuf := make([]byte, base64.StdEncoding.DecodedLen(len(buf)))
+	_, err := base64.StdEncoding.Decode(dBuf, buf)
+	if err != nil {
+		return nil
+	}
+	return dBuf
 }
 
 func SHAWithRSA(key, data []byte) (string, error) {
@@ -244,7 +262,7 @@ func SHAWithRSA(key, data []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return Base64Encode(buf), nil
+	return Base64EncodeString(buf), nil
 }
 
 func AESECBEncrypt(data, key []byte) ([]byte, error) {
