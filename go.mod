@@ -7,6 +7,7 @@ require (
 	github.com/IBM/sarama v1.43.3
 	github.com/alitto/pond/v2 v2.0.4
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
+	github.com/andybalholm/brotli v1.1.1
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
@@ -33,6 +34,7 @@ require (
 	github.com/samber/lo v1.47.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/silenceper/wechat/v2 v2.1.6
+	github.com/valyala/bytebufferpool v1.0.0
 	github.com/xuri/excelize/v2 v2.9.0
 	github.com/zeromicro/go-zero v1.7.3
 	go.etcd.io/etcd/client/pkg/v3 v3.5.16
@@ -61,7 +63,6 @@ require (
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/ClickHouse/ch-go v0.61.5 // indirect
-	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
