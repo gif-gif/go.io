@@ -5,37 +5,8 @@ import (
 	"github.com/andybalholm/brotli"
 	goerror "github.com/gif-gif/go.io/go-error"
 	"github.com/gif-gif/go.io/go-utils/gocrypto"
-	"github.com/valyala/bytebufferpool"
-	"net/http"
 	"time"
 )
-
-// 压缩 和 解压逻辑
-func CompressHandler(w http.ResponseWriter, r *http.Request, compressMethod string, compressType string) (bool, []byte, error) {
-	if compressType == "" {
-		compressType = UnGoZipType
-	}
-	if compressMethod == "" { //没有压缩逻辑
-		return false, nil, nil
-	}
-	bytebuffer := bytebufferpool.Get()
-	length, err := bytebuffer.ReadFrom(r.Body)
-	if err != nil {
-		return false, nil, goerror.NewParamErrMsg("ReadFrom error ")
-	}
-	bodyAll := bytebuffer.B[:length]
-	defer bytebufferpool.Put(bytebuffer)
-
-	ok, data, err := Compress(bodyAll, compressMethod, compressType)
-	if err != nil {
-		return false, nil, err
-	}
-	if !ok {
-		return false, data, nil
-	}
-
-	return true, data, nil
-}
 
 func Compress(body []byte, compressMethod string, compressType string) (bool, []byte, error) {
 	if compressType == "" {
@@ -93,11 +64,15 @@ func GoDataEncrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, e
 	timestamp := time.Now().Unix()
 	timestampBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(timestampBytes, uint64(timestamp))
+	if compressMethod == "" || compressMethod == NOZIP {
+		return data, nil
+	}
 
 	randomIv, err := gocrypto.GenerateByteKey(16)
 	if err != nil {
 		return nil, err
 	}
+
 	_, compressBytes, err := Compress(data, compressMethod, GoZipType)
 	if err != nil {
 		return nil, err
