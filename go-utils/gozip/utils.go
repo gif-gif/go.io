@@ -64,19 +64,22 @@ func GoDataEncrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, e
 	timestamp := time.Now().Unix()
 	timestampBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(timestampBytes, uint64(timestamp))
-	if compressMethod == "" || compressMethod == NOZIP {
-		return data, nil
-	}
 
 	randomIv, err := gocrypto.GenerateByteKey(16)
 	if err != nil {
 		return nil, err
 	}
 
-	_, compressBytes, err := Compress(data, compressMethod, GoZipType)
-	if err != nil {
-		return nil, err
+	var compressBytes []byte
+	if compressMethod != "" && compressMethod != NOZIP {
+		_, compressBytes, err = Compress(data, compressMethod, GoZipType)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		compressBytes = data
 	}
+
 	timeAndData := append(timestampBytes, compressBytes...)
 	dataEncrypt, err := gocrypto.AESCBCEncrypt(timeAndData, AesKey, randomIv)
 	if err != nil {
