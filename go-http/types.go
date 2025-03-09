@@ -43,11 +43,11 @@ type Request struct {
 	MultipartFormData map[string]string
 	FileBytes         []byte
 
-	Timeout       time.Duration
-	RetryCount    int
-	RetryWaitTime time.Duration
-	proxyURL      string
-
+	Timeout            time.Duration
+	RetryCount         int
+	RetryWaitTime      time.Duration
+	proxyURL           string
+	BinaryResponse     bool //是否二进制形式返回，true时不会解析body，直接返回body，不会用T 解析
 	SetCloseConnection bool //是否关闭连接
 
 	//gotrace infos

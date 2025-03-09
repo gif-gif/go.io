@@ -92,7 +92,10 @@ func (g *GoHttp[T]) doHttpRequest(context context.Context, req *Request) (*T, er
 	var err error
 	request := restyClient.R()
 	request.SetContext(context)
-	request.SetResult(t)
+	if !req.BinaryResponse {
+		request.SetResult(t)
+	}
+
 	request.SetHeaders(req.Headers)
 	if req.QueryParams != nil {
 		request.SetQueryParams(req.QueryParams)
@@ -135,19 +138,21 @@ func (g *GoHttp[T]) doHttpRequest(context context.Context, req *Request) (*T, er
 		return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "request timeout or unknown error->" + string(resp.Body()))
 	}
 	req.TraceInfo = resp.Request.TraceInfo() //调试信息
-	respData, ok := resp.Result().(*T)
-	if !ok {
-		return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "Response T is invalid")
-	}
+	if !req.BinaryResponse {
+		respData, ok := resp.Result().(*T)
+		if !ok {
+			return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "Response T is invalid")
+		}
 
-	if respData == nil {
-		return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "Response data is empty")
+		if respData == nil {
+			return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "Response data is empty")
+		}
 	}
 
 	req.ResponseProto = resp.Proto()
 	req.ResponseTime = resp.Time()
 	req.Response = resp
-	return respData, nil
+	return nil, nil
 }
 
 func (g *GoHttp[T]) HttpPostJson(context context.Context) (*T, error) {

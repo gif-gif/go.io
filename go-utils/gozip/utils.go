@@ -4,11 +4,16 @@ import (
 	"encoding/binary"
 	"github.com/andybalholm/brotli"
 	goerror "github.com/gif-gif/go.io/go-error"
+	golog "github.com/gif-gif/go.io/go-log"
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gif-gif/go.io/go-utils/gocrypto"
 	"time"
 )
 
 func Compress(body []byte, compressMethod string, compressType string) (bool, []byte, error) {
+	defer goutils.Recovery(func(err any) {
+		golog.Error(err)
+	})
 	if compressType == "" {
 		compressType = UnGoZipType
 	}
@@ -61,6 +66,9 @@ func Compress(body []byte, compressMethod string, compressType string) (bool, []
 //
 // 5. 拼接iv+encryptData
 func GoDataEncrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, error) {
+	defer goutils.Recovery(func(err any) {
+		golog.Error(err)
+	})
 	timestamp := time.Now().Unix()
 	timestampBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(timestampBytes, uint64(timestamp))
@@ -101,6 +109,10 @@ func GoDataEncrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, e
 //
 // 5. 解压data(如果有压缩)
 func GoDataDecrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, error) {
+	defer goutils.Recovery(func(err any) {
+		golog.Error(err)
+	})
+
 	AesIvLength := 16
 	first16BytesIv := data[:AesIvLength]
 	// 获取剩余的字节解密
