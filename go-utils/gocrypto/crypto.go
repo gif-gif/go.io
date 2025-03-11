@@ -122,7 +122,7 @@ func GenerateAESIv() (string, error) {
 	return key, nil
 }
 
-// 生成 AES 密钥和 IV
+// 生成 AES 密钥和 IV 返回string 格式(hex.EncodeToString)
 func GenerateAESKeyAndIV() (string, string, error) {
 	// 生成32字节（256位）的密钥
 	key, err := GenerateKey(32)
@@ -137,6 +137,23 @@ func GenerateAESKeyAndIV() (string, string, error) {
 	}
 
 	return key, iv, nil
+}
+
+// 生成 AES 密钥和 IV 返回string 格式(hex.EncodeToString)
+func GenerateAESKeyAndIVBase64() (string, string, error) {
+	// 生成32字节（256位）的密钥
+	key, err := GenerateByteKey(32)
+	if err != nil {
+		return "", "", err
+	}
+
+	// 生成 16 字节（128 位）的 IV
+	iv, err := GenerateByteKey(16)
+	if err != nil {
+		return "", "", err
+	}
+
+	return Base64EncodeString(key), Base64EncodeString(iv), nil
 }
 
 // 计算文件md5(支持超大文件)
@@ -263,6 +280,39 @@ func SHAWithRSA(key, data []byte) (string, error) {
 		return "", err
 	}
 	return Base64EncodeString(buf), nil
+}
+
+// AesCTRTransform 使用 AES CTR 模式对数据进行加密或解密
+// 由于 CTR 模式的特性，加密和解密操作是相同的
+func AesCTRTransform(data, key, iv []byte) ([]byte, error) {
+	// 参数验证
+	if len(data) <= 0 {
+		return nil, errors.New("输入数据为空")
+	}
+	if len(key) <= 0 {
+		return nil, errors.New("密钥为空")
+	}
+	if len(iv) <= 0 || len(iv) < aes.BlockSize {
+		return nil, errors.New("初始化向量为空或长度不足")
+	}
+
+	// 创建 AES 密码块
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	// 创建输出缓冲区
+	output := make([]byte, len(data))
+
+	// 创建 CTR 模式的加密器
+	stream := cipher.NewCTR(block, iv)
+
+	// 执行加密/解密操作
+	// 在 CTR 模式中，XorKeyStream 既可用于加密也可用于解密
+	stream.XORKeyStream(output, data)
+
+	return output, nil
 }
 
 func AESECBEncrypt(data, key []byte) ([]byte, error) {
