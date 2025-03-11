@@ -181,7 +181,7 @@ func GoDataAesCTRTransformDecode(data []byte, aesKey []byte, aesIv []byte, compr
 			return nil, err
 		}
 	} else {
-		compressBytes = data
+		compressBytes = body
 	}
 	return compressBytes, nil
 }
