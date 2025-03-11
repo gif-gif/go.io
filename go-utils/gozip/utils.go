@@ -137,3 +137,51 @@ func GoDataDecrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, e
 
 	return body, nil
 }
+
+// 加密和解密AesCtr(zip(data))
+//
+// compressMethod 空时不会压缩和解压
+func GoDataAesCTRTransformEncode(data []byte, aesKey []byte, aesIv []byte, compressMethod string) ([]byte, error) {
+	defer goutils.Recovery(func(err any) {
+		golog.Error(err)
+	})
+
+	var compressBytes []byte
+	var err error
+	if compressMethod != "" && compressMethod != NOZIP {
+		_, compressBytes, err = Compress(data, compressMethod, GoZipType)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		compressBytes = data
+	}
+
+	body, err := gocrypto.AesCTRTransform(compressBytes, aesKey, aesIv)
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
+
+func GoDataAesCTRTransformDecode(data []byte, aesKey []byte, aesIv []byte, compressMethod string) ([]byte, error) {
+	defer goutils.Recovery(func(err any) {
+		golog.Error(err)
+	})
+	var err error
+	body, err := gocrypto.AesCTRTransform(data, aesKey, aesIv)
+	if err != nil {
+		return nil, err
+	}
+
+	var compressBytes []byte
+	if compressMethod != "" && compressMethod != NOZIP {
+		_, compressBytes, err = Compress(body, compressMethod, UnGoZipType)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		compressBytes = data
+	}
+	return compressBytes, nil
+}
