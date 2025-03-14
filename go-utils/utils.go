@@ -272,6 +272,18 @@ func AfterPage(page int64, pageCount int64) int64 {
 	return after
 }
 
+func AfterPageValue(page int64, total int64, pageSize int64) int64 {
+	if page <= 0 {
+		page = 1
+	}
+	pageCount := GetPageCount(total, pageSize)
+	after := page + 1
+	if after > pageCount {
+		after = -1
+	}
+	return after
+}
+
 func BeforePage(page int64) int64 {
 	before := page - 1
 	if before <= 0 {

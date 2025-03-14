@@ -130,9 +130,11 @@ func GoDataDecrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, e
 	_ = binary.BigEndian.Uint64(timestampBytes) //客户端时间
 	body := timeAndZipBody[8:]
 
-	_, body, err = Compress(body, compressMethod, UnGoZipType)
-	if err != nil {
-		return nil, err
+	if compressMethod != "" && compressMethod != NOZIP {
+		_, body, err = Compress(body, compressMethod, UnGoZipType)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return body, nil
