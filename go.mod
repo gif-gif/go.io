@@ -34,7 +34,6 @@ require (
 	github.com/samber/lo v1.47.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/silenceper/wechat/v2 v2.1.6
-	github.com/valyala/bytebufferpool v1.0.0
 	github.com/xuri/excelize/v2 v2.9.0
 	github.com/zeromicro/go-zero v1.7.3
 	go.etcd.io/etcd/client/pkg/v3 v3.5.16
@@ -99,7 +98,6 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
