@@ -28,31 +28,23 @@ func GetErrCodeMsg(err error) (errCode uint32, errMsg string) {
 	}
 	errCode = 500
 	errMsg = "server error"
-
 	causeErr := errors.Cause(err)           // err类型
 	if e, ok := causeErr.(*CodeError); ok { //自定义错误类型
-		//自定义CodeError
 		errCode = e.GetErrCode()
 		errMsg = e.GetErrMsg()
 	} else {
-		if gstatus, ok := status.FromError(causeErr); ok { // grpc err错误
-			grpcCode := uint32(gstatus.Code())
-			if IsCodeErr(grpcCode) { //区分自定义错误跟系统底层、db等错误，底层、db错误
-				errCode = grpcCode
-				errMsg = gstatus.Message()
-			} else {
-				if errorsx != nil {
-					if _, ok := errorsx[grpcCode]; ok {
-						errCode = grpcCode
-						errMsg = gstatus.Message()
-					}
-				}
-			}
-
-		}
+		errCode, errMsg = GetErrorMsg(err)
 	}
-
 	return
+}
+
+func GetErrorMsg(err error) (uint32, string) {
+	causeErr := errors.Cause(err)
+	if gstatus, ok := status.FromError(causeErr); ok { // grpc err错误
+		grpcCode := uint32(gstatus.Code())
+		return grpcCode, gstatus.Message()
+	}
+	return 500, "server error"
 }
 
 // CodeErrorBuilder.build() 构建 CodeError
