@@ -36,3 +36,7 @@ func (c ClusterConf) GetCacheConf() cache.CacheConf {
 	}
 	return cacheConf
 }
+
+func (c ClusterConf) GetConfig() Config {
+	return Config(c)
+}
