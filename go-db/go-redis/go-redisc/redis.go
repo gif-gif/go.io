@@ -1,11 +1,11 @@
-package goredis
+package goredisc
 
 import (
 	"errors"
 	golog "github.com/gif-gif/go.io/go-log"
 )
 
-var __clients = map[string]*GoRedis{}
+var __clients = map[string]*GoRedisC{}
 
 // 可以一次初始化多个Redis实例或者 多次调用初始化多个实例
 func Init(configs ...Config) (err error) {
@@ -16,7 +16,7 @@ func Init(configs ...Config) (err error) {
 		}
 
 		if __clients[name] != nil {
-			return errors.New("goredis client [" + name + "] already exists")
+			return errors.New("goredisc client [" + name + "] already exists")
 		}
 
 		__clients[name], err = New(conf)
@@ -28,7 +28,7 @@ func Init(configs ...Config) (err error) {
 	return
 }
 
-func GetClient(names ...string) *GoRedis {
+func GetClient(names ...string) *GoRedisC {
 	name := "default"
 	if l := len(names); l > 0 {
 		name = names[0]
@@ -50,7 +50,7 @@ func DelClient(names ...string) {
 	}
 }
 
-func Default() *GoRedis {
+func Default() *GoRedisC {
 	if cli, ok := __clients["default"]; ok {
 		return cli
 	}
@@ -61,7 +61,7 @@ func Default() *GoRedis {
 		}
 	}
 
-	golog.WithTag("goredis").Error("no default redis client")
+	golog.WithTag("goredisc").Error("no default redis client")
 
 	return nil
 }
