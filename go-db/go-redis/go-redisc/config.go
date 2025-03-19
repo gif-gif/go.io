@@ -32,7 +32,7 @@ func (c ClusterConf) GetCacheConf() cache.CacheConf {
 				Pass:        c.Password,
 				Tls:         c.TLS,
 				Type:        c.Type,
-				PingTimeout: time.Duration(c.PingTimeout),
+				PingTimeout: time.Duration(c.PingTimeout) * time.Second,
 			},
 			Weight: c.Weight,
 		})
