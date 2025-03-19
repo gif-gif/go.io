@@ -64,7 +64,7 @@ func New(conf Config) (cli *GoRedisC, err error) {
 		gj.Start()
 		gj.SecondX(nil, 5, func() {
 			if err := cli.Redis.Ping(ctx).Err(); err != nil {
-				golog.WithTag("goredis").Fatal("redis ping error:", err)
+				golog.WithTag("goredis").Warn("redis ping error:", err)
 			}
 		})
 	}
