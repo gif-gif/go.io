@@ -3,6 +3,7 @@ package goredisc
 import (
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
+	"strings"
 	"time"
 )
 
@@ -25,18 +26,20 @@ type ClusterConf Config
 // 兼容go-zore
 func (c ClusterConf) GetCacheConf() cache.CacheConf {
 	cacheConf := make([]cache.NodeConf, 0, len(c.Addrs))
+	addrs := make([]string, 0, len(c.Addrs))
 	for _, addr := range c.Addrs {
-		cacheConf = append(cacheConf, cache.NodeConf{
-			RedisConf: redis.RedisConf{
-				Host:        addr,
-				Pass:        c.Password,
-				Tls:         c.TLS,
-				Type:        c.Type,
-				PingTimeout: time.Duration(c.PingTimeout) * time.Second,
-			},
-			Weight: c.Weight,
-		})
+		addrs = append(addrs, addr)
 	}
+	cacheConf = append(cacheConf, cache.NodeConf{
+		RedisConf: redis.RedisConf{
+			Host:        strings.Join(addrs, ","),
+			Pass:        c.Password,
+			Tls:         c.TLS,
+			Type:        c.Type,
+			PingTimeout: time.Duration(c.PingTimeout) * time.Second,
+		},
+		Weight: c.Weight,
+	})
 	return cacheConf
 }
 
