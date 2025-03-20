@@ -17,7 +17,7 @@ type Config struct {
 	AutoPing    bool     `yaml:"AutoPing" json:"autoPing,optional"`
 	TLS         bool     `yaml:"TLS" json:"tls,optional"`
 	Type        string   `yaml:"Type" json:",default=node,options=node|cluster"`
-	PingTimeout int64    `yaml:"PingTimeout" json:"pingTimeout"`
+	PingTimeout int64    `yaml:"PingTimeout" json:"pingTimeout,optional"`
 	Weight      int      `yaml:"Weight" json:",default=100"` //for gozero TODO: 这里需要有多个节点的配置
 }
 
@@ -29,6 +29,9 @@ func (c ClusterConf) GetCacheConf() cache.CacheConf {
 	addrs := make([]string, 0, len(c.Addrs))
 	for _, addr := range c.Addrs {
 		addrs = append(addrs, addr)
+	}
+	if c.PingTimeout == 0 {
+		c.PingTimeout = 10
 	}
 	cacheConf = append(cacheConf, cache.NodeConf{
 		RedisConf: redis.RedisConf{
