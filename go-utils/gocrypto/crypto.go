@@ -17,12 +17,16 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/util/gconv"
+	"golang.org/x/crypto/bcrypt"
 	"hash"
 	"io"
+	"math"
 	"math/big"
 	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
 //md5
@@ -515,4 +519,29 @@ func UrlEncode(str string) string {
 func UrlDecode(str string) string {
 	str, _ = url.QueryUnescape(str)
 	return str
+}
+
+// BcryptHash 使用 bcrypt 对密码进行加密
+func BcryptHash(password string) string {
+	bytes, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes)
+}
+
+// BcryptCheck 对比明文密码和数据库的哈希值
+func BcryptCheck(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+// 常用签名验证, sign md5 小写
+func CheckSign(secret string, linkSignTimeout int64, ts int64, sign string) bool {
+	if linkSignTimeout == 0 {
+		linkSignTimeout = 20
+	}
+	tsStep := time.Now().Unix() - ts
+	if math.Abs(gconv.Float64(tsStep)) > gconv.Float64(linkSignTimeout) { //连接失效
+		return false
+	}
+	serverSign := Md5([]byte(gconv.String(ts) + secret))
+	return serverSign == sign
 }
