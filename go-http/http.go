@@ -138,6 +138,9 @@ func (g *GoHttp[T]) doHttpRequest(context context.Context, req *Request) (*T, er
 		return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "request timeout or unknown error->" + string(resp.Body()))
 	}
 	req.TraceInfo = resp.Request.TraceInfo() //调试信息
+	req.ResponseProto = resp.Proto()
+	req.ResponseTime = resp.Time()
+	req.Response = resp
 	if !req.BinaryResponse {
 		respData, ok := resp.Result().(*T)
 		if !ok {
@@ -147,11 +150,9 @@ func (g *GoHttp[T]) doHttpRequest(context context.Context, req *Request) (*T, er
 		if respData == nil {
 			return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "Response data is empty")
 		}
+		return respData, nil
 	}
 
-	req.ResponseProto = resp.Proto()
-	req.ResponseTime = resp.Time()
-	req.Response = resp
 	return nil, nil
 }
 
