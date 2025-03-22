@@ -156,7 +156,6 @@ func TestAdmobAuthUrl(t *testing.T) {
 		Name:      "admob",
 		AccountId: "123",
 		AuthConfig: gooauth.Config{
-			State:        "test",
 			ClientSecret: "secret",
 			RedirectURL:  "https://test.com",
 		},

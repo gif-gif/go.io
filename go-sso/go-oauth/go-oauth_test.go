@@ -23,7 +23,7 @@ func TestAdmobAuthUrl(t *testing.T) {
 	})
 
 	param2 := oauth2.SetAuthURLParam("param2", "value2")
-	url := GetClient("test").AuthUrl("param1", param2)
+	url := GetClient("test").AuthUrl("ppp=====aa", param2)
 	golog.WithTag("admob").Info(url)
 
 	//golog.WithTag("admob").Info(goutils.UrlDecode("https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.readonly+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fadmob.report"))
