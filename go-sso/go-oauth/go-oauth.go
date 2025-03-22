@@ -26,7 +26,6 @@ type Config struct {
 	RedirectURL  string    `yaml:"RedirectURL" json:"redirectURL,optional"`
 	Endpoint     *Endpoint `yaml:"Endpoint" json:"endpoint"`
 	Scopes       []string  `yaml:"Scopes" json:"scopes,optional"`
-	State        string    `yaml:"State" json:"state,optional"`
 }
 
 type GoOAuth struct {
@@ -81,8 +80,8 @@ func (c *GoOAuth) TokenSource(ctx context.Context) oauth2.TokenSource {
 //
 //	param1 := oauth2.SetAuthURLParam("param1", "value1")
 //	param2 := oauth2.SetAuthURLParam("param2", "value2")
-func (c *GoOAuth) AuthUrl(opts ...oauth2.AuthCodeOption) string {
-	url := c.OAuthConfig.AuthCodeURL(c.Config.State, opts...)
+func (c *GoOAuth) AuthUrl(state string, opts ...oauth2.AuthCodeOption) string {
+	url := c.OAuthConfig.AuthCodeURL(state, opts...)
 	return url
 }
 

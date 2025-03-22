@@ -5,7 +5,19 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// OAuth2.0 授权接口
+// GoogleUserInfo 存储从 Google API 获取的用户信息
+type GoogleUserInfo struct {
+	ID            string `json:"id"`
+	Email         string `json:"email"`
+	VerifiedEmail bool   `json:"verified_email"`
+	Name          string `json:"name"`
+	GivenName     string `json:"given_name"`
+	FamilyName    string `json:"family_name"`
+	Picture       string `json:"picture"`
+	Locale        string `json:"locale"`
+}
+
+// OAuth2.0 授权接口, 支持多种授权方式
 type IGoOAuth interface {
 	// 自定义参数
 	//

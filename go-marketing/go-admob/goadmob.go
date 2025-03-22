@@ -149,7 +149,7 @@ func (o *GoAdmob) Refresh() error {
 //
 // 3、获取code后执行 Exchange 方法获取token
 func (c *GoAdmob) AuthUrl() string {
-	return c.GoAuth.AuthUrl()
+	return c.GoAuth.AuthUrl("")
 }
 
 // 获取token
