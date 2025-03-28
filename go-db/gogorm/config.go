@@ -1,5 +1,7 @@
 package gogorm
 
+import "gorm.io/gorm"
+
 type Config struct {
 	Name         string `yaml:"Name" json:"name,optional"`
 	DBType       string `yaml:"DBType" json:"dbType,optional"` // default mysql
@@ -7,6 +9,7 @@ type Config struct {
 	MaxIdleCount int    `yaml:"MaxIdleCount" json:"maxIdleCount,optional"` // zero means defaultMaxIdleConns; negative means 0
 	MaxOpen      int    `yaml:"MaxOpen" json:"maxOpen,optional"`           // <= 0 means unlimited
 	MaxLifetime  int    `yaml:"MaxLifetime" json:"maxLifetime,optional"`   // maximum amount of time a connection may be reused minutes
+	GormConfig   *gorm.Config
 }
 
 const (
@@ -16,4 +19,5 @@ const (
 	DATABASE_SQLSERVER  = "sqlserver"
 	DATABASE_CLICKHOUSE = "clickhouse"
 	DATABASE_TIDB       = "tidb"
+	DATABASE_STARROCKS  = "starrocks"
 )

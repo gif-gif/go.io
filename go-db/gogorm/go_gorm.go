@@ -2,12 +2,15 @@ package gogorm
 
 import (
 	"errors"
+	"github.com/gif-gif/go.io/goio"
 	"gorm.io/driver/clickhouse"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 	"time"
 )
 
@@ -21,7 +24,12 @@ func New(config *Config) (*GoGorm, error) {
 	if err != nil {
 		return nil, err
 	}
-	db, err := gorm.Open(dlt, &gorm.Config{QueryFields: true})
+
+	if config.GormConfig == nil {
+		config.GormConfig = createDefaultConfig(config)
+	}
+
+	db, err := gorm.Open(dlt, config.GormConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +72,8 @@ func createDialector(config *Config) (gorm.Dialector, error) {
 	case DATABASE_MYSQL:
 	case DATABASE_TIDB:
 		return mysql.Open(config.DataSource), nil
+	case DATABASE_STARROCKS:
+		return mysql.Open(config.DataSource), nil
 	case DATABASE_POSTGRESQL:
 		return postgres.New(postgres.Config{
 			DSN:                  config.DataSource,
@@ -80,4 +90,39 @@ func createDialector(config *Config) (gorm.Dialector, error) {
 	}
 
 	return nil, errors.New("unsupported database type")
+}
+
+func createDefaultConfig(config *Config) *gorm.Config {
+	logLevel := logger.Info
+	if goio.IsPro() {
+		logLevel = logger.Silent
+	}
+	switch config.DBType {
+	case DATABASE_MYSQL:
+	case DATABASE_TIDB:
+		return &gorm.Config{Logger: logger.Default.LogMode(logLevel)}
+	case DATABASE_STARROCKS:
+		return &gorm.Config{
+			// 使用较详细的日志级别，生产环境可调整
+			Logger: logger.Default.LogMode(logLevel),
+			// 关闭自动复数化命名，StarRocks对此支持有限
+			NamingStrategy: schema.NamingStrategy{
+				SingularTable: true,
+			},
+			// 禁用外键约束，StarRocks不支持外键
+			DisableForeignKeyConstraintWhenMigrating: true,
+		}
+	case DATABASE_POSTGRESQL:
+		return &gorm.Config{Logger: logger.Default.LogMode(logLevel)}
+	case DATABASE_SQLITE:
+		return &gorm.Config{Logger: logger.Default.LogMode(logLevel)}
+	case DATABASE_SQLSERVER:
+		return &gorm.Config{Logger: logger.Default.LogMode(logLevel)}
+	case DATABASE_CLICKHOUSE:
+		return &gorm.Config{Logger: logger.Default.LogMode(logLevel)}
+	default:
+		return &gorm.Config{Logger: logger.Default.LogMode(logLevel)}
+	}
+
+	return nil
 }

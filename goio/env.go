@@ -59,3 +59,15 @@ func SetupLogDefault() {
 		golog.SetAdapter(adapters.NewFileAdapter())
 	}
 }
+
+func IsTest() bool {
+	return Env == TEST
+}
+
+func IsPro() bool {
+	return Env == PRODUCTION
+}
+
+func IsDev() bool {
+	return Env == DEVELOPMENT
+}

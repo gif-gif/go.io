@@ -3,21 +3,27 @@ package goip
 import (
 	"context"
 	"fmt"
+	gocache "github.com/gif-gif/go.io/go-cache"
 	gohttp "github.com/gif-gif/go.io/go-http"
 	"github.com/ip2location/ip2location-go/v9"
 	"github.com/oschwald/geoip2-golang"
+	"golang.org/x/sync/singleflight"
 	"net"
+	"strings"
+	"time"
 )
 
 type GoIp struct {
-	dbReader     *geoip2.Reader
-	dbLocation   *ip2location.DB
-	IpServiceUrl string
+	dbReader          *geoip2.Reader
+	dbLocation        *ip2location.DB
+	IpServiceUrl      string
+	singlefightGForIp singleflight.Group
 }
 
 func New(config Config) (*GoIp, error) {
 	g := &GoIp{
-		IpServiceUrl: config.IpServiceUrl,
+		IpServiceUrl:      config.IpServiceUrl,
+		singlefightGForIp: singleflight.Group{},
 	}
 	if config.Mmdb != "" {
 		db, err := geoip2.Open(config.Mmdb)
@@ -95,6 +101,34 @@ func (g *GoIp) QueryLocationInfoByIp(ipStr string) (*IP2Locationrecord, error) {
 		As:                 results.As,
 	}
 	return rsp, nil
+}
+
+func (g *GoIp) GetLocationInfoByIp(ip string, duration time.Duration) (*IpLocation, error) {
+	cachedIpInfo, ok := gocache.Default().Get(ip)
+	if ok {
+		return cachedIpInfo.(*IpLocation), nil
+	}
+	rst, err, _ := g.singlefightGForIp.Do(ip, func() (interface{}, error) {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		defer cancel()
+		ipInfo, err := Default().GetIpLocation(ctx, ip)
+		if err != nil {
+			return nil, err
+		}
+
+		ipInfo.IsoCode = strings.ToLower(ipInfo.IsoCode)
+		if ipInfo.IsoCode == "cn" {
+			//ipInfo.Isp = ChinaISPNameToPinyin(ipInfo.Isp)
+		}
+		gocache.Default().SharedCache.Set(ip, ipInfo, duration)
+		return ipInfo, nil
+	})
+
+	if err == nil {
+		return rst.(*IpLocation), nil
+	}
+
+	return nil, err
 }
 
 // ----------------------------------------------------------------
