@@ -48,6 +48,9 @@ func GetClientIp(r *http.Request) string {
 	}
 	if clientIp == "" || strings.EqualFold("unknown", realIps) {
 		clientIp = r.RemoteAddr
+		if idx := strings.LastIndex(clientIp, ":"); idx > 0 {
+			clientIp = clientIp[:idx]
+		}
 	}
 
 	return clientIp

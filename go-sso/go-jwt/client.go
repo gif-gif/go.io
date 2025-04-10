@@ -1,18 +1,27 @@
 package gojwt
 
-import golog "github.com/gif-gif/go.io/go-log"
+import (
+	"errors"
+	golog "github.com/gif-gif/go.io/go-log"
+)
 
 var __clients = map[string]*GoJwt{}
 
-func Init(configs ...Config) {
+func Init(configs ...Config) error {
 	for _, conf := range configs {
 		name := conf.Name
 		if name == "" {
 			name = "default"
 		}
 
+		if __clients[name] != nil {
+			return errors.New("gojwt client [" + name + "] already exists")
+		}
+
 		__clients[name] = New(conf)
 	}
+
+	return nil
 }
 
 func GetClient(names ...string) *GoJwt {
