@@ -15,28 +15,32 @@ import (
 )
 
 type GoGorm struct {
-	DB     *gorm.DB
-	Config *Config
+	DB         *gorm.DB
+	Config     *Config
+	GormConfig *gorm.Config
 }
 
-func New(config *Config) (*GoGorm, error) {
+func New(config *Config, gormConfig ...gorm.Config) (*GoGorm, error) {
+	m := &GoGorm{
+		Config: config,
+	}
+
 	dlt, err := createDialector(config)
 	if err != nil {
 		return nil, err
 	}
 
-	if config.GormConfig == nil {
-		config.GormConfig = createDefaultConfig(config)
+	if len(gormConfig) > 0 {
+		m.GormConfig = &gormConfig[0]
 	}
 
-	db, err := gorm.Open(dlt, config.GormConfig)
+	if m.GormConfig == nil {
+		m.GormConfig = createDefaultConfig(config)
+	}
+
+	db, err := gorm.Open(dlt, m.GormConfig)
 	if err != nil {
 		return nil, err
-	}
-
-	m := &GoGorm{
-		DB:     db,
-		Config: config,
 	}
 
 	sqlDB, err := db.DB()
@@ -64,6 +68,7 @@ func New(config *Config) (*GoGorm, error) {
 		}
 	}
 
+	m.DB = db
 	return m, nil
 }
 

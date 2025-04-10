@@ -11,8 +11,8 @@ import (
 func main() {
 	goio.Init(goio.DEVELOPMENT)
 	config := goip.Config{
-		Mmdb:          "/Users/Jerry/Documents/my/dockers/projects/golang/ip_service/ip/data/GeoLite2-Country.mmdb",
-		Ip2locationDB: "/Users/Jerry/Documents/my/dockers/projects/golang/ip_service/ip/data/IP-COUNTRY-REGION-CITY-ISP.BIN",
+		//Mmdb:          "/Users/Jerry/Documents/my/dockers/projects/golang/ip_service/ip/data/GeoLite2-Country.mmdb",
+		Ip2locationDB: "/Users/Jerry/Documents/my/work/nodelink/doc/ip2location-IP-COUNTRY-REGION-CITY-ISP.BIN",
 		IpServiceUrl:  "",
 	}
 
@@ -23,13 +23,13 @@ func main() {
 		return
 	}
 
-	ipZhInfo, err := goip.Default().QueryDbReaderCountryForZhName(ip)
-	if err != nil {
-		golog.WithTag("goip").Error(err.Error())
-		return
-	}
-
-	golog.WithTag("goip").Info(ipZhInfo)
+	//ipZhInfo, err := goip.Default().QueryDbReaderCountryForZhName(ip)
+	//if err != nil {
+	//	golog.WithTag("goip").Error(err.Error())
+	//	return
+	//}
+	//
+	//golog.WithTag("goip").Info(ipZhInfo)
 
 	ipInfo, err := goip.Default().QueryLocationInfoByIp(ip)
 	if err != nil {

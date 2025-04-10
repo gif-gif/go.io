@@ -160,7 +160,8 @@ func (g *GoIp) GetIpLocation(ctx context.Context, ip string) (*IpLocation, error
 		return &IpLocation{}, nil
 	}
 	request := &gohttp.Request{
-		Url: g.IpServiceUrl,
+		Url:     g.IpServiceUrl,
+		Timeout: time.Second * 5,
 	}
 	request.SetQueryParams("ip", ip)
 	gh := gohttp.GoHttp[ipLocationResp]{

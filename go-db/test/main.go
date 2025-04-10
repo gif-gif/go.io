@@ -21,8 +21,23 @@ func main() {
 	//testSqlite3()
 	//mysqlTest()
 	//testTransaction()
-	postgreSqlTest()
+	//postgreSqlTest()
 	//testHasMany()
+
+	tarTest()
+}
+
+func tarTest() {
+	err := gogorm.Init(gogorm.Config{
+		Name:       "starrocks",
+		DBType:     gogorm.DATABASE_STARROCKS,
+		DataSource: "root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local",
+	})
+
+	if err != nil {
+		golog.WithTag("godb").Error(err.Error())
+		return
+	}
 }
 
 func testSqlite3() {
