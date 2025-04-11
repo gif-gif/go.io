@@ -1,7 +1,6 @@
 package gogorm
 
 import (
-	"errors"
 	"github.com/gif-gif/go.io/goio"
 	"gorm.io/driver/clickhouse"
 	"gorm.io/driver/mysql"
@@ -74,8 +73,7 @@ func New(config *Config, gormConfig ...gorm.Config) (*GoGorm, error) {
 
 func createDialector(config *Config) (gorm.Dialector, error) {
 	switch config.DBType {
-	case DATABASE_MYSQL:
-	case DATABASE_TIDB:
+	case DATABASE_MYSQL, DATABASE_TIDB:
 		return mysql.Open(config.DataSource), nil
 	case DATABASE_STARROCKS:
 		return mysql.Open(config.DataSource), nil
@@ -93,8 +91,6 @@ func createDialector(config *Config) (gorm.Dialector, error) {
 	default:
 		return mysql.Open(config.DataSource), nil
 	}
-
-	return nil, errors.New("unsupported database type")
 }
 
 func createDefaultConfig(config *Config) *gorm.Config {
@@ -103,8 +99,7 @@ func createDefaultConfig(config *Config) *gorm.Config {
 		logLevel = logger.Silent
 	}
 	switch config.DBType {
-	case DATABASE_MYSQL:
-	case DATABASE_TIDB:
+	case DATABASE_MYSQL, DATABASE_TIDB:
 		return &gorm.Config{Logger: logger.Default.LogMode(logLevel)}
 	case DATABASE_STARROCKS:
 		return &gorm.Config{
@@ -128,6 +123,4 @@ func createDefaultConfig(config *Config) *gorm.Config {
 	default:
 		return &gorm.Config{Logger: logger.Default.LogMode(logLevel)}
 	}
-
-	return nil
 }

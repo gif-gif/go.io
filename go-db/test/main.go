@@ -29,8 +29,8 @@ func main() {
 
 func tarTest() {
 	err := gogorm.Init(gogorm.Config{
-		Name:       "starrocks",
-		DBType:     gogorm.DATABASE_STARROCKS,
+		Name:       gogorm.DATABASE_MYSQL,
+		DBType:     gogorm.DATABASE_MYSQL,
 		DataSource: "root:223238@tcp(127.0.0.1:33060)/gromdb?charset=utf8mb4&parseTime=True&loc=Local",
 	})
 
