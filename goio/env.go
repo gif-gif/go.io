@@ -48,14 +48,14 @@ func Setup(feishu string) {
 		if msg.Level <= golog.WARN {
 			return
 		}
-		if Env == TEST || Env == PRODUCTION {
+		if IsTest() || IsPro() || IsPre() {
 			gomessage.FeiShu(feishu, fmt.Sprintf(">> %s/%s >> %s", Name, Env.String(), string(msg.JSON())))
 		}
 	})
 }
 
 func SetupLogDefault() {
-	if Env == TEST || Env == PRODUCTION {
+	if IsTest() || IsPro() || IsPre() {
 		golog.SetAdapter(adapters.NewFileAdapter())
 	}
 }
@@ -70,4 +70,8 @@ func IsPro() bool {
 
 func IsDev() bool {
 	return Env == DEVELOPMENT
+}
+
+func IsPre() bool {
+	return Env == PRE
 }

@@ -12,7 +12,7 @@ type Config struct {
 	AccessSecret       string `yaml:"AccessSecret" json:"accessSecret,optional"`
 	AccessExpire       int64  `yaml:"AccessExpire" json:"accessExpire,optional"`
 	RefreshTokenExpire int64  `yaml:"RefreshTokenExpire" json:"refreshTokenExpire,optional"`
-	JwtEncryptSecret   string `yaml:"JwtEncryptSecret" json:"jwtEncryptSecret,optional"`
+	JwtEncryptSecret   string `yaml:"JwtEncryptSecret" json:"jwtEncryptSecret,optional"` //Token加密秘钥
 }
 
 type GoJwt struct {
