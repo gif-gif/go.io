@@ -135,13 +135,13 @@ func (g *GoHttp[T]) doHttpRequest(context context.Context, req *Request) (*T, er
 	}
 
 	if resp.StatusCode() != http.StatusOK {
-		return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "request timeout or unknown error->" + string(resp.Body()))
+		return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "http request error->" + string(resp.Body()))
 	}
 	req.TraceInfo = resp.Request.TraceInfo() //调试信息
 	req.ResponseProto = resp.Proto()
 	req.ResponseTime = resp.Time()
 	req.Response = resp
-	if !req.BinaryResponse {
+	if !req.BinaryResponse { //返回结果如果是二进制直接返回，否则解析泛化处理
 		respData, ok := resp.Result().(*T)
 		if !ok {
 			return nil, errors.New("[" + gconv.String(resp.StatusCode()) + "]" + "Response T is invalid")
@@ -229,7 +229,7 @@ func (g *GoHttp[T]) HttpConcurrencyRequest() (*T, error) {
 			if err != nil {
 				errs = errors.Join(errs, err)
 			} else { //请求成功了应该直接返回，剩下的请求结果忽略
-				one.Do(func() {
+				one.Do(func() { //只保留最快成功的
 					rst = t
 				})
 				cancel() //有一个成功的取消所有请求
@@ -238,7 +238,7 @@ func (g *GoHttp[T]) HttpConcurrencyRequest() (*T, error) {
 	}
 
 	goutils.AsyncFuncGroup(fns...)
-	if goutils.IsContextDone(ctx) {
+	if goutils.IsContextDone(ctx) { //等待最快的返回后取消其他的上下文信号
 		return rst, nil
 	}
 

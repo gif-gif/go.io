@@ -17,6 +17,10 @@ type GoKafka struct {
 	redis *goredis.GoRedis
 }
 
+func (cli *GoKafka) GetConfig() Config {
+	return cli.conf
+}
+
 func (cli *GoKafka) init() (err error) {
 	id := strconv.Itoa(os.Getpid())
 	config := sarama.NewConfig()
