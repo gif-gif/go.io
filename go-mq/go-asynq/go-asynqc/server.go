@@ -1,46 +1,24 @@
-package goasynq
+package goasynqc
 
 import (
-	"context"
-	goredis "github.com/gif-gif/go.io/go-db/go-redis"
+	goredisc "github.com/gif-gif/go.io/go-db/go-redis/go-redisc"
 	golog "github.com/gif-gif/go.io/go-log"
+	goasynq "github.com/gif-gif/go.io/go-mq/go-asynq"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/hibiken/asynq"
 	"github.com/samber/lo"
 	"time"
 )
 
-type ServerConfig struct {
+type ClusterServerConfig struct {
 	Name string
-	goredis.Config
+	goredisc.Config
 	PoolSize    int
 	Concurrency int //default 10 指定要使用的并发工作线程数量
 	Queues      map[string]int
 }
 
-type GoAsynqServer struct {
-	ServeMux *asynq.ServeMux
-	Server   *asynq.Server
-}
-
-// Stop指示服务器停止从队列中提取新任务。
-// 在关闭服务器之前，可以使用Stop来确保所有
-// 在服务器关闭之前处理当前活动的任务。
-//
-// Stop不会关闭服务器，请确保在退出前调用shutdown。
-func (s *GoAsynqServer) Stop() {
-	s.Server.Stop()
-}
-
-// Shutdown会优雅地关闭服务器。
-// 它优雅地关闭了所有活跃的员工。服务器将等待
-// 在配置中指定的持续时间内，主动工作人员完成处理任务。关机超时。
-// 如果worker在超时期间没有完成任务处理，则该任务将被推回Redis。
-func (s *GoAsynqServer) Shutdown() {
-	s.Server.Shutdown()
-}
-
-func RunServer(config ServerConfig) *GoAsynqServer {
+func ClusterRunServer(config ClusterServerConfig) *goasynq.GoAsynqServer {
 	if config.Concurrency == 0 {
 		config.Concurrency = 10
 	}
@@ -58,11 +36,9 @@ func RunServer(config ServerConfig) *GoAsynqServer {
 	}
 
 	srv := asynq.NewServer(
-		asynq.RedisClientOpt{
-			Addr:         config.Addr,
+		asynq.RedisClusterClientOpt{
+			Addrs:        config.Addrs,
 			Password:     config.Password,
-			DB:           config.DB,
-			PoolSize:     config.PoolSize,
 			DialTimeout:  lo.If(config.DialTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.DialTimeout) * time.Second),
 			ReadTimeout:  lo.If(config.ReadTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.ReadTimeout) * time.Second),
 			WriteTimeout: lo.If(config.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.WriteTimeout) * time.Second),
@@ -79,7 +55,7 @@ func RunServer(config ServerConfig) *GoAsynqServer {
 	// mux maps a type to a handler
 	mux := asynq.NewServeMux()
 
-	gs := &GoAsynqServer{
+	gs := &goasynq.GoAsynqServer{
 		ServeMux: mux,
 		Server:   srv,
 	}
@@ -93,12 +69,4 @@ func RunServer(config ServerConfig) *GoAsynqServer {
 	})
 
 	return gs
-}
-
-func (s *GoAsynqServer) HandleFunc(taskTypeTopic string, handler func(context.Context, *asynq.Task) error) {
-	s.ServeMux.HandleFunc(taskTypeTopic, handler)
-}
-
-func (s *GoAsynqServer) Handle(taskTypeTopic string, handler asynq.Handler) {
-	s.ServeMux.Handle(taskTypeTopic, handler)
 }

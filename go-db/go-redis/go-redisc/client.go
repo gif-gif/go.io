@@ -6,6 +6,7 @@ import (
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gogf/gf/container/garray"
 	"github.com/redis/go-redis/v9"
+	"github.com/samber/lo"
 	"time"
 )
 
@@ -30,32 +31,30 @@ func New(conf Config) (cli *GoRedisC, err error) {
 		Addrs: conf.Addrs,
 
 		// 连接池配置
-		PoolSize:     10, // 连接池大小
-		MinIdleConns: 5,  // 最小空闲连接数
+		PoolSize:     lo.If(conf.PoolSize == 0, 10).Else(conf.PoolSize),
+		MinIdleConns: 5, // 最小空闲连接数
 
 		// 认证信息（如果需要）
 		Password: conf.Password, // 如果有密码，请设置
 
 		// 读写超时设置
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 5 * time.Second,
-
-		// 连接超时
-		DialTimeout: 5 * time.Second,
+		DialTimeout:  lo.If(conf.DialTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(conf.DialTimeout) * time.Second),
+		ReadTimeout:  lo.If(conf.ReadTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(conf.ReadTimeout) * time.Second),
+		WriteTimeout: lo.If(conf.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(conf.WriteTimeout) * time.Second),
 
 		// 最大重试次数
 		MaxRetries: 3,
 
 		// 集群刷新间隔
-		ClusterSlots: func(ctx context.Context) ([]redis.ClusterSlot, error) {
-			// 自定义集群槽位获取逻辑，通常使用默认值即可
-			return nil, nil
-		},
+		//ClusterSlots: func(ctx context.Context) ([]redis.ClusterSlot, error) {
+		//	// 自定义集群槽位获取逻辑，通常使用默认值即可
+		//	return nil, nil
+		//},
 	})
 
 	ctx := context.Background()
 	if err = cli.Redis.Ping(ctx).Err(); err != nil {
-		golog.WithTag("goredis").Error(err)
+		golog.WithTag("goredisc").Error(err)
 		return
 	}
 
@@ -64,7 +63,7 @@ func New(conf Config) (cli *GoRedisC, err error) {
 		gj.Start()
 		gj.SecondX(nil, 5, func() {
 			if err := cli.Redis.Ping(ctx).Err(); err != nil {
-				golog.WithTag("goredis").Warn("redis ping error:", err)
+				golog.WithTag("goredisc").Warn("redis ping error:", err)
 			}
 		})
 	}

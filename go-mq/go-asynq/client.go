@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	"github.com/hibiken/asynq"
+	"github.com/samber/lo"
+	"time"
 )
 
 type ClientConfig struct {
 	goredis.Config
 	PoolSize int
-	Name     string
+	Name     string `yaml:"Name" json:"name,optional"`
 }
 
 type GoAsynqClient struct {
@@ -17,16 +19,18 @@ type GoAsynqClient struct {
 }
 
 func NewClient(config ClientConfig) *GoAsynqClient {
-
 	if config.PoolSize == 0 {
 		config.PoolSize = 10
 	}
 
 	client := asynq.NewClient(asynq.RedisClientOpt{
-		Addr:     config.Addr,
-		DB:       config.DB,
-		Password: config.Password,
-		PoolSize: config.PoolSize,
+		Addr:         config.Addr,
+		DB:           config.DB,
+		Password:     config.Password,
+		PoolSize:     config.PoolSize,
+		DialTimeout:  lo.If(config.DialTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.DialTimeout) * time.Second),
+		ReadTimeout:  lo.If(config.ReadTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.ReadTimeout) * time.Second),
+		WriteTimeout: lo.If(config.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.WriteTimeout) * time.Second),
 	})
 
 	return &GoAsynqClient{

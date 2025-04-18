@@ -6,6 +6,7 @@ import (
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gogf/gf/container/garray"
 	"github.com/redis/go-redis/v9"
+	"github.com/samber/lo"
 	"time"
 )
 
@@ -24,11 +25,15 @@ func New(conf Config) (cli *GoRedis, err error) {
 		Ctx:    context.Background(),
 		Config: conf,
 	}
-
+	
 	cli.Redis = redis.NewClient(&redis.Options{
-		Addr:     conf.Addr,
-		Password: conf.Password,
-		DB:       conf.DB,
+		Addr:         conf.Addr,
+		Password:     conf.Password,
+		DB:           conf.DB,
+		PoolSize:     lo.If(conf.PoolSize == 0, 10).Else(conf.PoolSize),
+		DialTimeout:  lo.If(conf.DialTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(conf.DialTimeout) * time.Second),
+		ReadTimeout:  lo.If(conf.ReadTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(conf.ReadTimeout) * time.Second),
+		WriteTimeout: lo.If(conf.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(conf.WriteTimeout) * time.Second),
 	})
 
 	cli.Redis.AddHook(&RedisHook{Prefix: conf.Prefix})

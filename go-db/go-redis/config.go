@@ -9,15 +9,18 @@ import (
 type Config struct {
 	Name string `yaml:"Name" json:"name,optional"`
 	//NamePrefix string `yaml:"NamePrefix" json:"namePrefix,optional"`
-	Addr     string `yaml:"Addr" json:"addr,optional"`
-	Password string `yaml:"Password" json:"password,optional"`
-	DB       int    `yaml:"DB" json:"db,optional"`
-	Prefix   string `yaml:"Prefix" json:"prefix,optional"`
-	AutoPing bool   `yaml:"AutoPing" json:"autoPing,optional"`
-	TLS      bool   `yaml:"TLS" json:"tls,optional"`
-
-	Type   string `yaml:"Type" json:",default=node,options=node|cluster"`
-	Weight int    `yaml:"Weight" json:",default=100"` //for gozero
+	Addr         string `yaml:"Addr" json:"addr,optional"`
+	Password     string `yaml:"Password" json:"password,optional"`
+	DB           int    `yaml:"DB" json:"db,optional"`
+	Prefix       string `yaml:"Prefix" json:"prefix,optional"`
+	AutoPing     bool   `yaml:"AutoPing" json:"autoPing,optional"`
+	TLS          bool   `yaml:"TLS" json:"tls,optional"`
+	DialTimeout  int    `yaml:"DialTimeout" json:"dialTimeout,optional"`
+	ReadTimeout  int    `yaml:"ReadTimeout" json:"readTimeout,optional"`
+	WriteTimeout int    `yaml:"WriteTimeout" json:"writeTimeout,optional"`
+	PoolSize     int    `yaml:"PoolSize" json:"poolSize,optional"`
+	Type         string `yaml:"Type" json:",default=node,options=node|cluster"`
+	Weight       int    `yaml:"Weight" json:",default=100"` //for gozero
 }
 
 type ClusterConf []Config
