@@ -3,9 +3,10 @@
 ```
 redis 连接和操作 基于 github.com/go-redis/redis 库
 ```
+- 建议优先使用 goredisc （兼容集群和单点）
 - 使用方法
 ```go
-	config := goredis.Config{
+	config := goredisc.Config{
 		Name:     "goredis",
 		Addr:     "127.0.0.1:6379",
 		Password: "",
@@ -14,15 +15,15 @@ redis 连接和操作 基于 github.com/go-redis/redis 库
 		AutoPing: true,
 	}
 
-	err := goredis.Init(config)
+	err := goredisc.Init(config)
 	if err != nil {
 		golog.WithTag("goredis").Error(err)
 	}
 
-	cmd := goredis.Default().Set("goredis", "goredis")
+	cmd := goredisc.Default().Set("goredis", "goredis")
 	if cmd.Err() != nil {
 		golog.WithTag("goredis").Error(cmd.Err())
 	}
-	v := goredis.Default().Get("goredis").Val()
+	v := goredisc.Default().Get("goredis").Val()
 	golog.WithTag("goredis").InfoF(v)
 ```

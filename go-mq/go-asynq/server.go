@@ -11,11 +11,10 @@ import (
 )
 
 type ServerConfig struct {
-	Name string
-	goredis.Config
-	PoolSize    int
-	Concurrency int //default 10 指定要使用的并发工作线程数量
-	Queues      map[string]int
+	Name        string         `yaml:"Name" json:"name,optional"`
+	Config      goredis.Config `yaml:"Config" json:"config,optional"`
+	Concurrency int            `yaml:"Concurrency" json:"concurrency,optional"` //default 10 指定要使用的并发工作线程数量
+	Queues      map[string]int `yaml:"Queues" json:"queues,optional"`
 }
 
 type GoAsynqServer struct {
@@ -41,12 +40,12 @@ func (s *GoAsynqServer) Shutdown() {
 }
 
 func RunServer(config ServerConfig) *GoAsynqServer {
-	if config.Concurrency == 0 {
-		config.Concurrency = 10
+	if config.Config.PoolSize == 0 {
+		config.Config.PoolSize = 10
 	}
 
-	if config.PoolSize == 0 {
-		config.PoolSize = 10
+	if config.Concurrency == 0 {
+		config.Concurrency = 10
 	}
 
 	if config.Queues == nil {
@@ -59,13 +58,13 @@ func RunServer(config ServerConfig) *GoAsynqServer {
 
 	srv := asynq.NewServer(
 		asynq.RedisClientOpt{
-			Addr:         config.Addr,
-			Password:     config.Password,
-			DB:           config.DB,
-			PoolSize:     config.PoolSize,
-			DialTimeout:  lo.If(config.DialTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.DialTimeout) * time.Second),
-			ReadTimeout:  lo.If(config.ReadTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.ReadTimeout) * time.Second),
-			WriteTimeout: lo.If(config.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.WriteTimeout) * time.Second),
+			Addr:         config.Config.Addr,
+			Password:     config.Config.Password,
+			DB:           config.Config.DB,
+			PoolSize:     config.Config.PoolSize,
+			DialTimeout:  lo.If(config.Config.DialTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.Config.DialTimeout) * time.Second),
+			ReadTimeout:  lo.If(config.Config.ReadTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.Config.ReadTimeout) * time.Second),
+			WriteTimeout: lo.If(config.Config.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.Config.WriteTimeout) * time.Second),
 		},
 		asynq.Config{
 			// Specify how many concurrent workers to use

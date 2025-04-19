@@ -1,6 +1,7 @@
 package goasynqc
 
 import (
+	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	goredisc "github.com/gif-gif/go.io/go-db/go-redis/go-redisc"
 	golog "github.com/gif-gif/go.io/go-log"
 	goasynq "github.com/gif-gif/go.io/go-mq/go-asynq"
@@ -11,24 +12,47 @@ import (
 )
 
 type ClusterServerConfig struct {
-	Name string
-	goredisc.Config
-	PoolSize    int
-	Concurrency int //default 10 指定要使用的并发工作线程数量
-	Queues      map[string]int
+	Name        string          `yaml:"Name" json:"name,optional"`
+	Config      goredisc.Config `yaml:"Config" json:"config,optional"`
+	Concurrency int             `yaml:"Concurrency" json:"concurrency,optional"` //default 10 指定要使用的并发工作线程数量
+	Queues      map[string]int  `yaml:"Queues" json:"queues,optional"`
 }
 
-func ClusterRunServer(config ClusterServerConfig) *goasynq.GoAsynqServer {
-	if config.Concurrency == 0 {
-		config.Concurrency = 10
+func convertServerConfigToNode(conf *ClusterServerConfig) goasynq.ServerConfig {
+	return goasynq.ServerConfig{
+		Config: goredis.Config{
+			Name:         conf.Config.Name,
+			Addr:         conf.Config.Addrs[0],
+			DB:           conf.Config.DB,
+			Password:     conf.Config.Password,
+			Prefix:       conf.Config.Prefix,
+			TLS:          conf.Config.TLS,
+			AutoPing:     conf.Config.AutoPing,
+			PoolSize:     conf.Config.PoolSize,
+			DialTimeout:  conf.Config.DialTimeout,
+			ReadTimeout:  conf.Config.ReadTimeout,
+			WriteTimeout: conf.Config.WriteTimeout,
+			Type:         "node",
+			Weight:       conf.Config.Weight,
+		},
+	}
+}
+
+func ClusterRunServer(conf ClusterServerConfig) *goasynq.GoAsynqServer {
+	config := conf.Config
+	if config.Type != "cluster" {
+		return goasynq.RunServer(convertServerConfigToNode(&conf))
+	}
+	if conf.Concurrency == 0 {
+		conf.Concurrency = 10
 	}
 
 	if config.PoolSize == 0 {
 		config.PoolSize = 10
 	}
 
-	if config.Queues == nil {
-		config.Queues = map[string]int{
+	if conf.Queues == nil {
+		conf.Queues = map[string]int{
 			"critical": 6,
 			"default":  3,
 			"low":      1,
@@ -45,9 +69,9 @@ func ClusterRunServer(config ClusterServerConfig) *goasynq.GoAsynqServer {
 		},
 		asynq.Config{
 			// Specify how many concurrent workers to use
-			Concurrency: config.Concurrency,
+			Concurrency: conf.Concurrency,
 			// Optionally specify multiple queues with different priority.
-			Queues: config.Queues,
+			Queues: conf.Queues,
 			// See the godoc for other configuration options
 		},
 	)

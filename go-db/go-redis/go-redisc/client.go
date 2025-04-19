@@ -26,6 +26,15 @@ func New(conf Config) (cli *GoRedisC, err error) {
 		Config: conf,
 	}
 
+	//兼容集群模式和单点连接
+	clusterSlots := func(ctx context.Context) ([]redis.ClusterSlot, error) {
+		// 自定义集群槽位获取逻辑，通常使用默认值即可
+		return nil, nil
+	}
+	if conf.Type != "node" {
+		clusterSlots = nil
+	}
+
 	cli.Redis = redis.NewClusterClient(&redis.ClusterOptions{
 		// 指定集群中的节点地址，至少需要一个有效节点
 		Addrs: conf.Addrs,
@@ -46,10 +55,7 @@ func New(conf Config) (cli *GoRedisC, err error) {
 		MaxRetries: 3,
 
 		// 集群刷新间隔
-		//ClusterSlots: func(ctx context.Context) ([]redis.ClusterSlot, error) {
-		//	// 自定义集群槽位获取逻辑，通常使用默认值即可
-		//	return nil, nil
-		//},
+		ClusterSlots: clusterSlots,
 	})
 
 	ctx := context.Background()

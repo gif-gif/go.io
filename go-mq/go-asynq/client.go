@@ -9,9 +9,8 @@ import (
 )
 
 type ClientConfig struct {
-	goredis.Config
-	PoolSize int
-	Name     string `yaml:"Name" json:"name,optional"`
+	Config goredis.Config `yaml:"Config" json:"config,optional"`
+	Name   string         `yaml:"Name" json:"name,optional"`
 }
 
 type GoAsynqClient struct {
@@ -19,18 +18,18 @@ type GoAsynqClient struct {
 }
 
 func NewClient(config ClientConfig) *GoAsynqClient {
-	if config.PoolSize == 0 {
-		config.PoolSize = 10
+	if config.Config.PoolSize == 0 {
+		config.Config.PoolSize = 10
 	}
 
 	client := asynq.NewClient(asynq.RedisClientOpt{
-		Addr:         config.Addr,
-		DB:           config.DB,
-		Password:     config.Password,
-		PoolSize:     config.PoolSize,
-		DialTimeout:  lo.If(config.DialTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.DialTimeout) * time.Second),
-		ReadTimeout:  lo.If(config.ReadTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.ReadTimeout) * time.Second),
-		WriteTimeout: lo.If(config.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.WriteTimeout) * time.Second),
+		Addr:         config.Config.Addr,
+		DB:           config.Config.DB,
+		Password:     config.Config.Password,
+		PoolSize:     config.Config.PoolSize,
+		DialTimeout:  lo.If(config.Config.DialTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.Config.DialTimeout) * time.Second),
+		ReadTimeout:  lo.If(config.Config.ReadTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.Config.ReadTimeout) * time.Second),
+		WriteTimeout: lo.If(config.Config.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.Config.WriteTimeout) * time.Second),
 	})
 
 	return &GoAsynqClient{

@@ -8,7 +8,7 @@ import (
 var __clients = map[string]*goasynq.GoAsynqClient{}
 var __servers = map[string]*goasynq.GoAsynqServer{}
 
-// client
+// client for cluster or node
 func InitClient(configs ...ClusterClientConfig) error {
 	for _, conf := range configs {
 		name := conf.Name
@@ -61,7 +61,7 @@ func DelClient(names ...string) {
 	}
 }
 
-// server
+// server for cluster or node
 func InitServer(configs ...ClusterServerConfig) error {
 	for _, conf := range configs {
 		name := conf.Name
