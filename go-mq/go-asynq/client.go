@@ -52,9 +52,6 @@ func (c *GoAsynqClient) NewTask(taskTypeTopic string, payload any, opts ...asynq
 }
 
 func (c *GoAsynqClient) Enqueue(taskTypeTopic string, payload any, opts ...asynq.Option) (*asynq.TaskInfo, error) {
-	if c.Prefix != "" {
-		taskTypeTopic = c.Prefix + ":" + taskTypeTopic
-	}
 	task, err := c.NewTask(taskTypeTopic, payload, opts...)
 	if err != nil {
 		return nil, err
