@@ -36,6 +36,7 @@ func convertServerConfigToNode(conf *ClusterServerConfig) goasynq.ServerConfig {
 			Type:         "node",
 			Weight:       conf.Config.Weight,
 		},
+		Queues: conf.Queues,
 	}
 }
 
