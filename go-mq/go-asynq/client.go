@@ -10,11 +10,13 @@ import (
 
 type ClientConfig struct {
 	Config goredis.Config `yaml:"Config" json:"config,optional"`
+	Prefix string         `yaml:"Prefix" json:"prefix,optional"`
 	Name   string         `yaml:"Name" json:"name,optional"`
 }
 
 type GoAsynqClient struct {
 	Client *asynq.Client
+	Prefix string `yaml:"Prefix" json:"prefix,optional"`
 }
 
 func NewClient(config ClientConfig) *GoAsynqClient {
@@ -34,10 +36,14 @@ func NewClient(config ClientConfig) *GoAsynqClient {
 
 	return &GoAsynqClient{
 		Client: client,
+		Prefix: config.Prefix,
 	}
 }
 
 func (c *GoAsynqClient) NewTask(taskTypeTopic string, payload any, opts ...asynq.Option) (*asynq.Task, error) {
+	if c.Prefix != "" {
+		taskTypeTopic = c.Prefix + ":" + taskTypeTopic
+	}
 	payloadByte, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
@@ -46,6 +52,9 @@ func (c *GoAsynqClient) NewTask(taskTypeTopic string, payload any, opts ...asynq
 }
 
 func (c *GoAsynqClient) Enqueue(taskTypeTopic string, payload any, opts ...asynq.Option) (*asynq.TaskInfo, error) {
+	if c.Prefix != "" {
+		taskTypeTopic = c.Prefix + ":" + taskTypeTopic
+	}
 	task, err := c.NewTask(taskTypeTopic, payload, opts...)
 	if err != nil {
 		return nil, err

@@ -12,6 +12,7 @@ import (
 type ClusterClientConfig struct {
 	Config goredisc.Config `yaml:"Config" json:"config,optional"`
 	Name   string          `yaml:"Name" json:"name,optional"`
+	Prefix string          `yaml:"Prefix" json:"prefix,optional"`
 }
 
 func convertClientConfigToNode(conf *ClusterClientConfig) goasynq.ClientConfig {
@@ -54,5 +55,6 @@ func NewClusterClient(conf ClusterClientConfig) *goasynq.GoAsynqClient {
 
 	return &goasynq.GoAsynqClient{
 		Client: client,
+		Prefix: conf.Prefix,
 	}
 }

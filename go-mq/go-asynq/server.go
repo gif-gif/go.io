@@ -15,11 +15,13 @@ type ServerConfig struct {
 	Config      goredis.Config `yaml:"Config" json:"config,optional"`
 	Concurrency int            `yaml:"Concurrency" json:"concurrency,optional"` //default 10 指定要使用的并发工作线程数量
 	Queues      map[string]int `yaml:"Queues" json:"queues,optional"`
+	Prefix      string         `yaml:"Prefix" json:"prefix,optional"`
 }
 
 type GoAsynqServer struct {
 	ServeMux *asynq.ServeMux
 	Server   *asynq.Server
+	Prefix   string `yaml:"Prefix" json:"prefix,optional"`
 }
 
 // Stop指示服务器停止从队列中提取新任务。
@@ -81,6 +83,7 @@ func RunServer(config ServerConfig) *GoAsynqServer {
 	gs := &GoAsynqServer{
 		ServeMux: mux,
 		Server:   srv,
+		Prefix:   config.Prefix,
 	}
 
 	goutils.AsyncFunc(func() { // 异步运行挂起
@@ -95,9 +98,15 @@ func RunServer(config ServerConfig) *GoAsynqServer {
 }
 
 func (s *GoAsynqServer) HandleFunc(taskTypeTopic string, handler func(context.Context, *asynq.Task) error) {
+	if s.Prefix != "" {
+		taskTypeTopic = s.Prefix + ":" + taskTypeTopic
+	}
 	s.ServeMux.HandleFunc(taskTypeTopic, handler)
 }
 
 func (s *GoAsynqServer) Handle(taskTypeTopic string, handler asynq.Handler) {
+	if s.Prefix != "" {
+		taskTypeTopic = s.Prefix + ":" + taskTypeTopic
+	}
 	s.ServeMux.Handle(taskTypeTopic, handler)
 }

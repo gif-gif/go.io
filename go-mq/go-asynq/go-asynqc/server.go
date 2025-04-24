@@ -16,6 +16,7 @@ type ClusterServerConfig struct {
 	Config      goredisc.Config `yaml:"Config" json:"config,optional"`
 	Concurrency int             `yaml:"Concurrency" json:"concurrency,optional"` //default 10 指定要使用的并发工作线程数量
 	Queues      map[string]int  `yaml:"Queues" json:"queues,optional"`
+	Prefix      string          `yaml:"Prefix" json:"prefix,optional"`
 }
 
 func convertServerConfigToNode(conf *ClusterServerConfig) goasynq.ServerConfig {
@@ -82,6 +83,7 @@ func ClusterRunServer(conf ClusterServerConfig) *goasynq.GoAsynqServer {
 	gs := &goasynq.GoAsynqServer{
 		ServeMux: mux,
 		Server:   srv,
+		Prefix:   config.Prefix,
 	}
 
 	goutils.AsyncFunc(func() { // 异步运行挂起
