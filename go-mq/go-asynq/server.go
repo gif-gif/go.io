@@ -20,7 +20,6 @@ type ServerConfig struct {
 type GoAsynqServer struct {
 	ServeMux *asynq.ServeMux
 	Server   *asynq.Server
-	Prefix   string `yaml:"Prefix" json:"prefix,optional"`
 }
 
 // Stop指示服务器停止从队列中提取新任务。
@@ -96,15 +95,9 @@ func RunServer(config ServerConfig) *GoAsynqServer {
 }
 
 func (s *GoAsynqServer) HandleFunc(taskTypeTopic string, handler func(context.Context, *asynq.Task) error) {
-	if s.Prefix != "" {
-		taskTypeTopic = s.Prefix + ":" + taskTypeTopic
-	}
 	s.ServeMux.HandleFunc(taskTypeTopic, handler)
 }
 
 func (s *GoAsynqServer) Handle(taskTypeTopic string, handler asynq.Handler) {
-	if s.Prefix != "" {
-		taskTypeTopic = s.Prefix + ":" + taskTypeTopic
-	}
 	s.ServeMux.Handle(taskTypeTopic, handler)
 }
