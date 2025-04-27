@@ -7,6 +7,14 @@ import (
 
 var _clients = map[string]*GoGorm{}
 
+func GetNames() []string {
+	names := make([]string, 0, len(_clients))
+	for name := range _clients {
+		names = append(names, name)
+	}
+	return names
+}
+
 func Init(configs ...Config) (err error) {
 	for _, conf := range configs {
 		name := conf.Name

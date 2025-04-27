@@ -3,7 +3,6 @@ package gominio
 import (
 	"errors"
 	golog "github.com/gif-gif/go.io/go-log"
-	"github.com/minio/minio-go/v7"
 )
 
 var __clients = map[string]*Uploader{}
@@ -73,8 +72,4 @@ func Default() *Uploader {
 	golog.WithTag("gominio").Error("no default minio client")
 
 	return nil
-}
-
-func (g *Uploader) MinioClient() *minio.Client {
-	return g.client
 }

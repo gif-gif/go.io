@@ -1,4 +1,4 @@
-package test
+package main
 
 import (
 	"context"
@@ -25,7 +25,6 @@ func createBucketTest() {
 		AccessKeyId:     *AccessKeyId,
 		AccessKeySecret: *AccessKeySecret,
 		Endpoint:        *Endpoint,
-		Bucket:          *Bucket,
 		Domain:          *Domain,
 		UseSSL:          false,
 	}
@@ -54,7 +53,6 @@ func uploadTest() {
 		AccessKeyId:     *AccessKeyId,
 		AccessKeySecret: *AccessKeySecret,
 		Endpoint:        *Endpoint,
-		Bucket:          *Bucket,
 		Domain:          *Domain,
 		UseSSL:          false,
 	}
@@ -74,7 +72,7 @@ func uploadTest() {
 			filename = i[index+1:]
 		}
 
-		info, err := oss.FPutObject(context.Background(), strings.ToLower(filename), i, &minio.PutObjectOptions{
+		info, err := oss.FPutObject(context.Background(), *Bucket, strings.ToLower(filename), i, &minio.PutObjectOptions{
 			Expires: time.Now().AddDate(0, 0, 1),
 		})
 		if err != nil {
@@ -91,7 +89,6 @@ func getTest() {
 		AccessKeyId:     *AccessKeyId,
 		AccessKeySecret: *AccessKeySecret,
 		Endpoint:        *Endpoint,
-		Bucket:          *Bucket,
 		Domain:          *Domain,
 		UseSSL:          false,
 	}
@@ -102,7 +99,7 @@ func getTest() {
 		return
 	}
 
-	err = gominio.Default().FGetObject(context.Background(), "/test/2024/05/422744271b108960a4818cc91a1822d9.log", "/Users/Jerry/Desktop/bak202405/422744271b108960a4818cc91a1822d9.log", nil)
+	err = gominio.Default().FGetObject(context.Background(), *Bucket, "/test/2024/05/422744271b108960a4818cc91a1822d9.log", "/Users/Jerry/Desktop/bak202405/422744271b108960a4818cc91a1822d9.log", nil)
 	if err != nil {
 		fmt.Println(err.Error())
 		return

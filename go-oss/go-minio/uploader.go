@@ -32,7 +32,27 @@ func Create(conf Config) (*Uploader, error) {
 	return o, nil
 }
 
-func (o *Uploader) FPutObject(ctx context.Context, objectName, filePath string, options *minio.PutObjectOptions) (*minio.UploadInfo, error) {
+func (g *Uploader) GetConfig() Config {
+	return g.conf
+}
+
+func (g *Uploader) MinioClient() *minio.Client {
+	return g.client
+}
+
+func (o *Uploader) getClient() (*minio.Client, error) {
+	minioClient, err := minio.New(o.conf.Endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(o.conf.AccessKeyId, o.conf.AccessKeySecret, ""),
+		Secure: o.conf.UseSSL,
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return minioClient, nil
+}
+
+func (o *Uploader) FPutObject(ctx context.Context, bucketName, objectName, filePath string, options *minio.PutObjectOptions) (*minio.UploadInfo, error) {
 	if objectName == "" {
 		return nil, errors.New("文件名为空")
 	}
@@ -41,7 +61,7 @@ func (o *Uploader) FPutObject(ctx context.Context, objectName, filePath string, 
 		options = &minio.PutObjectOptions{ContentType: "application/octet-stream"}
 	}
 
-	info, err := o.client.FPutObject(ctx, o.conf.Bucket, objectName, filePath, *options)
+	info, err := o.client.FPutObject(ctx, bucketName, objectName, filePath, *options)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +69,14 @@ func (o *Uploader) FPutObject(ctx context.Context, objectName, filePath string, 
 	return &info, nil
 }
 
-func (o *Uploader) FGetObject(ctx context.Context, objectName, saveFilePath string, options *minio.GetObjectOptions) error {
+func (o *Uploader) GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (*minio.Object, error) {
+	if objectName == "" {
+		return nil, errors.New("文件名为空")
+	}
+	return o.client.GetObject(ctx, bucketName, objectName, opts)
+}
+
+func (o *Uploader) FGetObject(ctx context.Context, bucketName, objectName, saveFilePath string, options *minio.GetObjectOptions) error {
 	if objectName == "" {
 		return errors.New("文件名为空")
 	}
@@ -58,7 +85,7 @@ func (o *Uploader) FGetObject(ctx context.Context, objectName, saveFilePath stri
 		options = &minio.GetObjectOptions{}
 	}
 
-	err := o.client.FGetObject(ctx, o.conf.Bucket, objectName, saveFilePath, *options)
+	err := o.client.FGetObject(ctx, bucketName, objectName, saveFilePath, *options)
 	if err != nil {
 		return err
 	}
@@ -100,16 +127,4 @@ func (o *Uploader) ListObjects(bucketName string, opts *minio.ListObjectsOptions
 
 func (o *Uploader) PresignedGetObject(bucketName, objectName string, expiry time.Duration, reqParams url.Values) (u *url.URL, err error) {
 	return o.client.PresignedGetObject(context.Background(), bucketName, objectName, expiry, reqParams)
-}
-
-func (o *Uploader) getClient() (*minio.Client, error) {
-	minioClient, err := minio.New(o.conf.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(o.conf.AccessKeyId, o.conf.AccessKeySecret, ""),
-		Secure: o.conf.UseSSL,
-	})
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	return minioClient, nil
 }
