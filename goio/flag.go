@@ -14,7 +14,7 @@ import (
 	buildVersion="${version}.$(date +%Y%m%d).$(date +%H%M)"
 
 	// 编译
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X github.com/liqiongtao/googo.io/goo.Version=$buildVersion" -o ss
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X https://github.com/gif-gif/go.io/goio.Version=$buildVersion" -o ss
 
   - 执行
 

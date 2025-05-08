@@ -12,7 +12,7 @@ import (
 
 func Compress(body []byte, compressMethod string, compressType string) (bool, []byte, error) {
 	defer goutils.Recovery(func(err any) {
-		golog.Error(err)
+		golog.Warn(err)
 	})
 	if compressType == "" {
 		compressType = UnGoZipType
@@ -67,7 +67,7 @@ func Compress(body []byte, compressMethod string, compressType string) (bool, []
 // 5. 拼接iv+encryptData
 func GoDataEncrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, error) {
 	defer goutils.Recovery(func(err any) {
-		golog.Error(err)
+		golog.Warn(err)
 	})
 	timestamp := time.Now().Unix()
 	timestampBytes := make([]byte, 8)
@@ -110,10 +110,13 @@ func GoDataEncrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, e
 // 5. 解压data(如果有压缩)
 func GoDataDecrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, error) {
 	defer goutils.Recovery(func(err any) {
-		golog.Error(err)
+		golog.Warn(err)
 	})
-
 	AesIvLength := 16
+	if len(data) < AesIvLength { //非法数据
+		return nil, goerror.NewParamErrMsg("非法数据")
+	}
+
 	first16BytesIv := data[:AesIvLength]
 	// 获取剩余的字节解密
 	timeAndDataEncryptBytes := data[AesIvLength:]
@@ -145,7 +148,7 @@ func GoDataDecrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, e
 // compressMethod 空时不会压缩和解压
 func GoDataAesCTRTransformEncode(data []byte, aesKey []byte, aesIv []byte, compressMethod string) ([]byte, error) {
 	defer goutils.Recovery(func(err any) {
-		golog.Error(err)
+		golog.Warn(err)
 	})
 
 	var compressBytes []byte
@@ -168,7 +171,7 @@ func GoDataAesCTRTransformEncode(data []byte, aesKey []byte, aesIv []byte, compr
 
 func GoDataAesCTRTransformDecode(data []byte, aesKey []byte, aesIv []byte, compressMethod string) ([]byte, error) {
 	defer goutils.Recovery(func(err any) {
-		golog.Error(err)
+		golog.Warn(err)
 	})
 	var err error
 	body, err := gocrypto.AesCTRTransform(data, aesKey, aesIv)

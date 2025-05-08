@@ -6,6 +6,7 @@ import (
 	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
+	"github.com/samber/lo"
 	"os"
 	"strconv"
 	"time"
@@ -96,7 +97,37 @@ func (cli *GoKafka) init() (err error) {
 	return
 }
 
-func (cli *GoKafka) CreateTopicsRequest(topicName string, partitions int, replicationFactors int) error {
+//func (cli *GoKafka) CreateTopics(topics []string) (err error) {
+//	kafkaTopics, err := Producer().Client().Topics()
+//	if err != nil {
+//		golog.WithTag("kafka-producer").Error(err)
+//	}
+//	for _, topic := range topics {
+//		if lo.Contains(kafkaTopics, topic) {
+//			continue
+//		}
+//		msg := KafkaMessageTest{
+//			TopicName: topic,
+//		}
+//
+//		_, _, err := gokafka.Producer().SendMessage(&msg)
+//		if err != nil {
+//			golog.Warn("KafkaMessageTest send message failed: ", err.Error())
+//		}
+//		fmt.Println("KafkaMessageTest send message success:" + topic)
+//	}
+//}
+
+func (cli *GoKafka) CreateTopicRequest(topicName string, partitions int, replicationFactors int) error {
+	kafkaTopics, err := Producer().Client().Topics()
+	if err != nil {
+		return err
+	}
+
+	if lo.Contains(kafkaTopics, topicName) {
+		return nil
+	}
+
 	request := &sarama.CreateTopicsRequest{}
 	request.TopicDetails = make(map[string]*sarama.TopicDetail)
 	request.TopicDetails[topicName] = &sarama.TopicDetail{
@@ -104,7 +135,7 @@ func (cli *GoKafka) CreateTopicsRequest(topicName string, partitions int, replic
 		ReplicationFactor: int16(replicationFactors),
 	}
 	broker := cli.Brokers()[0]
-	err := broker.Open(cli.Config())
+	err = broker.Open(cli.Config())
 	if err != nil {
 		return err
 	}
@@ -119,6 +150,16 @@ func (cli *GoKafka) CreateTopicsRequest(topicName string, partitions int, replic
 	} else {
 		return fmt.Errorf(" broker is not connected")
 	}
+}
+
+func (cli *GoKafka) CreateTopicsRequest(topicNames []string, partitions int, replicationFactors int) error {
+	for _, topicName := range topicNames {
+		err := cli.CreateTopicRequest(topicName, partitions, replicationFactors)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (cli *GoKafka) Close() {
