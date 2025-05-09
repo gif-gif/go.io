@@ -107,7 +107,12 @@ func GetDateInterval(t1, t2 time.Time) int {
 
 // SinceDays 获取过去的天数,dateString格式20060102
 func SinceDays(dateString string) (int64, error) {
-	targetTime, err := time.ParseInLocation("20060102", dateString, time.Local)
+	return SinceDaysEx(dateString, DateLayout)
+}
+
+// SinceDays 获取过去的天数
+func SinceDaysEx(dateString string, format string) (int64, error) {
+	targetTime, err := time.ParseInLocation(format, dateString, time.Local)
 	if err != nil {
 		return 0, err
 	} else {
