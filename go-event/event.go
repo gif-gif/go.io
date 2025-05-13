@@ -71,10 +71,14 @@ func (ev *GoEvent) Subscribe(topic string, fn SubscribeFunc, async ...bool) {
 					fn(msg)
 				})
 			}
+			//v, ok := <-ch
+			//fmt.Println(v, ok)
 		} else {
 			for msg := range ch {
 				fn(msg)
 			}
+			//v, ok := <-ch
+			//fmt.Println(v, ok)
 		}
 	})
 }
