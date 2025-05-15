@@ -1,4 +1,4 @@
-package bean
+package gobean
 
 import (
 	"encoding/json"
