@@ -190,3 +190,25 @@ func GoDataAesCTRTransformDecode(data []byte, aesKey []byte, aesIv []byte, compr
 	}
 	return compressBytes, nil
 }
+
+func GoDataAesCTRTransform(data []byte, aesKey []byte, aesIv []byte, compressMethod string) ([]byte, error) {
+	defer goutils.Recovery(func(err any) {
+		golog.Warn(err)
+	})
+	var err error
+	body, err := gocrypto.AesCTRTransform(data, aesKey, aesIv)
+	if err != nil {
+		return nil, err
+	}
+
+	var compressBytes []byte
+	if compressMethod != "" && compressMethod != NOZIP {
+		_, compressBytes, err = Compress(body, compressMethod, compressMethod)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		compressBytes = body
+	}
+	return compressBytes, nil
+}
