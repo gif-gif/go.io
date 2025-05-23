@@ -37,8 +37,10 @@ func (cli *GoKafka) init() (err error) {
 	}
 
 	if cli.conf.KeepAlive == 0 {
-		config.Net.KeepAlive = 10 * time.Second
+		cli.conf.KeepAlive = 10
 	}
+
+	config.Net.KeepAlive = time.Duration(cli.conf.KeepAlive) * time.Second
 
 	// 等所有follower都成功后再返回
 	config.Producer.RequiredAcks = sarama.WaitForAll
