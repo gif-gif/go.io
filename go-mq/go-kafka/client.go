@@ -36,6 +36,10 @@ func (cli *GoKafka) init() (err error) {
 		config.Net.SASL.Password = cli.conf.Password
 	}
 
+	if cli.conf.KeepAlive == 0 {
+		config.Net.KeepAlive = 10 * time.Second
+	}
+
 	// 等所有follower都成功后再返回
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	// 分区策略为Manual，指定分区发送消息
@@ -47,6 +51,7 @@ func (cli *GoKafka) init() (err error) {
 	config.Producer.Return.Successes = true
 	config.Producer.Return.Errors = true
 	config.Consumer.Return.Errors = true
+
 	config.Consumer.Offsets.AutoCommit.Enable = true              // 自动提交
 	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second // 间隔
 	config.Consumer.Offsets.Retry.Max = 5

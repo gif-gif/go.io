@@ -47,6 +47,7 @@ func NewClusterClient(conf ClusterClientConfig) *goasynq.GoAsynqClient {
 	client := asynq.NewClient(asynq.RedisClusterClientOpt{
 		Addrs:        config.Addrs,
 		Password:     config.Password,
+		MaxRedirects: lo.If(config.MaxRedirects <= 0, 10).Else(config.MaxRedirects),
 		DialTimeout:  lo.If(config.DialTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.DialTimeout) * time.Second),
 		ReadTimeout:  lo.If(config.ReadTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.ReadTimeout) * time.Second),
 		WriteTimeout: lo.If(config.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.WriteTimeout) * time.Second),

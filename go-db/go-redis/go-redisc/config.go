@@ -19,6 +19,7 @@ type Config struct {
 	DialTimeout  int      `yaml:"DialTimeout" json:"dialTimeout,optional"`
 	ReadTimeout  int      `yaml:"ReadTimeout" json:"readTimeout,optional"`
 	WriteTimeout int      `yaml:"WriteTimeout" json:"writeTimeout,optional"`
+	MaxRedirects int      `yaml:"MaxRedirects" json:"maxRedirects,optional"`
 	PoolSize     int      `yaml:"PoolSize" json:"poolSize,optional"`
 	Type         string   `yaml:"Type" json:",default=node,options=node|cluster"`
 	PingTimeout  int64    `yaml:"PingTimeout" json:"pingTimeout,optional"`
