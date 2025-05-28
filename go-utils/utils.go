@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"math"
 	"math/rand"
+	"net"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -323,4 +324,22 @@ func IsEqualArray[T comparable](arr1 []T, arr2 []T) bool {
 		}
 	}
 	return true
+}
+
+// 方法1: 使用 net.ParseIP（推荐）
+func IsIPv4(str string) bool {
+	ip := net.ParseIP(str)
+	if ip == nil {
+		return false
+	}
+	// 检查是否是 IPv4
+	return ip.To4() != nil
+}
+
+// 方法2: 正则表达式（简单版）
+func IsIPv4Regex(str string) bool {
+	// 简单的 IPv4 正则（不完全准确）
+	pattern := `^(\d{1,3}\.){3}\d{1,3}$`
+	matched, _ := regexp.MatchString(pattern, str)
+	return matched
 }

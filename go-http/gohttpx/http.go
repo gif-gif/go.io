@@ -1,10 +1,24 @@
 package gohttpx
 
 import (
+	goutils "github.com/gif-gif/go.io/go-utils"
 	"io"
 	"net/http"
 	"strings"
 )
+
+func GetHeaderIpInfos(r *http.Request, field string) map[string]string {
+	result := make(map[string]string)
+	result["X-Forwarded-For"] = r.Header.Get("X-Forwarded-For")
+	result["X-Forward-For"] = r.Header.Get("X-Forward-For")
+	result["Proxy-Client-IP"] = r.Header.Get("Proxy-Client-IP")
+	result["WL-Proxy-Client-IP"] = r.Header.Get("WL-Proxy-Client-IP")
+	result["HTTP_CLIENT_IP"] = r.Header.Get("HTTP_CLIENT_IP")
+	result["HTTP_X_FORWARDED_FOR"] = r.Header.Get("HTTP_X_FORWARDED_FOR")
+	result["X-Real-IP"] = r.Header.Get("X-Real-IP")
+	result["r-RemoteAddr"] = r.RemoteAddr
+	return result
+}
 
 // GetClientIp returns the client ip of this request without port.
 // Note that this ip address might be modified by client header.
@@ -15,23 +29,28 @@ func GetClientIp(r *http.Request) string {
 		ipArray := strings.Split(realIps, ",")
 		clientIp = ipArray[0]
 		if clientIp != "" {
-			//fmt.Printf("GetClientIp X-Forwarded-For:%s\n", clientIp)
-			return clientIp
-		}
-	}
-
-	if clientIp == "" {
-		realIps := r.Header.Get("X-Forward-For")
-		if realIps != "" && len(realIps) != 0 && !strings.EqualFold("unknown", realIps) {
-			ipArray := strings.Split(realIps, ",")
-			clientIp = ipArray[0]
-			if clientIp != "" {
+			if goutils.IsIPv4(clientIp) {
 				return clientIp
+			}
+			if len(ipArray) > 1 {
+				clientIp = strings.TrimSpace(ipArray[1])
+				if goutils.IsIPv4(clientIp) {
+					return clientIp
+				}
 			}
 		}
 	}
 
-	if clientIp == "" || strings.EqualFold("unknown", realIps) {
+	realIps = r.Header.Get("X-Forward-For")
+	if realIps != "" && len(realIps) != 0 && !strings.EqualFold("unknown", realIps) {
+		ipArray := strings.Split(realIps, ",")
+		clientIp = ipArray[0]
+		if clientIp != "" {
+			return clientIp
+		}
+	}
+
+	if strings.EqualFold("unknown", realIps) {
 		clientIp = r.Header.Get("Proxy-Client-IP")
 	}
 	if clientIp == "" || strings.EqualFold("unknown", realIps) {
