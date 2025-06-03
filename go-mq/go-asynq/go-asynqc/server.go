@@ -20,6 +20,7 @@ type ClusterServerConfig struct {
 
 func convertServerConfigToNode(conf *ClusterServerConfig) goasynq.ServerConfig {
 	return goasynq.ServerConfig{
+		Concurrency: conf.Concurrency,
 		Config: goredis.Config{
 			Name:         conf.Config.Name,
 			Addr:         conf.Config.Addrs[0],
@@ -46,10 +47,6 @@ func ClusterRunServer(conf ClusterServerConfig) *goasynq.GoAsynqServer {
 	}
 	if conf.Concurrency == 0 {
 		conf.Concurrency = 10
-	}
-
-	if config.PoolSize == 0 {
-		config.PoolSize = 10
 	}
 
 	if conf.Queues == nil {
