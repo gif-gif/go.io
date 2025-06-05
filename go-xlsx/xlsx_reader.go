@@ -1,7 +1,6 @@
 package goxlsx
 
 import (
-	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -19,7 +18,6 @@ func NewReader(xlsxFile string) (*XlsxRead, error) {
 func (r *XlsxRead) ReadBySheet(sheet string, fn func(n int, row []string) error) error {
 	xlsx, err := excelize.OpenFile(r.FilePath)
 	if err != nil {
-		golog.Error(err)
 		return err
 	}
 	defer xlsx.Close()
@@ -30,7 +28,6 @@ func (r *XlsxRead) ReadBySheet(sheet string, fn func(n int, row []string) error)
 
 	rows, err := xlsx.Rows(sheet)
 	if err != nil {
-		golog.Error(err)
 		return err
 	}
 	defer rows.Close()
