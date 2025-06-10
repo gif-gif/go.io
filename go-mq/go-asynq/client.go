@@ -173,5 +173,5 @@ func (c *GoAsynqClient) PurgeQueue(queueName string) error {
 		}
 	}
 
-	return nil
+	return c.DeleteQueue(queueName, true)
 }
