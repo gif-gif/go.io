@@ -2,11 +2,10 @@ package goasynqc
 
 import (
 	"errors"
-	goasynq "github.com/gif-gif/go.io/go-mq/go-asynq"
 )
 
-var __clients = map[string]*goasynq.GoAsynqClient{}
-var __servers = map[string]*goasynq.GoAsynqServer{}
+var __clients = map[string]*GoAsynqClient{}
+var __servers = map[string]*GoAsynqServer{}
 
 // client for cluster or node
 func InitClient(configs ...ClusterClientConfig) error {
@@ -26,7 +25,7 @@ func InitClient(configs ...ClusterClientConfig) error {
 	return nil
 }
 
-func GetClient(names ...string) *goasynq.GoAsynqClient {
+func GetClient(names ...string) *GoAsynqClient {
 	name := "default"
 	if l := len(names); l > 0 {
 		name = names[0]
@@ -40,7 +39,7 @@ func GetClient(names ...string) *goasynq.GoAsynqClient {
 	return nil
 }
 
-func DefaultClient() *goasynq.GoAsynqClient {
+func DefaultClient() *GoAsynqClient {
 	if cli, ok := __clients["default"]; ok {
 		return cli
 	}
@@ -78,7 +77,7 @@ func InitServer(configs ...ClusterServerConfig) error {
 	return nil
 }
 
-func GetServer(names ...string) *goasynq.GoAsynqServer {
+func GetServer(names ...string) *GoAsynqServer {
 	name := "default"
 	if l := len(names); l > 0 {
 		name = names[0]
@@ -100,7 +99,7 @@ func DelServer(names ...string) {
 	}
 }
 
-func DefaultServer() *goasynq.GoAsynqServer {
+func DefaultServer() *GoAsynqServer {
 	if cli, ok := __servers["default"]; ok {
 		return cli
 	}
