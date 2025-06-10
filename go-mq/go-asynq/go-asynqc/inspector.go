@@ -16,7 +16,7 @@ type ClusterInspectorConfig struct {
 	Name   string          `yaml:"Name" json:"name,optional"`
 }
 
-func NewClusterInspector(conf ClusterClientConfig) *GoAsynqInspector {
+func NewClusterInspector(conf ClusterInspectorConfig) *GoAsynqInspector {
 	config := conf.Config
 	var inspector *asynq.Inspector
 	if config.Type != "cluster" {

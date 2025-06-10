@@ -6,6 +6,7 @@ import (
 
 var __clients = map[string]*GoAsynqClient{}
 var __servers = map[string]*GoAsynqServer{}
+var __inspector = map[string]*GoAsynqInspector{}
 
 // client for cluster or node
 func InitClient(configs ...ClusterClientConfig) error {
@@ -106,6 +107,59 @@ func DefaultServer() *GoAsynqServer {
 
 	if l := len(__servers); l == 1 {
 		for _, cli := range __servers {
+			return cli
+		}
+	}
+	return nil
+}
+
+// __inspector for cluster or node
+func InitInspector(configs ...ClusterInspectorConfig) error {
+	for _, conf := range configs {
+		name := conf.Name
+		if name == "" {
+			name = "default"
+		}
+
+		if __inspector[name] != nil {
+			return errors.New("__inspector already exists")
+		}
+
+		__inspector[name] = NewClusterInspector(conf)
+	}
+
+	return nil
+}
+
+func GetInspector(names ...string) *GoAsynqInspector {
+	name := "default"
+	if l := len(names); l > 0 {
+		name = names[0]
+		if name == "" {
+			name = "default"
+		}
+	}
+	if cli, ok := __inspector[name]; ok {
+		return cli
+	}
+	return nil
+}
+
+func DelInspector(names ...string) {
+	if l := len(names); l > 0 {
+		for _, name := range names {
+			delete(__inspector, name)
+		}
+	}
+}
+
+func DefaultInspector() *GoAsynqInspector {
+	if cli, ok := __inspector["default"]; ok {
+		return cli
+	}
+
+	if l := len(__inspector); l == 1 {
+		for _, cli := range __inspector {
 			return cli
 		}
 	}
