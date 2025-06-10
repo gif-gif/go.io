@@ -2,7 +2,7 @@ package goasynq
 
 import (
 	"context"
-	goredis "github.com/gif-gif/go.io/go-db/go-redis"
+	goredisc "github.com/gif-gif/go.io/go-db/go-redis/go-redisc"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/hibiken/asynq"
@@ -11,10 +11,10 @@ import (
 )
 
 type ServerConfig struct {
-	Name        string         `yaml:"Name" json:"name,optional"`
-	Config      goredis.Config `yaml:"Config" json:"config,optional"`
-	Concurrency int            `yaml:"Concurrency" json:"concurrency,optional"` //default 10 指定要使用的并发工作线程数量
-	Queues      map[string]int `yaml:"Queues" json:"queues,optional"`
+	Name        string          `yaml:"Name" json:"name,optional"`
+	Config      goredisc.Config `yaml:"Config" json:"config,optional"`
+	Concurrency int             `yaml:"Concurrency" json:"concurrency,optional"` //default 10 指定要使用的并发工作线程数量
+	Queues      map[string]int  `yaml:"Queues" json:"queues,optional"`
 }
 
 type GoAsynqServer struct {
@@ -58,7 +58,7 @@ func RunServer(config ServerConfig) *GoAsynqServer {
 
 	srv := asynq.NewServer(
 		asynq.RedisClientOpt{
-			Addr:         config.Config.Addr,
+			Addr:         config.Config.Addrs[0],
 			Password:     config.Config.Password,
 			DB:           config.Config.DB,
 			PoolSize:     config.Config.PoolSize,

@@ -1,7 +1,6 @@
 package goasynqc
 
 import (
-	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	goredisc "github.com/gif-gif/go.io/go-db/go-redis/go-redisc"
 	golog "github.com/gif-gif/go.io/go-log"
 	goasynq "github.com/gif-gif/go.io/go-mq/go-asynq"
@@ -21,22 +20,8 @@ type ClusterServerConfig struct {
 func convertServerConfigToNode(conf *ClusterServerConfig) goasynq.ServerConfig {
 	return goasynq.ServerConfig{
 		Concurrency: conf.Concurrency,
-		Config: goredis.Config{
-			Name:         conf.Config.Name,
-			Addr:         conf.Config.Addrs[0],
-			DB:           conf.Config.DB,
-			Password:     conf.Config.Password,
-			Prefix:       conf.Config.Prefix,
-			TLS:          conf.Config.TLS,
-			AutoPing:     conf.Config.AutoPing,
-			PoolSize:     conf.Config.PoolSize,
-			DialTimeout:  conf.Config.DialTimeout,
-			ReadTimeout:  conf.Config.ReadTimeout,
-			WriteTimeout: conf.Config.WriteTimeout,
-			Type:         "node",
-			Weight:       conf.Config.Weight,
-		},
-		Queues: conf.Queues,
+		Config:      conf.Config,
+		Queues:      conf.Queues,
 	}
 }
 

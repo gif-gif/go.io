@@ -538,3 +538,7 @@ func (s *GoRedisC) ZRevRank(key, field string) *redis.IntCmd {
 func (s *GoRedisC) ZUnionStore(dest string, store *redis.ZStore) *redis.IntCmd {
 	return s.Redis.ZUnionStore(s.Ctx, dest, store)
 }
+
+func (s *GoRedisC) Close() error {
+	return s.Redis.Close()
+}

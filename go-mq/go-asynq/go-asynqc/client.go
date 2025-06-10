@@ -1,7 +1,6 @@
 package goasynqc
 
 import (
-	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	goredisc "github.com/gif-gif/go.io/go-db/go-redis/go-redisc"
 	goasynq "github.com/gif-gif/go.io/go-mq/go-asynq"
 	"github.com/hibiken/asynq"
@@ -20,22 +19,8 @@ func convertClientConfigToNode(conf *ClusterClientConfig) goasynq.ClientConfig {
 		config.PoolSize = 10
 	}
 	return goasynq.ClientConfig{
-		Config: goredis.Config{
-			Name:         config.Name,
-			Addr:         config.Addrs[0],
-			DB:           config.DB,
-			Password:     config.Password,
-			Prefix:       config.Prefix,
-			TLS:          config.TLS,
-			AutoPing:     config.AutoPing,
-			PoolSize:     config.PoolSize,
-			DialTimeout:  config.DialTimeout,
-			ReadTimeout:  config.ReadTimeout,
-			WriteTimeout: config.WriteTimeout,
-			Type:         "node",
-			Weight:       config.Weight,
-		},
-		Name: config.Name,
+		Config: config,
+		Name:   config.Name,
 	}
 }
 
@@ -44,6 +29,7 @@ func NewClusterClient(conf ClusterClientConfig) *goasynq.GoAsynqClient {
 	if config.Type != "cluster" {
 		return goasynq.NewClient(convertClientConfigToNode(&conf))
 	}
+
 	client := asynq.NewClient(asynq.RedisClusterClientOpt{
 		Addrs:        config.Addrs,
 		Password:     config.Password,
@@ -53,7 +39,16 @@ func NewClusterClient(conf ClusterClientConfig) *goasynq.GoAsynqClient {
 		WriteTimeout: lo.If(config.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.WriteTimeout) * time.Second),
 	})
 
+	inspector := asynq.NewInspector(asynq.RedisClusterClientOpt{
+		Addrs:        config.Addrs,
+		Password:     config.Password,
+		DialTimeout:  lo.If(config.DialTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.DialTimeout) * time.Second),
+		ReadTimeout:  lo.If(config.ReadTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.ReadTimeout) * time.Second),
+		WriteTimeout: lo.If(config.WriteTimeout <= 0, time.Duration(5)*time.Second).Else(time.Duration(config.WriteTimeout) * time.Second),
+	})
+
 	return &goasynq.GoAsynqClient{
-		Client: client,
+		Client:    client,
+		Inspector: inspector,
 	}
 }

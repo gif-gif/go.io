@@ -45,6 +45,11 @@ func GetClient(names ...string) *GoRedis {
 func DelClient(names ...string) {
 	if l := len(names); l > 0 {
 		for _, name := range names {
+			r := GetClient(name)
+			if r != nil {
+				r.Close()
+			}
+
 			delete(__clients, name)
 		}
 	}

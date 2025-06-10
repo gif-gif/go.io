@@ -25,7 +25,7 @@ func New(conf Config) (cli *GoRedis, err error) {
 		Ctx:    context.Background(),
 		Config: conf,
 	}
-	
+
 	cli.Redis = redis.NewClient(&redis.Options{
 		Addr:         conf.Addr,
 		Password:     conf.Password,
@@ -522,4 +522,8 @@ func (s *GoRedis) ZRevRank(key, field string) *redis.IntCmd {
 // Zunionstore is the implementation of redis zunionstore command.
 func (s *GoRedis) ZUnionStore(dest string, store *redis.ZStore) *redis.IntCmd {
 	return s.Redis.ZUnionStore(s.Ctx, dest, store)
+}
+
+func (s *GoRedis) Close() error {
+	return s.Redis.Close()
 }
