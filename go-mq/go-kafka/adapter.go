@@ -9,8 +9,11 @@ type IProducer interface {
 	// 发送消息 - 同步
 	SendMessage(msg IMessage) (partition int32, offset int64, err error)
 
+	SendMessages(msgs []IMessage) (err error)
+
 	// 发送消息 - 异步
 	SendAsyncMessage(msg IMessage, cb MessageHandler) (err error)
+	SendAsyncMessages(msgs []IMessage, cb MessageHandler) (err error)
 }
 
 // 消费者

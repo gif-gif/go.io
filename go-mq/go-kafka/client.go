@@ -54,6 +54,11 @@ func (cli *GoKafka) init() (err error) {
 	config.Producer.Return.Errors = true
 	config.Consumer.Return.Errors = true
 
+	//批量发送策略
+	config.Producer.Flush.Messages = 100                     // 积累100条消息
+	config.Producer.Flush.Bytes = 1048576                    // 积累1MB数据
+	config.Producer.Flush.Frequency = 100 * time.Millisecond // 每100ms刷新
+
 	config.Consumer.Offsets.AutoCommit.Enable = true              // 自动提交
 	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second // 间隔
 	config.Consumer.Offsets.Retry.Max = 5
