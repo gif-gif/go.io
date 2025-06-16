@@ -118,6 +118,23 @@ func TestAttributeManager_DecryptAttribute(t *testing.T) {
 				CampaignPartner: "",
 			},
 			wantErr: false,
+		}, {
+			name: "userdef.CHANNEL_JUMP",
+			args: args{
+				appCode: "walkgain",
+				referer: "utm_source=jump&utm_medium=jump",
+			},
+			want: &AttributeInfo{
+				UtmSource:       "jump",
+				UtmMedium:       "jump",
+				Channel:         "jump",
+				CampaignId:      "",
+				CampaignName:    "",
+				AdCostMode:      "",
+				CampaignChannel: "",
+				CampaignPartner: "",
+			},
+			wantErr: false,
 		},
 	}
 	Init(Config{

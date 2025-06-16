@@ -2,6 +2,7 @@ package goattribution
 
 import (
 	"net/url"
+	"strings"
 )
 
 type OrganicHandler struct {
@@ -12,7 +13,11 @@ func (h *OrganicHandler) Channel() string {
 }
 
 func (h *OrganicHandler) Match(queryParams url.Values) bool {
-	return queryParams.Get("utm_medium") == h.Channel() || (queryParams.Get("utm_source") == "(not set)" && queryParams.Get("utm_medium") == "(not set)")
+	utm_medium := strings.TrimSpace(queryParams.Get("utm_medium"))
+	utm_source := strings.TrimSpace(queryParams.Get("utm_source"))
+	return utm_medium == h.Channel() ||
+		(utm_source == "(not set)" && utm_medium == "(not set)") ||
+		(utm_source == "" && utm_medium == "")
 }
 
 func (h *OrganicHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
