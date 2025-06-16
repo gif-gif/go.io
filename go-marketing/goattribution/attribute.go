@@ -30,10 +30,18 @@ type AttributeInfo struct {
 	AdCostMode      string
 	CampaignChannel string
 	CampaignPartner string
+	UtmCampaignId   string
+	UtmCampaignName string
+	UtmSource       string
+	UtmMedium       string
+	UtmContent      string
 }
 
-func CreateAttributeInfo(campaignId, campaignName string) (*AttributeInfo, error) {
+func CreateAttributeInfo(queryParams url.Values, campaignId, campaignName string) (*AttributeInfo, error) {
 	result := &AttributeInfo{
+		UtmSource:    queryParams.Get("utm_source"),
+		UtmMedium:    queryParams.Get("utm_medium"),
+		UtmContent:   queryParams.Get("utm_content"),
 		CampaignId:   campaignId,
 		CampaignName: campaignName,
 	}

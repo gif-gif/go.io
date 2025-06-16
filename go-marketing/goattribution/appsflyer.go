@@ -46,7 +46,7 @@ func (h *AppsFlyerAttributeHandler) Match(queryParams url.Values) bool {
 }
 
 func (h *AppsFlyerAttributeHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
-	info, err := CreateAttributeInfo(queryParams.Get("af_c_id"), queryParams.Get("c"))
+	info, err := CreateAttributeInfo(queryParams, queryParams.Get("af_c_id"), queryParams.Get("c"))
 	if err != nil {
 		logx.Errorf("AppsFlyerAttributeHandler handle %v queryParams:%+v", err, queryParams)
 	}

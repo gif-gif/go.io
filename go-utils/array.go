@@ -123,3 +123,23 @@ func SplitArray(arr []interface{}, size int) (list [][]interface{}) {
 
 	return
 }
+
+//
+//// Insert 在指定位置插入元素
+//// 支持负数索引，-1 表示最后一个位置，-2 表示倒数第二个位置
+//func InsertArray[T any](slice []T, index int, element T) []T {
+//	// 处理负数索引
+//	if index < 0 {
+//		index = len(slice) + index + 1
+//	}
+//
+//	// 边界检查
+//	if index < 0 {
+//		index = 0
+//	} else if index > len(slice) {
+//		index = len(slice)
+//	}
+//
+//	// 插入元素
+//	return append(slice[:index], append([]T{element}, slice[index:]...)...)
+//}

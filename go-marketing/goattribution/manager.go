@@ -2,6 +2,7 @@ package goattribution
 
 import (
 	"fmt"
+	"slices"
 )
 
 type (
@@ -24,6 +25,8 @@ func New(config Config) *AttributeManager {
 			&BigoAttributeHandler{},
 			&OrganicHandler{},
 			&GoogleAttributeHandler{},
+			//新的渠道处理器需要放在这里
+			&CommonAttributeHandler{},
 		},
 		Config: config,
 	}
@@ -31,7 +34,7 @@ func New(config Config) *AttributeManager {
 
 // 注册一个属性处理器
 func (m *AttributeManager) AddAttributeHandler(handler AttributeHandler) {
-	m.AttributeHandlers = append(m.AttributeHandlers, handler)
+	m.AttributeHandlers = slices.Insert(m.AttributeHandlers, 0, handler)
 }
 
 func (m *AttributeManager) DecryptAttribute(referer string) (*AttributeInfo, error) {

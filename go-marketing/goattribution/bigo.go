@@ -18,6 +18,9 @@ func (h *BigoAttributeHandler) Match(queryParams url.Values) bool {
 
 func (h *BigoAttributeHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
 	return &AttributeInfo{
-		Channel: h.Channel(),
+		UtmSource:  queryParams.Get("utm_source"),
+		UtmMedium:  queryParams.Get("utm_medium"),
+		UtmContent: queryParams.Get("utm_content"),
+		Channel:    h.Channel(),
 	}, nil
 }

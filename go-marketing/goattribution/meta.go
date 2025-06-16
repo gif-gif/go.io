@@ -42,28 +42,28 @@ type FacebookAttributeHandler struct {
 }
 
 func (h *FacebookAttributeHandler) Channel() string {
-	return "meta"
+	return CHANNEL_META
 }
 
 func (h *FacebookAttributeHandler) Match(queryParams url.Values) bool {
-	return strings.Contains(queryParams.Get("utm_source"), h.Channel())
+	return strings.Contains(queryParams.Get("utm_source"), h.Channel()) || strings.Contains(queryParams.Get("utm_source"), "facebook")
 }
 
 func (h *FacebookAttributeHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
 	key := []byte(h.DecryptKey)
-	info, err := h.DecryptFacebookAttribute(queryParams.Get("utm_content"), key)
+	info, err := h.DecryptFacebookAttribute(queryParams, queryParams.Get("utm_content"), key)
 	if err != nil {
 		logx.Errorf("FacebookAttributeHandler handle DecryptFacebookAttribute error:%v queryParams:%+v", err, queryParams)
 	}
 	return info, nil
 }
 
-func (h *FacebookAttributeHandler) DecryptFacebookAttribute(content string, key []byte) (*AttributeInfo, error) {
+func (h *FacebookAttributeHandler) DecryptFacebookAttribute(queryParams url.Values, content string, key []byte) (*AttributeInfo, error) {
 	facebookAd, err := h.DecryptFacebookAd(content, key)
 	if err != nil {
 		return nil, err
 	}
-	info, err := CreateAttributeInfo(gconv.String(facebookAd.CampaignID), facebookAd.CampaignName)
+	info, err := CreateAttributeInfo(queryParams, gconv.String(facebookAd.CampaignID), facebookAd.CampaignName)
 	info.Channel = h.Channel()
 	return info, err
 }
