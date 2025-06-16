@@ -22,8 +22,5 @@ func ConvertMapToStruct[T any](data map[string]interface{}) (*T, error) {
 	if err != nil {
 		return &t, err
 	}
-
-	dataBytes, _ := json.Marshal(data)
-	_ = json.Unmarshal(dataBytes, &t)
 	return &t, nil
 }
