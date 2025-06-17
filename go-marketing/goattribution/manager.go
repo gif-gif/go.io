@@ -25,7 +25,6 @@ func New(config Config) *AttributeManager {
 			&BigoAttributeHandler{},
 			&OrganicHandler{},
 			&GoogleAttributeHandler{},
-			//新的渠道处理器需要放在这里
 			&CommonAttributeHandler{},
 		},
 		Config: config,
@@ -33,6 +32,9 @@ func New(config Config) *AttributeManager {
 }
 
 // 注册一个属性处理器
+// 注意：注册的顺序很重要，因为会按照注册的顺序进行匹配
+// 例如：如果先注册了 FacebookAttributeHandler，那么就会先匹配 FacebookAttributeHandler，然后再匹配 AppsFlyerAttributeHandler
+// 这个函数会把handler插入到AttributeHandlers的头部
 func (m *AttributeManager) AddAttributeHandler(handler AttributeHandler) {
 	m.AttributeHandlers = slices.Insert(m.AttributeHandlers, 0, handler)
 }

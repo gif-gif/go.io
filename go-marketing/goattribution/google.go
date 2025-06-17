@@ -12,7 +12,7 @@ func (h *GoogleAttributeHandler) Channel() string {
 }
 
 func (h *GoogleAttributeHandler) Match(queryParams url.Values) bool {
-	return len(queryParams.Get("gclid")) > 0
+	return len(queryParams.Get("gclid")) > 0 //ads
 }
 
 func (h *GoogleAttributeHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
