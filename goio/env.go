@@ -60,6 +60,12 @@ func SetupLogDefault() {
 	}
 }
 
+func SetupLogDefaultByFilepath(filepath string) {
+	if IsTest() || IsPro() || IsPre() {
+		golog.SetAdapter(adapters.NewFileAdapter(adapters.FilePathOption(filepath)))
+	}
+}
+
 func IsTest() bool {
 	return Env == TEST
 }

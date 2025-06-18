@@ -62,7 +62,7 @@ func NewFileAdapter(opt ...FileOption) *FileAdapter {
 	files, _ := filepath.Glob(fa.filepath + ymd + "_*.log")
 	fa.count = len(files)
 
-	fa.timer = gotime.NewTimer(opts.ClearLogInterval) // 每天12点清理一次
+	fa.timer = gotime.NewTimer(opts.ClearLogInterval) // 每12点清理一次
 	fa.timer.Start(func() {
 		fa.CleanOldLogs()
 	})
