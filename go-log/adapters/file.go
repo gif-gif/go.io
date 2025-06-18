@@ -6,7 +6,6 @@ import (
 	"github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gif-gif/go.io/go-utils/gotime"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -181,7 +180,7 @@ func (fa *FileAdapter) CleanOldLogs() error {
 	cutoffTime := now.AddDate(0, 0, -fa.keepDays)
 
 	// 读取目录中的所有文件
-	files, err := ioutil.ReadDir(fa.filepath)
+	files, err := os.ReadDir(fa.filepath)
 	if err != nil {
 		return fmt.Errorf("读取目录失败: %v", err)
 	}
@@ -233,6 +232,6 @@ func (fa *FileAdapter) CleanOldLogs() error {
 		}
 	}
 
-	//log.Printf("清理完成: 删除 %d 个文件, 保留 %d 个文件", deletedCount, keptCount)
+	golog.InfoF("清理完成: 删除 %d 个文件, 保留 %d 个文件", deletedCount, keptCount)
 	return nil
 }
