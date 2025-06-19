@@ -2,6 +2,7 @@ package gohttp
 
 import (
 	"context"
+	"github.com/gif-gif/go.io/go-utils/gocrypto"
 	"github.com/gif-gif/go.io/go-utils/gozip"
 	goserver "github.com/gif-gif/go.io/goio/server"
 )
@@ -39,7 +40,7 @@ func CompressRequest(url string, body []byte, compressMethod string, compressTyp
 
 // EncryptRequest 加密请求 aes cbc
 func EncryptRequest(url string, body []byte, reqAesKey []byte, resAesKey []byte, compressMethod string, headers map[string]string) ([]byte, error) {
-	data, err := gozip.GoDataEncrypt(body, reqAesKey, compressMethod)
+	data, err := gocrypto.GoDataEncrypt(body, reqAesKey, compressMethod)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +60,7 @@ func EncryptRequest(url string, body []byte, reqAesKey []byte, resAesKey []byte,
 	}
 
 	compressMethod = payload.Response.Header().Get("X-NL-Content-Encoding")
-	resData, err := gozip.GoDataDecrypt(payload.Response.Body(), resAesKey, compressMethod)
+	resData, err := gocrypto.GoDataDecrypt(payload.Response.Body(), resAesKey, compressMethod)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +69,7 @@ func EncryptRequest(url string, body []byte, reqAesKey []byte, resAesKey []byte,
 
 // aes ctr 加密请求
 func EncryptCTRRequest(url string, body []byte, aesKey []byte, aesIv []byte, compressMethod string, headers map[string]string) ([]byte, error) {
-	data, err := gozip.GoDataAesCTRTransformEncode(body, aesKey, aesIv, compressMethod)
+	data, err := gocrypto.GoDataAesCTRTransformEncode(body, aesKey, aesIv, compressMethod)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +89,7 @@ func EncryptCTRRequest(url string, body []byte, aesKey []byte, aesIv []byte, com
 	}
 
 	compressMethod = payload.Response.Header().Get("X-NL-Content-Encoding")
-	resData, err := gozip.GoDataAesCTRTransformDecode(payload.Response.Body(), aesKey, aesIv, compressMethod)
+	resData, err := gocrypto.GoDataAesCTRTransformDecode(payload.Response.Body(), aesKey, aesIv, compressMethod)
 	if err != nil {
 		return nil, err
 	}
