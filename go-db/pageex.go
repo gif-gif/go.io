@@ -9,6 +9,7 @@ import (
 type OrderItem struct {
 	Column string `json:"column"`
 	Asc    bool   `json:"asc"`
+	IsFunc bool   `json:"isFunc"` //是否是函数, 默认是false , 如果是true, 则会移除column中的反引号
 }
 
 type Page struct {
@@ -22,9 +23,15 @@ type Page struct {
 	IgnoreList  bool         `json:"need_list,optional"`
 	OnlyTotal   bool         `json:"only_total,optional"`
 	Ids         []int64      `json:"ids,optional"`
-	States      []int64      `json:"states,optional"`
-	Statuses    []int64      `json:"statutes,optional"`
+	//ExcludeIds  []int64      `json:"excludeIds,optional"`
+	States   []int64 `json:"states,optional"`
+	Statuses []int64 `json:"statutes,optional"`
 }
+
+//TODO: 待优化
+//type CommonCondition struct {
+//	ExcludeIds []int64 `json:"exclude_ids,optional"`
+//}
 
 func (p *Page) OrderBy() string {
 	size := len(p.SortBy)
