@@ -19,10 +19,5 @@ func (h *YandexAttributeHandler) Match(queryParams url.Values) bool {
 }
 
 func (h *YandexAttributeHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
-	return &AttributeInfo{
-		UtmSource:  queryParams.Get("utm_source"),
-		UtmMedium:  queryParams.Get("utm_medium"),
-		UtmContent: queryParams.Get("utm_content"),
-		Channel:    h.Channel(),
-	}, nil
+	return CreateBaseAttributeInfo(queryParams, h.Channel()), nil
 }

@@ -25,6 +25,7 @@ type AttributeHandler interface {
 }
 
 type AttributeInfo struct {
+	ClickId         string
 	Channel         string
 	CampaignId      string
 	CampaignName    string
@@ -43,6 +44,7 @@ func CreateAttributeInfo(queryParams url.Values, campaignId, campaignName string
 		UtmSource:    queryParams.Get("utm_source"),
 		UtmMedium:    queryParams.Get("utm_medium"),
 		UtmContent:   queryParams.Get("utm_content"),
+		ClickId:      queryParams.Get("click_id"),
 		CampaignId:   campaignId,
 		CampaignName: campaignName,
 	}

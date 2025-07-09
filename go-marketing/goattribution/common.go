@@ -18,10 +18,5 @@ func (h *CommonAttributeHandler) Match(queryParams url.Values) bool {
 
 func (h *CommonAttributeHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
 	h._Channel = queryParams.Get("utm_medium")
-	return &AttributeInfo{
-		UtmSource:  queryParams.Get("utm_source"),
-		UtmMedium:  queryParams.Get("utm_medium"),
-		UtmContent: queryParams.Get("utm_content"),
-		Channel:    h.Channel(),
-	}, nil
+	return CreateBaseAttributeInfo(queryParams, h.Channel()), nil
 }
