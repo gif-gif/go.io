@@ -18,6 +18,7 @@ func New(config Config) *AttributeManager {
 	}
 	return &AttributeManager{
 		AttributeHandlers: []AttributeHandler{
+			&YandexAttributeHandler{},
 			&FacebookAttributeHandler{
 				DecryptKey: config.DecryptKeys[CHANNEL_META],
 			},

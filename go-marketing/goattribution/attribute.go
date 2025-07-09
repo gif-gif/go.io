@@ -12,6 +12,7 @@ const (
 	CHANNEL_ORGANIC   = "organic"
 	CHANNEL_META      = "meta"
 	CHANNEL_GOOGLE    = "google"
+	CHANNEL_YANDEX    = "yandex"
 	CHANNEL_APPSFLYER = "appsflyer"
 	CHANNEL_MINTEGRAL = "mintegral"
 	CHANNEL_BIGO      = "bigo"
