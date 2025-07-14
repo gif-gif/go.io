@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	CHANNEL_UNKWON    = "unknown"
 	CHANNEL_ORGANIC   = "organic"
 	CHANNEL_META      = "meta"
 	CHANNEL_GOOGLE    = "google"

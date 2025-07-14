@@ -24,8 +24,8 @@ func New(config Config) *AttributeManager {
 			},
 			&AppsFlyerAttributeHandler{},
 			&BigoAttributeHandler{},
-			&OrganicHandler{},
 			&GoogleAttributeHandler{},
+			&OrganicHandler{},
 			&CommonAttributeHandler{},
 		},
 		Config: config,
@@ -47,7 +47,11 @@ func (m *AttributeManager) DecryptAttribute(referer string) (*AttributeInfo, err
 	}
 	for _, handler := range m.AttributeHandlers {
 		if handler.Match(queryParams) {
-			return handler.Handle(queryParams)
+			v, err := handler.Handle(queryParams)
+			if err != nil {
+				continue
+			}
+			return v, nil
 		}
 	}
 

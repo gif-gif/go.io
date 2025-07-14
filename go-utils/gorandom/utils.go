@@ -144,7 +144,7 @@ func Test() {
 	// 旧版本需要：rand.Seed(time.Now().UnixNano())
 
 	// 1. 随机整数
-	fmt.Printf("Random int (1-100): %d\n", RandomInt(1, 100))
+	fmt.Printf("Random int (1-100): %d\n", RandomInt(0, 1))
 
 	// 2. 随机浮点数
 	fmt.Printf("Random float: %.4f\n", RandomFloat())
