@@ -8,14 +8,14 @@ import (
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/samber/lo"
 	"os"
-	"strconv"
 	"time"
 )
 
 type GoKafka struct {
 	conf Config
 	sarama.Client
-	redis *goredis.GoRedis
+	redis                   *goredis.GoRedis
+	ConsumerGroupInstanceId string
 }
 
 func (cli *GoKafka) GetConfig() Config {
@@ -23,7 +23,16 @@ func (cli *GoKafka) GetConfig() Config {
 }
 
 func (cli *GoKafka) init() (err error) {
-	id := strconv.Itoa(os.Getpid())
+	createUniqueInstanceId := func() string {
+		hostname, _ := os.Hostname()
+		timestamp := time.Now().Unix()
+		return fmt.Sprintf("consumer-%s-%d", hostname, timestamp)
+	}
+
+	//id := strconv.Itoa(os.Getpid())
+	id := createUniqueInstanceId()
+
+	cli.ConsumerGroupInstanceId = id
 	config := sarama.NewConfig()
 	config.ClientID = id
 	config.ChannelBufferSize = 1024
