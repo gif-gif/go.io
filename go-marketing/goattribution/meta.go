@@ -53,7 +53,7 @@ func (h *FacebookAttributeHandler) Handle(queryParams url.Values) (*AttributeInf
 	key := []byte(h.DecryptKey)
 	info, err := h.DecryptFacebookAttribute(queryParams, queryParams.Get("utm_content"), key)
 	if err != nil {
-		logx.Errorf("FacebookAttributeHandler handle DecryptFacebookAttribute error:%v queryParams:%+v", err, queryParams)
+		//logx.Errorf("FacebookAttributeHandler handle DecryptFacebookAttribute error:%v queryParams:%+v", err, queryParams)
 		return nil, err
 	}
 	return info, nil

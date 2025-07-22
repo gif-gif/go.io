@@ -19,12 +19,12 @@ func New(config Config) *AttributeManager {
 	return &AttributeManager{
 		AttributeHandlers: []AttributeHandler{
 			&YandexAttributeHandler{},
+			&GoogleAttributeHandler{},
 			&FacebookAttributeHandler{
 				DecryptKey: config.DecryptKeys[CHANNEL_META],
 			},
 			&AppsFlyerAttributeHandler{},
 			&BigoAttributeHandler{},
-			&GoogleAttributeHandler{},
 			&OrganicHandler{},
 			&CommonAttributeHandler{},
 		},
