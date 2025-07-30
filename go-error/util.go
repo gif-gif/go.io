@@ -26,13 +26,16 @@ func GetErrCodeMsg(err error) (errCode uint32, errMsg string) {
 	if err == nil {
 		return 0, ""
 	}
-	errCode = 500
+	errCode = SERVER_COMMON_ERROR
 	errMsg = "server error"
 	causeErr := errors.Cause(err)           // err类型
 	if e, ok := causeErr.(*CodeError); ok { //自定义错误类型
 		errCode = e.GetErrCode()
 		errMsg = e.GetErrMsg()
-	} else {
+	} else if er, ok := err.(*HttpCodeError); ok { //http 状态码
+		errCode = er.GetErrCode()
+		errMsg = er.GetErrMsg()
+	} else { //通用错误
 		errCode, errMsg = GetErrorMsg(err)
 	}
 	return
