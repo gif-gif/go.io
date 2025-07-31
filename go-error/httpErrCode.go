@@ -1,5 +1,6 @@
 package goerror
 
+const STATUS_OK uint32 = 200
 const STATUS_NOCONTENT uint32 = 204
 const STATUS_FOUND uint32 = 302
 const STATUS_UNAUTHORIZATION uint32 = 401
