@@ -13,17 +13,17 @@ const TOKEN_EXPIRE_ERROR uint32 = 401
 const FORBIDDEN_ERROR uint32 = 403
 const NOT_FOUND_ERROR uint32 = 404
 
-const SERVER_COMMON_ERROR uint32 = 1500
-const CAPTCHA_ERROR uint32 = 1700
-const USER_NOT_EXISTS_ERROR uint32 = 1701
-const USER_LOGIN_ERROR uint32 = 1703
-const USER_EXISTS_ERROR uint32 = 1704
+const SERVER_COMMON_ERROR uint32 = 500
+const CAPTCHA_ERROR uint32 = 700
+const USER_NOT_EXISTS_ERROR uint32 = 701
+const USER_LOGIN_ERROR uint32 = 703
+const USER_EXISTS_ERROR uint32 = 704
 
 // server
 
-const DB_ERROR uint32 = 1555
-const REDIS_ERROR uint32 = 1666
-const ETCD_ERROR uint32 = 1777
+const DB_ERROR uint32 = 555
+const REDIS_ERROR uint32 = 666
+const ETCD_ERROR uint32 = 777
 
 // 错误处理枚举
 // showType?: number; // error display type： 0 silent; 1 message.warn; 2 message.error; 4 notification; 9 page
