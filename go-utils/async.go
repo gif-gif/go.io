@@ -24,6 +24,10 @@ func NewErrorGroup(context context.Context, maxWorkers int) ErrorGroup {
 	return e
 }
 
+func (e *ErrorGroup) GetContext() context.Context {
+	return e.ctx
+}
+
 func (e *ErrorGroup) Submit(fn ...func() error) {
 	for _, f := range fn {
 		e.errGroup.Go(f)
