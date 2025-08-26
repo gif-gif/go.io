@@ -3,15 +3,15 @@ package gocaptcha
 import (
 	"context"
 	"fmt"
-	goredis "github.com/gif-gif/go.io/go-db/go-redis"
+	goredisc "github.com/gif-gif/go.io/go-db/go-redis/go-redisc"
 	"github.com/mojocn/base64Captcha"
 	"time"
 )
 
 // 默认内存，分布式用redis等
 type Config struct {
-	Name        string          `json:"name,optional" yaml:"Name"`
-	RedisConfig *goredis.Config `json:"redisConfig,optional" yaml:"RedisConfig"`
+	Name        string           `json:"name,optional" yaml:"Name"`
+	RedisConfig *goredisc.Config `json:"redisConfig,optional" yaml:"RedisConfig"`
 }
 
 type configJsonBody struct {
@@ -36,7 +36,7 @@ type GoCaptcha struct {
 }
 
 type RedisStore struct {
-	redis   *goredis.GoRedis
+	redis   *goredisc.GoRedisC
 	Context context.Context
 }
 
@@ -59,13 +59,13 @@ func (r *RedisStore) Verify(id, answer string, clear bool) bool {
 }
 
 // new other store
-func NewRedis(config goredis.Config) (*GoCaptcha, error) {
-	err := goredis.Init(config)
+func NewRedis(config goredisc.Config) (*GoCaptcha, error) {
+	err := goredisc.Init(config)
 	if err != nil {
 		return nil, err
 	}
 
-	redis := goredis.GetClient(config.Name)
+	redis := goredisc.GetClient(config.Name)
 	if redis == nil {
 		return nil, fmt.Errorf("failed to connect to redis %v", config)
 	}
@@ -215,7 +215,7 @@ func (g *GoCaptcha) ChineseCaptcha(width, height, length int, source string) (*C
 	if height == 0 {
 		height = 80
 	}
-	
+
 	var param = configJsonBody{
 		CaptchaType: "chinese",
 		DriverChinese: &base64Captcha.DriverChinese{

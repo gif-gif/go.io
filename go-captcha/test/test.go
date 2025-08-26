@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	gocaptcha "github.com/gif-gif/go.io/go-captcha"
-	goredis "github.com/gif-gif/go.io/go-db/go-redis"
+	goredisc "github.com/gif-gif/go.io/go-db/go-redis/go-redisc"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gin-gonic/gin"
@@ -125,9 +125,9 @@ func captchaVerifyHandle(w http.ResponseWriter, r *http.Request) {
 
 // start a net/http server
 func main() {
-	config := goredis.Config{
+	config := goredisc.Config{
 		Name:     "gocaptcha",
-		Addr:     "127.0.0.1:6379",
+		Addrs:    []string{"127.0.0.1:6379"},
 		Password: "",
 		DB:       0,
 		Prefix:   "gocaptcha",

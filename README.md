@@ -198,9 +198,9 @@ func main() {
 
 ### 验证码(支持分布式验证,基于redis)
 ```go
-config := goredis.Config{
+config := goredisc.Config{
     Name:     "gocaptcha",
-    Addr:     "127.0.0.1:6379",
+    Addrs:    []string{"127.0.0.1:6379"},
     Password: "",
     DB:       0,
     Prefix:   "gocaptcha",
@@ -208,8 +208,8 @@ config := goredis.Config{
 }
 
 err := gocaptcha.Init(gocaptcha.Config{
-    RedisConfig: &config,
-})
+        RedisConfig: &config,
+ })
 
 if err != nil {
     golog.Error(err.Error())
