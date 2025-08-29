@@ -1,11 +1,12 @@
 package gopool
 
 import (
-	"github.com/alitto/pond/v2"
+	"github.com/panjf2000/ants/v2"
+	"time"
 )
 
 type GoPool struct {
-	pool pond.Pool
+	pool *ants.Pool
 }
 
 type PoolStat struct {
@@ -18,117 +19,66 @@ type PoolStat struct {
 	CompletedTasks  uint64
 }
 
+//	ants will pre-malloc the whole capacity of pool when calling ants.NewPool.
 //
-//func New(maxWorkers int, options ...pond.Option) *GoPool {
-//	p := pond.NewPool(maxWorkers, options...)
-//	return &GoPool{pool: p}
-//}
-//
-//func (g *GoPool) StopAndWait() {
-//	g.pool.StopAndWait()
-//}
-//
-//// 如果池已停止并且不再接受任务，则Stopped返回true，否则返回false。
-//func (g *GoPool) Stopped() bool {
-//	return g.pool.Stopped()
-//}
-//
-//// 使用固定数量的Worker创建一个无缓冲（阻塞）池，提交任务等待
-//func NewFixedSizePool(maxWorkers int) *GoPool {
-//	return New(maxWorkers)
-//}
-//
-//// Create a context that will be cancelled
-//// Tasks being processed will continue until they finish, but queued tasks are cancelled.
-//func NewContextPool(maxWorkers int, ctx context.Context) *GoPool {
-//	return New(maxWorkers)
-//}
-//
-////	 Create a task group
-////
-////			group := pool.Group()
-////
-////			// Submit a group of related tasks
-////			for i := 0; i < 20; i++ {
-////				n := i
-////				group.Submit(func() {
-////					fmt.Printf("Running group task #%d\n", n)
-////				})
-////			}
-////
-////			// Wait for all tasks in the group to complete
-////			group.Wait()
-////		}
-//func (g *GoPool) NewTaskGroup() pond.TaskGroup {
-//	return g.pool.NewGroup()
-//}
-//
-//func (g *GoPool) Submit(fn func()) {
-//	g.pool.Submit(fn)
-//}
-//
-//func (g *GoPool) PrometheusHandler() {
-//	prometheus.MustRegister(prometheus.NewGaugeFunc(
-//		prometheus.GaugeOpts{
-//			Name: "pool_workers_running",
-//			Help: "Number of running worker goroutines",
-//		},
-//		func() float64 {
-//			return float64(g.pool.RunningWorkers())
-//		}))
-//	prometheus.MustRegister(prometheus.NewGaugeFunc(
-//		prometheus.GaugeOpts{
-//			Name: "pool_workers_idle",
-//			Help: "Number of idle worker goroutines",
-//		},
-//		func() float64 {
-//			return 0
-//		}))
-//
-//	// Task metrics
-//	prometheus.MustRegister(prometheus.NewCounterFunc(
-//		prometheus.CounterOpts{
-//			Name: "pool_tasks_submitted_total",
-//			Help: "Number of tasks submitted",
-//		},
-//		func() float64 {
-//			return float64(g.pool.SubmittedTasks())
-//		}))
-//	prometheus.MustRegister(prometheus.NewGaugeFunc(
-//		prometheus.GaugeOpts{
-//			Name: "pool_tasks_waiting_total",
-//			Help: "Number of tasks waiting in the queue",
-//		},
-//		func() float64 {
-//			return float64(g.pool.WaitingTasks())
-//		}))
-//	prometheus.MustRegister(prometheus.NewCounterFunc(
-//		prometheus.CounterOpts{
-//			Name: "pool_tasks_successful_total",
-//			Help: "Number of tasks that completed successfully",
-//		},
-//		func() float64 {
-//			return float64(g.pool.SuccessfulTasks())
-//		}))
-//	prometheus.MustRegister(prometheus.NewCounterFunc(
-//		prometheus.CounterOpts{
-//			Name: "pool_tasks_failed_total",
-//			Help: "Number of tasks that completed with panic",
-//		},
-//		func() float64 {
-//			return float64(g.pool.FailedTasks())
-//		}))
-//	prometheus.MustRegister(prometheus.NewCounterFunc(
-//		prometheus.CounterOpts{
-//			Name: "pool_tasks_completed_total",
-//			Help: "Number of tasks that completed either successfully or with panic",
-//		},
-//		func() float64 {
-//			return float64(g.pool.CompletedTasks())
-//		}))
-//	// Expose the registered metrics via HTTP
-//	//http.Handle("/metrics", promhttp.Handler())
-//}
+// p, _ := ants.NewPool(100000, ants.WithPreAlloc(true))
+func New(maxWorkers int, options ...ants.Option) (*GoPool, error) {
+	p, err := ants.NewPool(maxWorkers, options...)
+	return &GoPool{pool: p}, err
+}
+
+func (g *GoPool) GetPool() *ants.Pool {
+	return g.pool
+}
+
+func (g *GoPool) Submit(fn func()) error {
+	return g.pool.Submit(fn)
+}
+
+// 释放关闭此池并释放工作队列。
+func (g *GoPool) Release() {
+	g.pool.Release()
+}
+
+// 只要调用 Reboot() 方法，就可以重新激活一个之前已经被销毁掉的池，并且投入使用。
+func (g *GoPool) Reboot() {
+	g.pool.Reboot()
+}
+
+// ReleaseTimeout就像Release，但带有超时，等待所有工作者退出后再超时。
+func (g *GoPool) ReleaseTimeout(timeout time.Duration) error {
+	return g.pool.ReleaseTimeout(timeout)
+}
+
+// 可用Worker数量，-1 表示无限制
+func (g *GoPool) Free() {
+	g.pool.Free()
+}
+
+// 调整更改了此池的容量，请注意，这对无限池或预分配池是无效的。线程安全
+func (g *GoPool) Tune(size int) {
+	g.pool.Tune(size)
+}
+
+func (g *GoPool) IsClosed() bool {
+	return g.pool.IsClosed()
+}
+
+// 运行中的Worker数量
+func (g *GoPool) Running() int {
+	return g.pool.Running()
+}
+
+// 等待返回等待执行的任务数量。
+func (g *GoPool) Waiting() int {
+	return g.pool.Waiting()
+}
+
+// Cap返回该池的容量
+func (g *GoPool) Cap() int {
+	return g.pool.Cap()
+}
+
 //
 //func (g *GoPool) PoolStats() PoolStat {
 //	return PoolStat{

@@ -307,7 +307,7 @@ func mysqlTest() {
 - https://github.com/olivere/elastic
 - https://github.com/elastic/go-elasticsearch
 - https://github.com/mongodb/mongo-go-driver
-- https://github.com/alitto/pond
+- https://github.com/panjf2000/ants
 - https://github.com/tucnak/telebot
 - https://github.com/PaulSonOfLars/gotgbot
 - https://github.com/mojocn/base64Captcha
