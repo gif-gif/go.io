@@ -319,3 +319,4 @@ func mysqlTest() {
 - https://github.com/xuri/excelize
 - https://github.com/samber/lo
 - https://github.com/shopspring/decimal
+- https://github.com/liqiongtao/googo.io
