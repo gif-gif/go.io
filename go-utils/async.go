@@ -3,6 +3,7 @@ package goutils
 import (
 	"context"
 	golog "github.com/gif-gif/go.io/go-log"
+	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/sync/errgroup"
 	"sync"
 	"time"
@@ -52,6 +53,7 @@ func Recovery(errFn func(err any)) {
 		if errFn != nil {
 			errFn(r)
 		} else {
+			logx.Errorf("AsyncFunc recover: %v", r)
 			golog.Error(r)
 		}
 	}
