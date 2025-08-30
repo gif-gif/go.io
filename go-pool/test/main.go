@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	golog "github.com/gif-gif/go.io/go-log"
+	gopool "github.com/gif-gif/go.io/go-pool"
 	"github.com/gif-gif/go.io/goio"
+	"github.com/panjf2000/ants/v2"
 	"time"
 )
 
@@ -16,7 +18,13 @@ func timeCost(start time.Time) {
 func main() {
 	goio.Init(goio.DEVELOPMENT)
 	defer timeCost(time.Now())
-	testStopPool()
+	pool, _ := gopool.New(100, ants.WithPreAlloc(true))
+	err := pool.Submit(func() {
+
+	})
+	if err != nil {
+		golog.ErrorF("Submit failed: %v", err)
+	}
 }
 
 func testDynamicSize() {
