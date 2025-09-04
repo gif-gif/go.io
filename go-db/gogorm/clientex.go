@@ -3,9 +3,31 @@ package gogorm
 import (
 	"errors"
 	golog "github.com/gif-gif/go.io/go-log"
+	"gorm.io/gorm"
 )
 
 var _clientsForDbType = map[string]*GoGorm{}
+
+func InitByDbTypeWithGormConfig(gormConfig gorm.Config, configs ...Config) (err error) {
+	for _, conf := range configs {
+		name := conf.Name
+		if name == "" {
+			name = "default"
+		}
+
+		key := conf.DBType + ":" + name
+		if _clientsForDbType[key] != nil {
+			return errors.New("gogorm clientForDbType already exists")
+		}
+
+		_clientsForDbType[key], err = New(&conf, gormConfig)
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
 
 func InitByDbType(configs ...Config) (err error) {
 	for _, conf := range configs {
