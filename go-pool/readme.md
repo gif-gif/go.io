@@ -1,6 +1,6 @@
 # GoPool for workers 并发请求 go routines 池
 
-- 准备基于 https://github.com/panjf2000/ants 封装
+- 基于 https://github.com/panjf2000/ants 封装
 
 Examples
 ```

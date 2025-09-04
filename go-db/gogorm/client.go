@@ -3,6 +3,7 @@ package gogorm
 import (
 	"errors"
 	golog "github.com/gif-gif/go.io/go-log"
+	"gorm.io/gorm"
 )
 
 var _clients = map[string]*GoGorm{}
@@ -13,6 +14,26 @@ func GetNames() []string {
 		names = append(names, name)
 	}
 	return names
+}
+
+func InitWithGormConfig(gormConfig gorm.Config, configs ...Config) (err error) {
+	for _, conf := range configs {
+		name := conf.Name
+		if name == "" {
+			name = "default"
+		}
+
+		if _clients[name] != nil {
+			return errors.New("gogorm client already exists")
+		}
+
+		_clients[name], err = New(&conf, gormConfig)
+		if err != nil {
+			return
+		}
+	}
+
+	return
 }
 
 func Init(configs ...Config) (err error) {

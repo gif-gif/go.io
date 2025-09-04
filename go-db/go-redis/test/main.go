@@ -1,16 +1,29 @@
 package main
 
 import (
-	"fmt"
 	goredisc "github.com/gif-gif/go.io/go-db/go-redis/go-redisc"
+	golog "github.com/gif-gif/go.io/go-log"
 )
 
 func main() {
-	c := goredisc.ClusterConf{
-		Name: "goredis",
+	config := goredisc.Config{
+		Name:     "goredis",
+		Addrs:    []string{"127.0.0.1:6379"},
+		Password: "",
+		DB:       0,
+		Prefix:   "goredis",
+		AutoPing: true,
 	}
 
-	config := c.GetConfig()
+	err := goredisc.Init(config)
+	if err != nil {
+		golog.WithTag("goredis").Error(err)
+	}
 
-	fmt.Println(config)
+	cmd := goredisc.Default().Set("goredis", "goredis")
+	if cmd.Err() != nil {
+		golog.WithTag("goredis").Error(cmd.Err())
+	}
+	v := goredisc.Default().Get("goredis").Val()
+	golog.WithTag("goredis").InfoF(v)
 }
