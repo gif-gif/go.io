@@ -7,8 +7,9 @@ import (
 	"time"
 )
 
-// RandomGenerator 结构体定义
+// RandomGenerator 结构体定义 ,线程安全
 type RandomGenerator struct {
+	mu  sync.Mutex
 	rng *rand.Rand
 }
 
@@ -34,23 +35,46 @@ func NewRandomGeneratorWithSeed2(seed1 uint64, seed2 uint64) *RandomGenerator {
 	}
 }
 
+func NewRandomGeneratorWithUnixNano() *RandomGenerator {
+	// 使用当前时间和纳秒作为种子
+	seed := time.Now().UnixNano()
+	return &RandomGenerator{
+		rng: rand.New(rand.NewPCG(uint64(seed), uint64(seed>>32))),
+	}
+}
+
 // RandomGenerator 的方法
-func (r *RandomGenerator) Int(min, max int) int {
+func (r *RandomGenerator) IntRange(min, max int) int {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	if min > max {
 		min, max = max, min
 	}
 	return r.rng.IntN(max-min+1) + min
 }
 
+// 生成 [0, n) 范围内的公平随机整数
+func (g *RandomGenerator) Int(n int) int {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return g.rng.IntN(n)
+}
+
 func (r *RandomGenerator) Float() float64 {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	return r.rng.Float64()
 }
 
 func (r *RandomGenerator) FloatRange(min, max float64) float64 {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	return min + r.rng.Float64()*(max-min)
 }
 
 func (r *RandomGenerator) String(length int) string {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, length)
 	for i := range b {
@@ -60,10 +84,14 @@ func (r *RandomGenerator) String(length int) string {
 }
 
 func (r *RandomGenerator) Bool() bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	return r.rng.IntN(2) == 1
 }
 
 func (r *RandomGenerator) Choice(slice []string) string {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	if len(slice) == 0 {
 		return ""
 	}
@@ -71,6 +99,8 @@ func (r *RandomGenerator) Choice(slice []string) string {
 }
 
 func (r *RandomGenerator) Shuffle(slice []int) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	r.rng.Shuffle(len(slice), func(i, j int) {
 		slice[i], slice[j] = slice[j], slice[i]
 	})
@@ -83,7 +113,7 @@ func TestGoRandom() {
 	rg := NewRandomGenerator()
 
 	// 生成随机数
-	fmt.Printf("随机整数 (1-100): %d\n", rg.Int(1, 100))
+	fmt.Printf("随机整数 (1-100): %d\n", rg.IntRange(1, 100))
 	fmt.Printf("随机浮点数: %.4f\n", rg.Float())
 	fmt.Printf("随机字符串: %s\n", rg.String(10))
 	fmt.Printf("随机布尔值: %v\n", rg.Bool())
@@ -98,10 +128,10 @@ func TestGoRandom() {
 	seed2 := uint64(now.UnixNano() >> 32)
 	rg3 := NewRandomGeneratorWithSeed2(seed1, seed2)
 
-	fmt.Printf("生成器固定两个种子: %d, %d, %d\n", rg3.Int(1, 100), rg3.Int(1, 100), rg3.Int(1, 100))
+	fmt.Printf("生成器固定两个种子: %d, %d, %d\n", rg3.IntRange(1, 100), rg3.IntRange(1, 100), rg3.IntRange(1, 100))
 	// 两个生成器会产生相同的随机数序列
-	fmt.Printf("生成器1: %d, %d, %d\n", rg1.Int(1, 100), rg1.Int(1, 100), rg1.Int(1, 100))
-	fmt.Printf("生成器2: %d, %d, %d\n", rg2.Int(1, 100), rg2.Int(1, 100), rg2.Int(1, 100))
+	fmt.Printf("生成器1: %d, %d, %d\n", rg1.IntRange(1, 100), rg1.IntRange(1, 100), rg1.IntRange(1, 100))
+	fmt.Printf("生成器2: %d, %d, %d\n", rg2.IntRange(1, 100), rg2.IntRange(1, 100), rg2.IntRange(1, 100))
 
 	// 示例 3: 游戏应用
 	fmt.Println("\n=== 示例 3: 游戏应用 ===")
@@ -116,8 +146,8 @@ func TestGoRandom() {
 	enemyRng := NewRandomGenerator()  // 敌人的随机数
 	itemRng := NewRandomGenerator()   // 物品的随机数
 
-	fmt.Printf("玩家伤害: %d\n", playerRng.Int(10, 20))
-	fmt.Printf("敌人伤害: %d\n", enemyRng.Int(5, 15))
+	fmt.Printf("玩家伤害: %d\n", playerRng.IntRange(10, 20))
+	fmt.Printf("敌人伤害: %d\n", enemyRng.IntRange(5, 15))
 	fmt.Printf("掉落物品: %s\n", itemRng.Choice([]string{"剑", "盾", "药水", "金币"}))
 
 	// 示例 5: 并发使用
@@ -132,7 +162,7 @@ type GameExample struct {
 
 func (g *GameExample) Play() {
 	// 掷骰子
-	dice := g.rng.Int(1, 6)
+	dice := g.rng.IntRange(1, 6)
 	fmt.Printf("掷骰子结果: %d\n", dice)
 
 	// 暴击判定
@@ -159,7 +189,7 @@ func concurrentExample() {
 			rng := NewRandomGeneratorWithSeed(uint64(id))
 
 			for j := 0; j < 3; j++ {
-				num := rng.Int(1, 100)
+				num := rng.IntRange(1, 100)
 				fmt.Printf("Goroutine %d: %d\n", id, num)
 			}
 		}(i)
@@ -183,7 +213,7 @@ func NewStatefulRandom() *StatefulRandom {
 
 func (s *StatefulRandom) NextInt(min, max int) int {
 	s.callCount++
-	return s.Int(min, max)
+	return s.IntRange(min, max)
 }
 
 func (s *StatefulRandom) GetCallCount() int {
@@ -197,7 +227,7 @@ func testDistribution() {
 
 	// 生成 10000 个 1-10 的随机数
 	for i := 0; i < 10000; i++ {
-		num := rg.Int(1, 10)
+		num := rg.IntRange(1, 10)
 		counts[num]++
 	}
 
