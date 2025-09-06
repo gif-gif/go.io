@@ -22,6 +22,7 @@ Golang Development Framework Continuously Developing and Updating
 - goio 提供了常用库封装，支持必要的简洁使用功能，在其之上可以进二次开发，以提供更好的代码维护；
 - 以跨平台跨项目为首要原则，以减少二次开发的成本；
 - 各个模块逻辑保持唯一不重复，但模块之间相互便捷使用实现复杂逻辑开发
+- 所有模块包名以go开头
 
 ## 开发规范
 - dev 分之开发，跑测试case，确定没问题 合并到 main 分支跑测试case

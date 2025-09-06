@@ -8,6 +8,32 @@ import (
 	"time"
 )
 
+// 不重复的随机数
+func GenerateUniqueRandomInts(min, max, count int) []int {
+	if min >= max || count <= 0 {
+		return []int{}
+	}
+
+	total := max - min + 1
+	if count > total {
+		count = total
+	}
+
+	// 创建范围内所有数字
+	numbers := make([]int, total)
+	for i := 0; i < total; i++ {
+		numbers[i] = min + i
+	}
+
+	// Fisher-Yates 洗牌
+	for i := len(numbers) - 1; i > 0; i-- {
+		j := rand.IntN(i + 1)
+		numbers[i], numbers[j] = numbers[j], numbers[i]
+	}
+
+	return numbers[:count]
+}
+
 // 1. 生成随机整数（指定范围）
 func RandomInt(min, max int) int {
 	if min > max {
