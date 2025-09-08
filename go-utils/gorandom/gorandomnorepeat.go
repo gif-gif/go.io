@@ -29,7 +29,7 @@ func NewWeightedRandomSelector(items []WeightedItem) *WeightedRandomSelector {
 }
 
 // SelectMultiple 选择多个不重复的元素
-func (w *WeightedRandomSelector) SelectMultiple(count int) []interface{} {
+func (w *WeightedRandomSelector) SelectMultiple(count int) []WeightedItem {
 	if count <= 0 || count > len(w.items) {
 		return nil
 	}
@@ -39,7 +39,7 @@ func (w *WeightedRandomSelector) SelectMultiple(count int) []interface{} {
 	copy(availableItems, w.items)
 	totalWeight := w.totalWeight
 
-	result := make([]interface{}, 0, count)
+	result := make([]WeightedItem, 0, count)
 
 	for i := 0; i < count; i++ {
 		if len(availableItems) == 0 {
@@ -68,7 +68,7 @@ func (w *WeightedRandomSelector) SelectMultiple(count int) []interface{} {
 
 		// 添加选中的元素到结果中
 		selectedItem := availableItems[selectedIndex]
-		result = append(result, selectedItem.Value)
+		result = append(result, selectedItem)
 
 		// 从可用元素中移除已选择的元素
 		totalWeight -= selectedItem.Weight
