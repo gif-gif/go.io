@@ -1,5 +1,7 @@
 package goutils
 
+import "slices"
+
 func SplitStringArray(arr []string, size int) (list [][]string) {
 	l := len(arr)
 
@@ -143,3 +145,27 @@ func SplitArray(arr []interface{}, size int) (list [][]interface{}) {
 //	// 插入元素
 //	return append(slice[:index], append([]T{element}, slice[index:]...)...)
 //}
+
+// Comparator 函数类型，接受两个参数并返回整数：
+// - 负数表示 a < b
+// - 零表示 a == b
+// - 正数表示 a > b
+type Comparator[T any] func(a, b T) int
+
+// SortWith 使用多个比较函数对切片进行排序
+func SortWith[T any](fns []Comparator[T], list []T) []T {
+	result := make([]T, len(list))
+	copy(result, list)
+
+	// 使用自定义排序逻辑
+	slices.SortStableFunc(result, func(a, b T) int {
+		for _, fn := range fns {
+			if cmp := fn(a, b); cmp != 0 {
+				return cmp
+			}
+		}
+		return 0 // 所有比较函数都返回 0，保持原顺序
+	})
+
+	return result
+}
