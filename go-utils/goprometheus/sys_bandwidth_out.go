@@ -3,6 +3,7 @@ package goprometheus
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/util/gconv"
 	"strings"
 
 	"github.com/prometheus/common/model"
@@ -27,4 +28,25 @@ func (g *GoPrometheus) GetSysBandwidthOut(ctx context.Context, query MetricQuery
 	queryStr := fmt.Sprintf(`max by (%s) (rate(%s{%s}[%s]))`, MetricLabelInstanceId, MetricNodeTrafficOut, strings.Join(filters, ","), timeRange)
 
 	return g.PrometheusQuery(ctx, queryStr)
+}
+
+func (g *GoPrometheus) PreHandleSysBandwidthOut(vector *model.Vector, result map[int64]*Bandwidth) map[int64]*Bandwidth {
+	for _, sample := range *vector {
+		instanceId := gconv.Int64(string(sample.Metric[MetricLabelInstanceId]))
+		if _, ok := result[instanceId]; !ok {
+			result[instanceId] = &Bandwidth{}
+		}
+		result[instanceId].Out = int64(sample.Value)
+	}
+	return result
+}
+
+func (g *GoPrometheus) SysBandwidthOut(ctx context.Context, query MetricQuery) (map[int64]*Bandwidth, error) {
+	vector, err := g.GetSysBandwidthOut(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[int64]*Bandwidth)
+	result = g.PreHandleSysBandwidthOut(&vector, result)
+	return result, nil
 }

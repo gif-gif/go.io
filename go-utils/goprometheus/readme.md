@@ -7,3 +7,8 @@
 ```
 fmt.Sprintf(`%s="%s-node-exporter"`, MetricLabelJob, query.ProductCode)
 ```
+
+三、用法 
+```
+g := goprometheus.NewGoPrometheus()
+```

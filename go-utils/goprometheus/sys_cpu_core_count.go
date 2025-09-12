@@ -3,6 +3,7 @@ package goprometheus
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/util/gconv"
 	"strings"
 
 	"github.com/prometheus/common/model"
@@ -19,4 +20,23 @@ func (g *GoPrometheus) GetSysCpuCoreCount(ctx context.Context, query MetricQuery
 	queryStr := fmt.Sprintf(`count by (%s) (count by (%s,%s) (%s{%s}))`, MetricLabelInstanceId, MetricLabelInstanceId, MetricLabelCpu, MetricNodeCpuSecondsTotal, strings.Join(filters, ","))
 
 	return g.PrometheusQuery(ctx, queryStr)
+}
+
+func (g *GoPrometheus) PreHandleSysCpuCoreCount(vector *model.Vector, result map[int64]int64) map[int64]int64 {
+	for _, sample := range *vector {
+		instanceId := gconv.Int64(string(sample.Metric[MetricLabelInstanceId]))
+		result[instanceId] = int64(sample.Value)
+	}
+
+	return result
+}
+
+func (g *GoPrometheus) SysCpuCoreCount(ctx context.Context, query MetricQuery) (map[int64]int64, error) {
+	vector, err := g.GetSysCpuCoreCount(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[int64]int64)
+	result = g.PreHandleSysCpuCoreCount(&vector, result)
+	return result, nil
 }

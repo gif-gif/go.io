@@ -3,6 +3,7 @@ package goprometheus
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/util/gconv"
 	"strings"
 
 	"github.com/prometheus/common/model"
@@ -22,4 +23,26 @@ func (g *GoPrometheus) GetSysMemoryUsage(ctx context.Context, query MetricQuery)
 	queryStr := fmt.Sprintf(`(1 - (%s / %s)) * 100`, availableQuery, totalQuery)
 
 	return g.PrometheusQuery(ctx, queryStr)
+}
+
+func (g *GoPrometheus) PreHandleSysMemoryUsage(vector *model.Vector, result map[int64]*SysUsage) map[int64]*SysUsage {
+	for _, sample := range *vector {
+		instanceId := gconv.Int64(string(sample.Metric[MetricLabelInstanceId]))
+		if _, ok := result[instanceId]; !ok {
+			result[instanceId] = &SysUsage{}
+		}
+		result[instanceId].MemoryUsage = float64(sample.Value)
+	}
+
+	return result
+}
+
+func (g *GoPrometheus) SysMemoryUsage(ctx context.Context, query MetricQuery) (map[int64]*SysUsage, error) {
+	vector, err := g.GetSysMemoryUsage(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[int64]*SysUsage)
+	result = g.PreHandleSysMemoryUsage(&vector, result)
+	return result, nil
 }

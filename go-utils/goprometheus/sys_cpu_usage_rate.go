@@ -3,6 +3,7 @@ package goprometheus
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/util/gconv"
 	"strings"
 
 	"github.com/prometheus/common/model"
@@ -27,4 +28,26 @@ func (g *GoPrometheus) GetSysCpuUsageRate(ctx context.Context, query MetricQuery
 	queryStr := fmt.Sprintf(`(1 - avg(rate(%s{%s}[%s])) by (%s)) * 100`, MetricNodeCpuSecondsTotal, strings.Join(filters, ","), timeRange, MetricLabelInstanceId)
 
 	return g.PrometheusQuery(ctx, queryStr)
+}
+
+func (g *GoPrometheus) PreHandleSysCpuUsage(vector *model.Vector, result map[int64]*SysUsage) map[int64]*SysUsage {
+	for _, sample := range *vector {
+		instanceId := gconv.Int64(string(sample.Metric[MetricLabelInstanceId]))
+		if _, ok := result[instanceId]; !ok {
+			result[instanceId] = &SysUsage{}
+		}
+		result[instanceId].CpuUsage = float64(sample.Value)
+	}
+
+	return result
+}
+
+func (g *GoPrometheus) SysCpuUsageRate(ctx context.Context, query MetricQuery) (model.Vector, error) {
+	vector, err := g.GetSysCpuUsageRate(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[int64]*SysUsage)
+	result = g.PreHandleSysCpuUsage(&vector, result)
+	return vector, nil
 }

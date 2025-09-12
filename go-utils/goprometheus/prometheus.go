@@ -13,7 +13,7 @@ type GoPrometheus struct {
 
 func New(config Config) (*GoPrometheus, error) {
 	client, err := prometheusApi.NewClient(prometheusApi.Config{
-		Address: config.GetAddress(),
+		Address: config.GetUrl(),
 	})
 	if err != nil {
 		return nil, err

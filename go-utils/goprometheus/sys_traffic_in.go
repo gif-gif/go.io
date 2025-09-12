@@ -3,6 +3,7 @@ package goprometheus
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/util/gconv"
 	"strings"
 
 	"github.com/prometheus/common/model"
@@ -27,4 +28,25 @@ func (g *GoPrometheus) GetSysTrafficIn(ctx context.Context, query MetricQuery) (
 	queryStr := fmt.Sprintf(`sum by (%s) (increase(%s{%s}[%s]))`, MetricLabelInstanceId, MetricNodeTrafficIn, strings.Join(filters, ","), timeRange)
 
 	return g.PrometheusQuery(ctx, queryStr)
+}
+
+func (g *GoPrometheus) PreHandleSysTrafficIn(vector *model.Vector, result map[int64]*Traffic) map[int64]*Traffic {
+	for _, sample := range *vector {
+		instanceId := gconv.Int64(string(sample.Metric[MetricLabelInstanceId]))
+		if _, ok := result[instanceId]; !ok {
+			result[instanceId] = &Traffic{}
+		}
+		result[instanceId].In = int64(sample.Value)
+	}
+	return result
+}
+
+func (g *GoPrometheus) SysTrafficIn(ctx context.Context, query MetricQuery) (map[int64]*Traffic, error) {
+	vector, err := g.GetSysTrafficIn(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[int64]*Traffic)
+	result = g.PreHandleSysTrafficIn(&vector, result)
+	return result, nil
 }
