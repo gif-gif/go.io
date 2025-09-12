@@ -18,3 +18,8 @@ type Traffic struct {
 	Out   int64 `json:"out,optional"`   // 出站流量
 	Total int64 `json:"total,optional"` // 总流量
 }
+
+type MemberLevelUserCount struct {
+	Level int64 `json:"level,optional"` // 会员等级
+	Count int64 `json:"count,optional"` // 用户数
+}

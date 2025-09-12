@@ -22,8 +22,9 @@ func New(config Config) (*GoPrometheus, error) {
 	v1API := v1.NewAPI(client)
 
 	return &GoPrometheus{
-		Client: client,
-		Api:    v1API,
+		Client:  client,
+		Api:     v1API,
+		Filters: config.Filters,
 	}, nil
 }
 

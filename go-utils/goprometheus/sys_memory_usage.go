@@ -16,7 +16,7 @@ func (g *GoPrometheus) GetSysMemoryUsage(ctx context.Context, query MetricQuery)
 	filters = append(filters, g.Filters...)
 
 	// filters = toGroupFilter(filters, query.Group) // node-exporter 没有 group 标签
-	filters = toInstanceIdsFilter(filters, query.InstanceIds)
+	filters = ToInstanceIdsFilter(filters, query.InstanceIds)
 
 	totalQuery := fmt.Sprintf(`%s{%s}`, MetricNodeMemTotal, strings.Join(filters, ","))
 	availableQuery := fmt.Sprintf(`%s{%s}`, MetricNodeMemAvailable, strings.Join(filters, ","))

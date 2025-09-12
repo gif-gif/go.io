@@ -19,7 +19,7 @@ func (g *GoPrometheus) GetSysDiskTotal(ctx context.Context, query MetricQuery) (
 	filters = append(filters, g.Filters...)
 
 	// filters = toGroupFilter(filters, query.Group) // node-exporter 没有 group 标签
-	filters = toInstanceIdsFilter(filters, query.InstanceIds)
+	filters = ToInstanceIdsFilter(filters, query.InstanceIds)
 
 	queryStr := fmt.Sprintf(`%s{%s}`, MetricNodeDiskSize, strings.Join(filters, ","))
 	return g.PrometheusQuery(ctx, queryStr)

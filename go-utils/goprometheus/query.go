@@ -3,6 +3,7 @@ package goprometheus
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/prometheus/common/model"
@@ -30,4 +31,10 @@ func (g *GoPrometheus) PrometheusQuery(ctx context.Context, query string) (model
 	}
 
 	return vector, nil
+}
+
+func (g *GoPrometheus) PrometheusQueryMetrics(ctx context.Context, metrics string, filters []string) (model.Vector, error) {
+	filters = append(filters, g.GetFilters()...) //把内部filters 加上
+	queryStr := fmt.Sprintf(`%s{%s}`, metrics, strings.Join(filters, ","))
+	return g.PrometheusQuery(ctx, queryStr)
 }

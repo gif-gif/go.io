@@ -16,7 +16,7 @@ func (g *GoPrometheus) GetSysTotalBandwidthIn(ctx context.Context, query MetricQ
 	}
 	filters = append(filters, g.Filters...)
 	// filters = toGroupFilter(filters, query.Group) // node-exporter 没有 group 标签
-	filters = toInstanceIdsFilter(filters, query.InstanceIds)
+	filters = ToInstanceIdsFilter(filters, query.InstanceIds)
 
 	timeRange := query.TimeRange
 	if timeRange == "" {

@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func toGroupFilter(filters []string, group string) []string {
+func ToGroupFilter(filters []string, group string) []string {
 	if group == "" {
 		return filters
 	} else {
@@ -14,7 +14,7 @@ func toGroupFilter(filters []string, group string) []string {
 	}
 }
 
-func toInstanceIdsFilter(filters []string, instanceIds []int64) []string {
+func ToInstanceIdsFilter(filters []string, instanceIds []int64) []string {
 	if len(instanceIds) == 0 {
 		return filters
 	}
