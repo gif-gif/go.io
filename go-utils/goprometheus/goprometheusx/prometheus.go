@@ -1,9 +1,9 @@
-package prometheusx
+package goprometheusx
 
 import (
 	"fmt"
-	"github.com/gif-gif/go.io/go-utils/prometheusx/metric"
 	"github.com/patrickmn/go-cache"
+	"github.com/zeromicro/go-zero/core/metric"
 	"time"
 )
 

@@ -1,4 +1,4 @@
-package goprometheus
+package goprometheusx
 
 // A VectorOpts is a general configuration.
 type VectorOpts struct {

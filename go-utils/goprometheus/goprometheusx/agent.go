@@ -1,4 +1,4 @@
-package prometheusx
+package goprometheusx
 
 import (
 	golog "github.com/gif-gif/go.io/go-log"

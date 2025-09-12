@@ -1,58 +1,44 @@
 package goprometheus
 
 import (
-	"fmt"
-	"github.com/gif-gif/go.io/go-utils/prometheusx/metric"
-	"github.com/patrickmn/go-cache"
-	"time"
+	prometheusApi "github.com/prometheus/client_golang/api"
+	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
-const (
-	LevelWarning = "warn"
-	LevelError   = "error"
-	LevelPanic   = "panic"
-)
+type GoPrometheus struct {
+	Client  prometheusApi.Client
+	Api     v1.API
+	Filters []string // 服务器过滤条件
+}
 
-var (
-	metricServerErrorTotal = metric.NewCounterVec(&metric.CounterVecOpts{
-		Namespace: "server",
-		Subsystem: "alert",
-		Name:      "alert_count",
-		Help:      "server error",
-		Labels:    []string{"level", "module", "name"},
+func New(config Config) (*GoPrometheus, error) {
+	client, err := prometheusApi.NewClient(prometheusApi.Config{
+		Address: config.GetAddress(),
 	})
-
-	sharedCache = cache.New(time.Minute, 5*time.Minute)
-)
-
-func Init(config Config) {
-	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)
-	StartAgent(addr, config.Path)
-}
-
-func Alert(level, module, name string) error {
-	key := level + module + name
-	if _, ok := sharedCache.Get(key); ok {
-		return fmt.Errorf("alert too fast:%s", key)
+	if err != nil {
+		return nil, err
 	}
 
-	if len(name) > 50 {
-		return fmt.Errorf("name is too long,max is 50, %s", name)
+	v1API := v1.NewAPI(client)
+
+	return &GoPrometheus{
+		Client: client,
+		Api:    v1API,
+	}, nil
+}
+
+func (g *GoPrometheus) AddFilters(filters ...string) {
+	g.Filters = append(g.Filters, filters...)
+}
+
+func (g *GoPrometheus) GetFilters() []string {
+	return g.Filters
+}
+
+func (g *GoPrometheus) SetFilters(filters ...string) {
+	if len(g.Filters) == 0 {
+		g.Filters = []string{}
+	} else {
+		g.Filters = filters
 	}
-
-	metricServerErrorTotal.Inc(level, module, name)
-	sharedCache.Set(key, struct{}{}, time.Second*2)
-	return nil
-}
-
-func AlertErr(module, name string) {
-	Alert(LevelError, module, name)
-}
-
-func AlertWarn(module, name string) {
-	Alert(LevelWarning, module, name)
-}
-
-func AlertPanic(module, name string) {
-	Alert(LevelPanic, module, name)
 }

@@ -1,4 +1,4 @@
-package prometheusx
+package goprometheusx
 
 type Config struct {
 	Host string `json:"host,optional" yaml:"host"`

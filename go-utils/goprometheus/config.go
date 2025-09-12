@@ -1,7 +1,14 @@
 package goprometheus
 
 type Config struct {
-	Host string `json:"host,optional" yaml:"host"`
-	Port int    `json:"port,default=9101" yaml:"port"`
-	Path string `json:"path,default=/metrics" yaml:"path"`
+	Name    string   `json:"name,optional" yaml:"Name"`
+	Address string   `json:"address,optional" yaml:"Address" default:"0.0.0.0:9090"`
+	Filters []string `json:"filters,optional" yaml:"Filters"`
+}
+
+func (c *Config) GetAddress() string {
+	if c.Address == "" {
+		c.Address = "0.0.0.0:9090"
+	}
+	return c.Address
 }
