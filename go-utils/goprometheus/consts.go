@@ -4,16 +4,6 @@ import (
 	"github.com/prometheus/common/model"
 )
 
-type MetricName = string
-type MetricLabel = model.LabelName
-
-type MetricQuery = struct {
-	ProductCode string
-	Group       string
-	InstanceIds []int64
-	TimeRange   string
-}
-
 var (
 	MetricVersion                  = "version"
 	MetricStartupTimestamp         = "startup_timestamp"

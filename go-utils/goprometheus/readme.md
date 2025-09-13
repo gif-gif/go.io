@@ -10,5 +10,41 @@ fmt.Sprintf(`%s="%s-node-exporter"`, MetricLabelJob, query.ProductCode)
 
 三、用法 
 ```
-g := goprometheus.NewGoPrometheus()
+package main
+
+import (
+	"context"
+	"fmt"
+	"github.com/gif-gif/go.io/go-utils/goprometheus"
+)
+
+func main() {
+	product := "fkey"
+	err := goprometheus.Init(goprometheus.Config{
+		Name:          product,
+		PrometheusUrl: "http://127.0.0.1:9091",
+		Filters: []string{
+			//fmt.Sprintf(`%s="%s-node-exporter"`, goprometheus.MetricLabelJob, product),
+			fmt.Sprintf(`%s="%s-node"`, goprometheus.MetricLabelJob, product),
+		},
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	query := goprometheus.MetricQuery{
+		ProductCode: product,
+		Group:       "all",
+		InstanceIds: []int64{2015},
+	}
+
+	memberCount, err := goprometheus.GetClient(product).SvrRealMemberLevelUserCount(context.Background(), query)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(memberCount)
+
+}
+
 ```

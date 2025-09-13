@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	golog "github.com/gif-gif/go.io/go-log"
-	"github.com/gif-gif/go.io/go-utils/prometheusx"
+	"github.com/gif-gif/go.io/go-utils/goprometheus/goprometheusx"
 	"github.com/gif-gif/go.io/goio"
 	"github.com/gif-gif/go.io/goio/server"
 	conf "github.com/gif-gif/go.io/goio/server-case/config"
@@ -45,8 +45,8 @@ func startSever() {
 	goio.Init(confs.Env)
 	goio.SetupLogDefault()
 	goio.Setup("")
-	prometheusx.Init(confs.Prometheus)
-	prometheusx.AlertErr(confs.Server.Name, "main start")
+	goprometheusx.Init(confs.Prometheus)
+	goprometheusx.AlertErr(confs.Server.Name, "main start")
 
 	s := goserver.NewServer(
 		goserver.ServerNameOption("serverName"),

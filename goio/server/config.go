@@ -10,7 +10,7 @@ import (
 	goetcd "github.com/gif-gif/go.io/go-etcd"
 	golog "github.com/gif-gif/go.io/go-log"
 	gokafka "github.com/gif-gif/go.io/go-mq/go-kafka"
-	"github.com/gif-gif/go.io/go-utils/prometheusx"
+	"github.com/gif-gif/go.io/go-utils/goprometheus/goprometheusx"
 	"github.com/gif-gif/go.io/goio"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -24,16 +24,16 @@ type Config struct {
 		Name string `yaml:"name"`
 	} `yaml:"server"`
 
-	Prometheus  prometheusx.Config  `yaml:"prometheus"`
-	MongoDB     gomongo.Config      `yaml:"mongodb"`
-	Mysql       gogorm.Config       `yaml:"mysql"`
-	Postgres    gogorm.Config       `yaml:"postgres"`
-	Sqlite      gogorm.Config       `yaml:"sqlite"`
-	Clickhouse1 gogorm.Config       `yaml:"clickhouse1"`
-	Redis       goredis.Config      `yaml:"redis"`
-	Kafka       gokafka.Config      `yaml:"kafka"`
-	Clickhouse  goclickhouse.Config `yaml:"clickhouse"`
-	Es          goes.Config         `yaml:"es"`
+	Prometheus  goprometheusx.Config `yaml:"prometheus"`
+	MongoDB     gomongo.Config       `yaml:"mongodb"`
+	Mysql       gogorm.Config        `yaml:"mysql"`
+	Postgres    gogorm.Config        `yaml:"postgres"`
+	Sqlite      gogorm.Config        `yaml:"sqlite"`
+	Clickhouse1 gogorm.Config        `yaml:"clickhouse1"`
+	Redis       goredis.Config       `yaml:"redis"`
+	Kafka       gokafka.Config       `yaml:"kafka"`
+	Clickhouse  goclickhouse.Config  `yaml:"clickhouse"`
+	Es          goes.Config          `yaml:"es"`
 	////EsIndex EsIndex          `yaml:"es_index"`
 
 	Etcd goetcd.Config `yaml:"etcd"`

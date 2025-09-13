@@ -370,3 +370,11 @@ func UrlDecode(str string) string {
 	str, _ = url.QueryUnescape(str)
 	return str
 }
+
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包
+// 这个包即将废弃 用gocrypto包

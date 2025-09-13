@@ -1,5 +1,17 @@
 package goprometheus
 
+import "github.com/prometheus/common/model"
+
+type MetricName = string
+type MetricLabel = model.LabelName
+
+type MetricQuery = struct {
+	ProductCode string
+	Group       string
+	InstanceIds []int64
+	TimeRange   string
+}
+
 type Bandwidth struct {
 	In  int64 `json:"in,optional"`
 	Out int64 `json:"out,optional"`
@@ -19,6 +31,7 @@ type Traffic struct {
 	Total int64 `json:"total,optional"` // 总流量
 }
 
+// 会员等级用户数
 type MemberLevelUserCount struct {
 	Level int64 `json:"level,optional"` // 会员等级
 	Count int64 `json:"count,optional"` // 用户数

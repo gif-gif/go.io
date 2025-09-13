@@ -33,6 +33,10 @@ func (g *GoPrometheus) PrometheusQuery(ctx context.Context, query string) (model
 	return vector, nil
 }
 
+//	filters = append(filters, g.GetFilters()...) //把内部filters 加上
+//	queryStr := fmt.Sprintf(`%s{%s}`, metrics, strings.Join(filters, ","))
+//
+// 执行实例 real_member_level_user_count{job="fkey-node",group="all",instance_id=~"2015"}
 func (g *GoPrometheus) PrometheusQueryMetrics(ctx context.Context, metrics string, filters []string) (model.Vector, error) {
 	filters = append(filters, g.GetFilters()...) //把内部filters 加上
 	queryStr := fmt.Sprintf(`%s{%s}`, metrics, strings.Join(filters, ","))
