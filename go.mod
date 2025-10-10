@@ -23,8 +23,10 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/hibiken/asynq v0.25.1
 	github.com/ip2location/ip2location-go/v9 v9.7.0
+	github.com/json-iterator/go v1.1.12
 	github.com/minio/minio-go/v7 v7.0.70
 	github.com/mojocn/base64Captcha v1.3.6
+	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/oschwald/geoip2-golang v1.11.0
 	github.com/panjf2000/ants/v2 v2.11.3
@@ -133,7 +135,6 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
