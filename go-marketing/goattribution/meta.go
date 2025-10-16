@@ -51,18 +51,15 @@ func (h *FacebookAttributeHandler) Match(queryParams url.Values) bool {
 }
 
 func (h *FacebookAttributeHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
-
-	utm_medium := strings.TrimSpace(queryParams.Get("utm_medium"))
-	utm_source := strings.TrimSpace(queryParams.Get("utm_source"))
-
-	if strings.Contains("facebook.com", utm_medium) || strings.Contains("meta.com", utm_source) {
-		return CreateBaseAttributeInfo(queryParams, h.Channel()), nil
-	}
-
 	key := []byte(h.DecryptKey)
 	info, err := h.DecryptFacebookAttribute(queryParams, queryParams.Get("utm_content"), key)
-	if err != nil {
-		//logx.Errorf("FacebookAttributeHandler handle DecryptFacebookAttribute error:%v queryParams:%+v", err, queryParams)
+	if err != nil { //解析失败，重新解析
+		utm_medium := strings.TrimSpace(queryParams.Get("utm_medium"))
+		utm_source := strings.TrimSpace(queryParams.Get("utm_source"))
+
+		if strings.Contains("facebook.com", utm_medium) || strings.Contains("meta.com", utm_source) {
+			return CreateBaseAttributeInfo(queryParams, h.Channel()), nil
+		}
 		return nil, err
 	}
 	return info, nil
