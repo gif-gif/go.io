@@ -3,6 +3,7 @@ package gobean
 import (
 	"encoding/json"
 	"fmt"
+
 	"golang.org/x/exp/constraints"
 )
 
@@ -32,6 +33,11 @@ type Float64Range struct {
 type Int64Method struct {
 	Method string `json:"method,optional"`
 	Value  int64  `json:"value,optional"`
+}
+
+type NetPortRange struct {
+	Begin string `json:"begin,optional"`
+	End   int64  `json:"end,optional"`
 }
 
 func (r *Int64Method) Check(val int64) bool {
