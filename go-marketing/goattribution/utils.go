@@ -2,7 +2,7 @@ package goattribution
 
 import "net/url"
 
-func CreateBaseAttributeInfo(queryParams url.Values, channel string) *AttributeInfo {
+func CreateBaseAttributeInfo(queryParams url.Values, channel string, subChannel string) *AttributeInfo {
 	clickId := queryParams.Get("click_id")
 	if clickId == "" {
 		clickId = queryParams.Get("clickid")
@@ -16,5 +16,6 @@ func CreateBaseAttributeInfo(queryParams url.Values, channel string) *AttributeI
 		UtmContent: queryParams.Get("utm_content"),
 		ClickId:    clickId,
 		Channel:    channel,
+		SubChannel: subChannel,
 	}
 }

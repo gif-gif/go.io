@@ -9,6 +9,10 @@ import (
 type TestAttributeHandler struct {
 }
 
+func (h *TestAttributeHandler) SubChannel() string {
+	return "CHANNEL_SUB_TEST"
+}
+
 func (h *TestAttributeHandler) Channel() string {
 	return "CHANNEL_TEST"
 }

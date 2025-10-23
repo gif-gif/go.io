@@ -11,6 +11,7 @@ import (
 	"github.com/gif-gif/go.io/go-marketing/goattribution/cryptography"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gogf/gf/util/gconv"
+	"github.com/samber/lo"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -39,7 +40,13 @@ type FacebookAd struct {
 }
 
 type FacebookAttributeHandler struct {
-	DecryptKey string
+	DecryptKey  string
+	_Channel    string
+	_SubChannel string
+}
+
+func (h *FacebookAttributeHandler) SubChannel() string {
+	return h._SubChannel
 }
 
 func (h *FacebookAttributeHandler) Channel() string {
@@ -47,7 +54,7 @@ func (h *FacebookAttributeHandler) Channel() string {
 }
 
 func (h *FacebookAttributeHandler) Match(queryParams url.Values) bool {
-	return strings.Contains(queryParams.Get("utm_source"), h.Channel()) || strings.Contains(queryParams.Get("utm_source"), "facebook")
+	return strings.Contains(queryParams.Get("utm_source"), CHANNEL_META) || strings.Contains(queryParams.Get("utm_source"), "facebook")
 }
 
 func (h *FacebookAttributeHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
@@ -58,7 +65,9 @@ func (h *FacebookAttributeHandler) Handle(queryParams url.Values) (*AttributeInf
 		utm_source := strings.TrimSpace(queryParams.Get("utm_source"))
 
 		if strings.Contains("facebook.com", utm_medium) || strings.Contains("meta.com", utm_source) {
-			return CreateBaseAttributeInfo(queryParams, h.Channel()), nil
+			utm_medium = lo.If(utm_medium != "", utm_medium).Else(CHANNEL_META)
+			h._SubChannel = utm_medium
+			return CreateBaseAttributeInfo(queryParams, h.Channel(), h.SubChannel()), nil
 		}
 		return nil, err
 	}

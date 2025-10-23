@@ -5,7 +5,12 @@ import (
 )
 
 type CommonAttributeHandler struct {
-	_Channel string
+	_Channel    string
+	_SubChannel string
+}
+
+func (h *CommonAttributeHandler) SubChannel() string {
+	return h._SubChannel
 }
 
 func (h *CommonAttributeHandler) Channel() string {
@@ -19,13 +24,15 @@ func (h *CommonAttributeHandler) Match(queryParams url.Values) bool {
 func (h *CommonAttributeHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
 	utm_medium := queryParams.Get("utm_medium")
 	utm_source := queryParams.Get("utm_source")
+	h._Channel = CHANNEL_UNKWON
+	h._SubChannel = CHANNEL_UNKWON
 	if utm_source != "" {
 		h._Channel = utm_source
-	} else if utm_medium != "" {
-		h._Channel = utm_medium
-	} else {
-		h._Channel = CHANNEL_UNKWON
 	}
 
-	return CreateBaseAttributeInfo(queryParams, h.Channel()), nil
+	if utm_medium != "" {
+		h._SubChannel = utm_medium
+	}
+
+	return CreateBaseAttributeInfo(queryParams, h.Channel(), h.SubChannel()), nil
 }

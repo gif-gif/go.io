@@ -6,6 +6,12 @@ import (
 )
 
 type OrganicHandler struct {
+	_Channel    string
+	_SubChannel string
+}
+
+func (h *OrganicHandler) SubChannel() string {
+	return CHANNEL_ORGANIC
 }
 
 func (h *OrganicHandler) Channel() string {
@@ -21,5 +27,5 @@ func (h *OrganicHandler) Match(queryParams url.Values) bool {
 }
 
 func (h *OrganicHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
-	return CreateBaseAttributeInfo(queryParams, h.Channel()), nil
+	return CreateBaseAttributeInfo(queryParams, h.Channel(), h.SubChannel()), nil
 }

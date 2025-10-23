@@ -3,9 +3,10 @@ package goattribution
 import (
 	"errors"
 	"fmt"
-	golog "github.com/gif-gif/go.io/go-log"
 	"net/url"
 	"strings"
+
+	golog "github.com/gif-gif/go.io/go-log"
 )
 
 const (
@@ -22,12 +23,14 @@ const (
 type AttributeHandler interface {
 	Match(queryParams url.Values) bool
 	Handle(queryParams url.Values) (*AttributeInfo, error)
-	Channel() string //开发者定义的渠道标识
+	Channel() string    //渠道标识
+	SubChannel() string //子渠道标识
 }
 
 type AttributeInfo struct {
 	ClickId         string
 	Channel         string
+	SubChannel      string
 	CampaignId      string
 	CampaignName    string
 	AdCostMode      string

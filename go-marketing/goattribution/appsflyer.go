@@ -37,8 +37,12 @@ import (
 type AppsFlyerAttributeHandler struct {
 }
 
+func (h *AppsFlyerAttributeHandler) SubChannel() string {
+	return CHANNEL_APPSFLYER
+}
+
 func (h *AppsFlyerAttributeHandler) Channel() string {
-	return "appsflyer"
+	return CHANNEL_APPSFLYER
 }
 
 func (h *AppsFlyerAttributeHandler) Match(queryParams url.Values) bool {

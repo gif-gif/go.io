@@ -2,9 +2,17 @@ package goattribution
 
 import (
 	"net/url"
+
+	"github.com/samber/lo"
 )
 
 type GoogleAttributeHandler struct {
+	_Channel    string
+	_SubChannel string
+}
+
+func (h *GoogleAttributeHandler) SubChannel() string {
+	return h._SubChannel
 }
 
 func (h *GoogleAttributeHandler) Channel() string {
@@ -17,5 +25,10 @@ func (h *GoogleAttributeHandler) Match(queryParams url.Values) bool {
 }
 
 func (h *GoogleAttributeHandler) Handle(queryParams url.Values) (*AttributeInfo, error) {
-	return CreateBaseAttributeInfo(queryParams, h.Channel()), nil
+	utm_medium := queryParams.Get("utm_medium")
+	//utm_source := queryParams.Get("utm_source")
+	h._Channel = CHANNEL_GOOGLE
+	h._SubChannel = lo.If(utm_medium != "", utm_medium).Else(CHANNEL_GOOGLE)
+
+	return CreateBaseAttributeInfo(queryParams, h.Channel(), h.SubChannel()), nil
 }
