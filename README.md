@@ -44,7 +44,7 @@ Golang Development Framework Continuously Developing and Updating
 
 ## How to install
 ```
-go get -u github.com/gif-gif/go.io
+go get github.com/gif-gif/go.io
 ```
 
 ## How to use
