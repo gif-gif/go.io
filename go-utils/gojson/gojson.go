@@ -12,7 +12,6 @@ import (
 	"github.com/oliveagle/jsonpath"
 )
 
-// 在项目入口统一配置
 var JSON = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func Pretty(strJson string) string {
@@ -23,14 +22,28 @@ func Pretty(strJson string) string {
 	return out.String()
 }
 
-func Marshal(obj any, pretty bool) string {
+func MarshalToString(obj any, pretty ...bool) (string, error) {
 	var data []byte
-	if pretty {
-		data, _ = JSON.MarshalIndent(obj, "", "    ")
+	isPretty := len(pretty) > 0 && pretty[0]
+	var err error
+	if isPretty {
+		data, err = JSON.MarshalIndent(obj, "", "    ")
 	} else {
-		data, _ = JSON.Marshal(obj)
+		data, err = JSON.Marshal(obj)
 	}
-	return string(data)
+	return string(data), err
+}
+
+func Marshal(obj any, pretty ...bool) ([]byte, error) {
+	var data []byte
+	isPretty := len(pretty) > 0 && pretty[0]
+	var err error
+	if isPretty {
+		data, err = JSON.MarshalIndent(obj, "", "    ")
+	} else {
+		data, err = JSON.Marshal(obj)
+	}
+	return data, err
 }
 
 func UnmarshalFromFile(filePath string, val any) error {
@@ -41,8 +54,12 @@ func UnmarshalFromFile(filePath string, val any) error {
 	return JSON.Unmarshal(data, val)
 }
 
-func Unmarshal(data string, val any) error {
+func UnmarshalFromString(data string, val any) error {
 	return JSON.UnmarshalFromString(data, val)
+}
+
+func Unmarshal(data []byte, val any) error {
+	return JSON.Unmarshal(data, val)
 }
 
 func UnmarshalFromGzip(data []byte, val any) error {
