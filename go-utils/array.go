@@ -1,6 +1,138 @@
 package goutils
 
-import "slices"
+import (
+	"bytes"
+	"fmt"
+	"slices"
+	"sort"
+
+	"github.com/samber/lo"
+)
+
+func CloneMap[TKey comparable, TValue any](m1 map[TKey]TValue) map[TKey]TValue {
+	m2 := make(map[TKey]TValue, len(m1))
+	for k, v := range m1 {
+		m2[k] = v
+	}
+	return m2
+}
+
+func ArrayJoin[T any](arr []T, sep string) string {
+	buf := bytes.NewBuffer(nil)
+
+	for idx, val := range arr {
+		if idx == 0 {
+			buf.WriteString(fmt.Sprintf("%v", val))
+		} else {
+			buf.WriteString(fmt.Sprintf("%v%v", sep, val))
+		}
+	}
+
+	return buf.String()
+}
+
+// 元素都转换成字符串比较
+func IsInArray[T comparable](arr []T, target T) bool {
+	return slices.Contains(arr, target)
+}
+
+// 条件满足任意元素 exists func(target T) bool 返回true时返回true
+//
+// 适合判断数组中存储复杂对象，判断条件定义情况
+//
+// 用以下代替
+//
+//	slices.ContainsFunc(arr, func(t T) bool {
+//
+//	})
+func IsInArrayX[T any](arr []T, exists func(target T) bool) bool {
+	for _, t := range arr {
+		if exists(t) {
+			return true
+		}
+	}
+	return false
+}
+
+// 条件满足任意元素 exists func(target *T) bool 返回true时返回true
+//
+// 适合判断数组中存储复杂对象，判断条件定义情况,数组元素是指针类型时用
+//
+// 用以下代替
+//
+//	slices.ContainsFunc(arr, func(t T) bool {
+//
+//	})
+func IsInArrayXX[T any](arr []*T, exists func(target *T) bool) bool {
+	for _, t := range arr {
+		if exists(t) {
+			return true
+		}
+	}
+	return false
+}
+
+func ReverseArray(arr []*interface{}) {
+	for i, j := 0, len(arr)-1; i <= j; i, j = i+1, j-1 {
+		arr[i], arr[j] = arr[j], arr[i]
+	}
+}
+
+// 插入排序函数，使用泛型指定元素类型
+func InsertionSort[T any](arr []T, less func(T, T) bool) {
+	n := len(arr)
+	for i := 1; i < n; i++ {
+		key := arr[i]
+		j := i - 1
+
+		// 将比key大的元素向后移动一位
+		for j >= 0 && less(arr[j], key) == false {
+			arr[j+1] = arr[j]
+			j--
+		}
+
+		// 插入关键元素到正确的位置
+		arr[j+1] = key
+	}
+}
+
+// 定义一个泛型排序函数
+func GenericSort[T any](arr []T, less func(T, T) bool) {
+	sort.Slice(arr, func(i, j int) bool {
+		return less(arr[i], arr[j])
+	})
+}
+
+// 两个数组是否相等，判断长度一样的两个数组 元素是否完全相同，顺序可以不同
+func IsEqualArray[T comparable](arr1 []T, arr2 []T) bool {
+	if len(arr1) != len(arr2) {
+		return false
+	}
+
+	for _, v := range arr1 {
+		if !lo.Contains(arr2, v) {
+			return false
+		}
+	}
+	return true
+}
+
+func RemoveArrayDuplicateValue[T any](arr []T) []T {
+	if len(arr) <= 1 {
+		return arr
+	}
+	seen := make(map[string]struct{}, len(arr))
+	result := make([]T, 0, len(arr))
+
+	for _, val := range arr {
+		key := fmt.Sprintf("%v", val)
+		if _, ok := seen[key]; !ok {
+			result = append(result, val)
+			seen[key] = struct{}{}
+		}
+	}
+	return result
+}
 
 func SplitStringArray(arr []string, size int) (list [][]string) {
 	l := len(arr)
