@@ -25,6 +25,7 @@ require (
 	github.com/ip2location/ip2location-go/v9 v9.7.0
 	github.com/json-iterator/go v1.1.12
 	github.com/minio/minio-go/v7 v7.0.70
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852
 	github.com/olivere/elastic/v7 v7.0.32
