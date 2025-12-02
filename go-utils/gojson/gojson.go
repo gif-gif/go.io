@@ -13,6 +13,7 @@ import (
 )
 
 var JSON = jsoniter.ConfigCompatibleWithStandardLibrary
+var JSONFast = jsoniter.ConfigFastest
 
 func Pretty(strJson string) string {
 	var out bytes.Buffer

@@ -14,7 +14,7 @@ func ConvertToMap(data interface{}) map[string]interface{} {
 	return mapResult
 }
 
-// for json tag
+// for json tag 慢
 func ConvertMapToStruct[T any](data map[string]interface{}) (*T, error) {
 	var t T
 	fieldsBytes, err := gojson.Marshal(data)
@@ -29,7 +29,7 @@ func ConvertMapToStruct[T any](data map[string]interface{}) (*T, error) {
 	return &t, nil
 }
 
-// for mapstructure tag
+// for mapstructure tag 快
 func ConvertMapToStructEx[T any](data map[string]interface{}) (*T, error) {
 	var t T
 	// 转换为结构体
