@@ -1,11 +1,12 @@
-package goutils
+package gosnow
 
 import (
 	"fmt"
+	"testing"
+
 	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gogf/gf/util/gconv"
-	"testing"
 )
 
 // Name     string `yaml:"Name" json:"name,optional"`

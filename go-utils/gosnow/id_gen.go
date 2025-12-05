@@ -1,9 +1,10 @@
-package goutils
+package gosnow
 
 import (
-	"github.com/google/uuid"
 	"strconv"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 type iGenId interface {
