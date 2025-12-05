@@ -3,8 +3,6 @@ package gosnow
 import (
 	"strconv"
 	"sync"
-
-	"github.com/google/uuid"
 )
 
 type iGenId interface {
@@ -31,8 +29,4 @@ func GenId() int64 {
 
 func GenIdStr() string {
 	return strconv.FormatInt(GenId(), 10)
-}
-
-func UUID() string {
-	return uuid.New().String()
 }
