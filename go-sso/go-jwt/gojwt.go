@@ -1,10 +1,12 @@
 package gojwt
 
 import (
+	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
 	"strings"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type Config struct {
@@ -77,9 +79,21 @@ func (c *GoJwt) ParseToken(tokenString string) (map[string]interface{}, error) {
 	}
 }
 
-func (c *GoJwt) IsValidToken(tokenString string) bool {
-	if strings.Contains(tokenString, "Bearer ") {
+func (c *GoJwt) ParseTokenEx(tokenString string) (map[string]interface{}, bool, error) {
+	// 1. 去除空格
+	tokenString = strings.TrimSpace(tokenString)
+
+	// 2. 检查空字符串
+	if tokenString == "" {
+		return nil, false, errors.New("token is empty")
+	}
+
+	// 3. 处理 Bearer 前缀
+	if strings.HasPrefix(tokenString, "Bearer ") {
 		tokenString = strings.TrimSpace(tokenString[7:])
+		if tokenString == "" {
+			return nil, false, errors.New("token is empty after Bearer prefix")
+		}
 	}
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -89,22 +103,74 @@ func (c *GoJwt) IsValidToken(tokenString string) bool {
 	})
 
 	if err != nil {
+		return nil, false, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok && token.Valid {
+		return claims, true, nil
+	} else {
+		return nil, false, err
+	}
+}
+
+func (c *GoJwt) IsValidToken(tokenString string) bool {
+	// 1. 去除空格
+	tokenString = strings.TrimSpace(tokenString)
+
+	// 2. 检查空字符串
+	if tokenString == "" {
 		return false
 	}
+
+	// 3. 处理 Bearer 前缀
+	if strings.HasPrefix(tokenString, "Bearer ") {
+		tokenString = strings.TrimSpace(tokenString[7:])
+		if tokenString == "" {
+			return false
+		}
+	}
+
+	// 4. 解析并验证 token
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// 验证签名算法
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(c.Config.AccessSecret), nil
+	})
+
+	// 5. 检查错误和有效性
+	if err != nil {
+		return false
+	}
+
 	return token.Valid
 }
 
 // 验证Refresh Token并生成新的Access Token
 func (c *GoJwt) RefreshAccessToken(refreshTokenStr string) (accessToken, refreshToken string, expires int64, err error) {
-	if strings.Contains(refreshTokenStr, "Bearer ") {
-		refreshTokenStr = refreshTokenStr[7:]
-	}
-	if !c.IsValidToken(refreshTokenStr) {
-		return "", "", 0, fmt.Errorf("invalid refresh token")
+	// 1. 去除空格
+	refreshTokenStr = strings.TrimSpace(refreshTokenStr)
+
+	// 2. 检查空字符串
+	if refreshTokenStr == "" {
+		return "", "", 0, errors.New("refresh token is empty")
 	}
 
-	params, err := c.ParseToken(refreshTokenStr)
+	// 3. 处理 Bearer 前缀
+	if strings.HasPrefix(refreshTokenStr, "Bearer ") {
+		refreshTokenStr = strings.TrimSpace(refreshTokenStr[7:])
+		if refreshTokenStr == "" {
+			return "", "", 0, errors.New("refresh token is empty")
+		}
+	}
+
+	params, ok, err := c.ParseTokenEx(refreshTokenStr)
 	if err != nil {
+		return "", "", 0, err
+	}
+	if !ok {
 		return "", "", 0, fmt.Errorf("invalid refresh token")
 	}
 	return c.GeneratedTokens(params)
