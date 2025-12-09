@@ -2,6 +2,7 @@ package goetcd
 
 import (
 	"errors"
+
 	golog "github.com/gif-gif/go.io/go-log"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
@@ -74,10 +75,12 @@ func SetWithPrevKV(key, val string) (resp *clientv3.PutResponse, err error) {
 	return Default().SetWithPrevKV(key, val)
 }
 
+// ttl is seconds
 func SetTTL(key, val string, ttl int64) (resp *clientv3.PutResponse, err error) {
 	return Default().SetTTL(key, val, ttl)
 }
 
+// ttl is seconds
 func SetTTLWithPrevKV(key, val string, ttl int64) (resp *clientv3.PutResponse, err error) {
 	return Default().SetTTLWithPrevKV(key, val, ttl)
 }
