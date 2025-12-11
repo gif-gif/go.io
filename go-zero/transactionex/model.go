@@ -12,9 +12,9 @@ type Model struct {
 
 type TableTransactionFunc func(session sqlx.Session) error
 
-func NewModel(conn sqlx.SqlConn, c cache.CacheConf) *Model {
+func NewModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Option) *Model {
 	return &Model{
-		CachedConn: sqlc.NewConn(conn, c),
+		CachedConn: sqlc.NewConn(conn, c, opts...),
 	}
 }
 

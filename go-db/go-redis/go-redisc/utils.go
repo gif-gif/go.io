@@ -278,7 +278,7 @@ func BenchmarkRedisLatency(rdb *redis.ClusterClient, duration time.Duration) *La
 			return rdb.Ping(ctx).Err()
 		},
 		"SET": func() error {
-			return rdb.Set(ctx, fmt.Sprintf("test_key_%d", time.Now().UnixNano()), "test_value", 0).Err()
+			return rdb.Set(ctx, fmt.Sprintf("test_key_%d", time.Now().UnixNano()), "test_value", 20*time.Second).Err()
 		},
 		"GET": func() error {
 			return rdb.Get(ctx, "test_key").Err()

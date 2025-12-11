@@ -1,7 +1,6 @@
-package goutils
+package gosnow
 
 import (
-	"github.com/google/uuid"
 	"strconv"
 	"sync"
 )
@@ -30,8 +29,4 @@ func GenId() int64 {
 
 func GenIdStr() string {
 	return strconv.FormatInt(GenId(), 10)
-}
-
-func UUID() string {
-	return uuid.New().String()
 }

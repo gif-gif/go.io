@@ -18,10 +18,11 @@ redis:
     db: 0
     prefix: "goio:"
 
-etcd:
-    endpoints:
-        - "127.0.0.1:23790"
-    username: ""
-    password: ""
+Etcd:
+  Name: "default"
+  Endpoints:
+    - "127.0.0.1:2379"
+  Username: "root"
+  Password: ""
 
 feishu: "https://open.feishu.cn/open-apis/bot/v2/hook/810d552b-8146-47c3-ae01-13d63007b47d"

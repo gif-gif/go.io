@@ -26,12 +26,12 @@ func main() {
 
 	golog.Info(a, r, e)
 
-	m, err := gojwt.Default().ParseToken(a)
+	m, ok, err := gojwt.Default().ParseTokenEx(a)
 	if err != nil {
 		golog.Error(err.Error())
 		return
 	}
-	golog.Info(m)
+	golog.Info(m, ok)
 
 	if gojwt.Default().IsValidToken(a) {
 		golog.WithTag("IsValidToken").Info("OK")

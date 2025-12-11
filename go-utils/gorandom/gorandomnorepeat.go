@@ -30,16 +30,20 @@ func NewWeightedRandomSelector(items []WeightedItem) *WeightedRandomSelector {
 
 // SelectMultiple 选择多个不重复的元素
 func (w *WeightedRandomSelector) SelectMultiple(count int) []WeightedItem {
-	if count <= 0 || count > len(w.items) {
+	if count <= 0 {
 		return nil
 	}
+
+	if count > len(w.items) {
+		return w.items
+	}
+
+	result := make([]WeightedItem, 0, count)
 
 	// 创建可用元素的副本
 	availableItems := make([]WeightedItem, len(w.items))
 	copy(availableItems, w.items)
 	totalWeight := w.totalWeight
-
-	result := make([]WeightedItem, 0, count)
 
 	for i := 0; i < count; i++ {
 		if len(availableItems) == 0 {

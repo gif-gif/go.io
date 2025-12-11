@@ -2,19 +2,18 @@ package goutils
 
 import (
 	"fmt"
-	"github.com/gogf/gf/util/gconv"
-	"github.com/samber/lo"
-	"golang.org/x/crypto/bcrypt"
 	"math"
 	"math/rand"
 	"net"
 	"reflect"
 	"regexp"
 	"runtime"
-	"slices"
-	"sort"
 	"strings"
 	"time"
+
+	"github.com/gogf/gf/util/gconv"
+	"github.com/samber/lo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // BcryptHash 使用 bcrypt 对密码进行加密
@@ -42,48 +41,8 @@ func CheckSign(secret string, linkSignTimeout int64, ts int64, sign string) bool
 	return serverSign == sign
 }
 
-// 元素都转换成字符串比较
-func IsInArray[T comparable](arr []T, target T) bool {
-	return slices.Contains(arr, target)
-}
-
-// 条件满足任意元素 exists func(target T) bool 返回true时返回true
-//
-// 适合判断数组中存储复杂对象，判断条件定义情况
-//
-// 用以下代替
-//
-//	slices.ContainsFunc(arr, func(t T) bool {
-//
-//	})
-func IsInArrayX[T any](arr []T, exists func(target T) bool) bool {
-	for _, t := range arr {
-		if exists(t) {
-			return true
-		}
-	}
-	return false
-}
-
-// 条件满足任意元素 exists func(target *T) bool 返回true时返回true
-//
-// 适合判断数组中存储复杂对象，判断条件定义情况,数组元素是指针类型时用
-//
-// 用以下代替
-//
-//	slices.ContainsFunc(arr, func(t T) bool {
-//
-//	})
-func IsInArrayXX[T any](arr []*T, exists func(target *T) bool) bool {
-	for _, t := range arr {
-		if exists(t) {
-			return true
-		}
-	}
-	return false
-}
-
-// 通用三目运算
+// Deprecated ： use lo.If
+// 通用三目运算(废弃)
 func IfNot[T any](isTrue bool, a, b T) T {
 	if isTrue {
 		return a
@@ -91,6 +50,7 @@ func IfNot[T any](isTrue bool, a, b T) T {
 	return b
 }
 
+// Deprecated(废弃) ： use lo.If
 func IfString(isTrue bool, a, b string) string {
 	if isTrue {
 		return a
@@ -98,6 +58,7 @@ func IfString(isTrue bool, a, b string) string {
 	return b
 }
 
+// Deprecated(废弃) ： use lo.If
 func IfInt(isTrue bool, a, b int) int {
 	if isTrue {
 		return a
@@ -105,6 +66,7 @@ func IfInt(isTrue bool, a, b int) int {
 	return b
 }
 
+// Deprecated(废弃) ： use lo.If
 func IfFloat32(isTrue bool, a, b float32) float32 {
 	if isTrue {
 		return a
@@ -112,17 +74,12 @@ func IfFloat32(isTrue bool, a, b float32) float32 {
 	return b
 }
 
+// Deprecated(废弃) ： use lo.If
 func IfFloat64(isTrue bool, a, b float64) float64 {
 	if isTrue {
 		return a
 	}
 	return b
-}
-
-func ReverseArray(arr []*interface{}) {
-	for i, j := 0, len(arr)-1; i <= j; i, j = i+1, j-1 {
-		arr[i], arr[j] = arr[j], arr[i]
-	}
 }
 
 func PadStart(str, pad string, length int) string {
@@ -203,31 +160,6 @@ func GetRuntimeStack() string {
 	var buf [4096]byte
 	n := runtime.Stack(buf[:], false)
 	return string(buf[:n])
-}
-
-// 插入排序函数，使用泛型指定元素类型
-func InsertionSort[T any](arr []T, less func(T, T) bool) {
-	n := len(arr)
-	for i := 1; i < n; i++ {
-		key := arr[i]
-		j := i - 1
-
-		// 将比key大的元素向后移动一位
-		for j >= 0 && less(arr[j], key) == false {
-			arr[j+1] = arr[j]
-			j--
-		}
-
-		// 插入关键元素到正确的位置
-		arr[j+1] = key
-	}
-}
-
-// 定义一个泛型排序函数
-func GenericSort[T any](arr []T, less func(T, T) bool) {
-	sort.Slice(arr, func(i, j int) bool {
-		return less(arr[i], arr[j])
-	})
 }
 
 // 把缺失的数字填充到数组中
@@ -312,20 +244,6 @@ func Sum(list []int) int {
 	return lo.Sum(list)
 }
 
-// 两个数组是否相等，判断长度一样的两个数组 元素是否完全相同，顺序可以不同
-func IsEqualArray[T comparable](arr1 []T, arr2 []T) bool {
-	if len(arr1) != len(arr2) {
-		return false
-	}
-
-	for _, v := range arr1 {
-		if !lo.Contains(arr2, v) {
-			return false
-		}
-	}
-	return true
-}
-
 // 方法1: 使用 net.ParseIP（推荐）
 func IsIPv4(str string) bool {
 	ip := net.ParseIP(str)
@@ -337,6 +255,7 @@ func IsIPv4(str string) bool {
 }
 
 // 方法2: 正则表达式（简单版）
+// Deprecated(废弃)
 func IsIPv4Regex(str string) bool {
 	// 简单的 IPv4 正则（不完全准确）
 	pattern := `^(\d{1,3}\.){3}\d{1,3}$`

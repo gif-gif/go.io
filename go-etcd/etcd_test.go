@@ -1,11 +1,14 @@
 package goetcd
 
 import (
+	"context"
 	"fmt"
-	gocontext "github.com/gif-gif/go.io/go-context"
 	"log"
 	"testing"
 	"time"
+
+	gocontext "github.com/gif-gif/go.io/go-context"
+	goutils "github.com/gif-gif/go.io/go-utils"
 )
 
 // 配置结构定义
@@ -71,4 +74,38 @@ func TestWatch(t *testing.T) {
 	for i := range ch {
 		fmt.Println(i)
 	}
+}
+
+// get array value by prefix key
+func TestWatch1(t *testing.T) {
+	Init(Config{
+		Endpoints: []string{"127.0.0.1:2379"},
+		Username:  "root",
+		//Password:  "123456",
+	})
+
+	startTime := time.Now()
+	pool := goutils.NewErrorGroup(context.Background(), 1000)
+	pool.Submit(func() error {
+		for i := 0; i < 100000; i++ {
+			SetTTL(fmt.Sprintf("/xz/node-server/node-%d", i), fmt.Sprintf("192.168.1.%d", i), 180)
+		}
+		return nil
+	})
+
+	err := pool.Wait()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	elapsed := time.Since(startTime)
+	fmt.Printf("SetTTL 10000 nodes cost: %v\n", elapsed)
+
+	startTime = time.Now()
+	GetArray("/xz/node-server/")
+	elapsed = time.Since(startTime)
+	fmt.Printf("GetArray 10000 nodes cost: %v\n", elapsed)
+	//for _, v := range ch {
+	//	fmt.Println(v)
+	//}
+
 }
