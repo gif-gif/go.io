@@ -17,4 +17,11 @@ type Config struct {
 
 	GroupId     string         `json:"groupId,optional" yaml:"GroupId"`
 	RedisConfig goredis.Config `json:"redisConfig,optional" yaml:"RedisConfig"`
+
+	AutoCommit AutoCommitOption `json:"autoCommit" yaml:"AutoCommit"`
+}
+
+type AutoCommitOption struct {
+	Enable   bool `json:"enable,default=true" yaml:"Enable,default=true"`
+	Interval int  `json:"interval,default=1" yaml:"Interval,default=1"` // 单位：秒
 }

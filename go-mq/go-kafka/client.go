@@ -2,13 +2,14 @@ package gokafka
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/IBM/sarama"
 	goredis "github.com/gif-gif/go.io/go-db/go-redis"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/samber/lo"
-	"os"
-	"time"
 )
 
 type GoKafka struct {
@@ -60,6 +61,7 @@ func (cli *GoKafka) init() (err error) {
 	// 分区策略为Random，解决消费组分布式部署
 	config.Producer.Partitioner = sarama.NewRandomPartitioner
 	config.Producer.Return.Successes = true
+	config.Producer.MaxMessageBytes = 1024 * 1024 * 100
 	config.Producer.Return.Errors = true
 	config.Consumer.Return.Errors = true
 
@@ -68,8 +70,11 @@ func (cli *GoKafka) init() (err error) {
 	config.Producer.Flush.Bytes = 1048576                    // 积累1MB数据
 	config.Producer.Flush.Frequency = 100 * time.Millisecond // 每100ms刷新
 
-	config.Consumer.Offsets.AutoCommit.Enable = true              // 自动提交
-	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second // 间隔
+	config.Producer.Compression = sarama.CompressionSnappy
+
+	// 增加是否自动提交的配置开启自动提交
+	config.Consumer.Offsets.AutoCommit.Enable = cli.conf.AutoCommit.Enable                                  // 自动提交
+	config.Consumer.Offsets.AutoCommit.Interval = time.Duration(cli.conf.AutoCommit.Interval) * time.Second // 间隔
 	config.Consumer.Offsets.Retry.Max = 5
 	if cli.conf.OffsetNewest {
 		config.Consumer.Offsets.Initial = sarama.OffsetNewest
@@ -85,6 +90,8 @@ func (cli *GoKafka) init() (err error) {
 	config.Consumer.Group.Heartbeat.Interval = 5 * time.Second
 	config.Consumer.Group.Session.Timeout = 15 * time.Second
 	config.Consumer.Group.Rebalance.Timeout = 12 * time.Second
+	config.Consumer.Fetch.Default = 100
+	config.Consumer.Fetch.Max = 1000
 	config.Producer.Timeout = 10 * time.Second
 
 	if cli.conf.Timeout > 0 {
