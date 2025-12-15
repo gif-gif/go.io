@@ -66,11 +66,11 @@ func (cli *GoKafka) init() (err error) {
 	config.Consumer.Return.Errors = true
 
 	//批量发送策略
-	config.Producer.Flush.Messages = 100                     // 积累100条消息
-	config.Producer.Flush.Bytes = 1048576                    // 积累1MB数据
-	config.Producer.Flush.Frequency = 100 * time.Millisecond // 每100ms刷新
-
-	config.Producer.Compression = sarama.CompressionSnappy
+	config.Producer.Flush.Messages = cli.conf.ProducerFlush.Messages                                     // 积累100条消息
+	config.Producer.Flush.Bytes = cli.conf.ProducerFlush.Bytes                                           // 积累1MB数据
+	config.Producer.Flush.Frequency = time.Duration(cli.conf.ProducerFlush.Frequency) * time.Millisecond // 每100ms刷新
+	// 新增默认压缩方式
+	config.Producer.Compression = sarama.CompressionLZ4
 
 	// 增加是否自动提交的配置开启自动提交
 	config.Consumer.Offsets.AutoCommit.Enable = cli.conf.AutoCommit.Enable                                  // 自动提交
@@ -82,16 +82,17 @@ func (cli *GoKafka) init() (err error) {
 		config.Consumer.Offsets.Initial = sarama.OffsetOldest
 	}
 	config.Consumer.Group.Rebalance.GroupStrategies = []sarama.BalanceStrategy{
-		sarama.NewBalanceStrategyRoundRobin(),
 		sarama.NewBalanceStrategySticky(),
+		sarama.NewBalanceStrategyRoundRobin(),
 		sarama.NewBalanceStrategyRange(),
 	}
 
-	config.Consumer.Group.Heartbeat.Interval = 5 * time.Second
-	config.Consumer.Group.Session.Timeout = 15 * time.Second
-	config.Consumer.Group.Rebalance.Timeout = 12 * time.Second
-	config.Consumer.Fetch.Default = 100
-	config.Consumer.Fetch.Max = 1000
+	config.Consumer.Group.Heartbeat.Interval = time.Duration(cli.conf.ConsumerConfig.GroupConfig.HeartbeatInterval) * time.Second
+	config.Consumer.Group.Session.Timeout = time.Duration(cli.conf.ConsumerConfig.GroupConfig.SessionTimeout) * time.Second
+	config.Consumer.Group.Rebalance.Timeout = time.Duration(cli.conf.ConsumerConfig.GroupConfig.ReblanceInterval) * time.Second
+	config.Consumer.Fetch.Default = cli.conf.ConsumerConfig.ConsumerFetchConfig.Default * 1024 * 1024
+	config.Consumer.Fetch.Max = cli.conf.ConsumerConfig.ConsumerFetchConfig.Max * 1024 * 1024
+	config.Consumer.Fetch.Min = cli.conf.ConsumerConfig.ConsumerFetchConfig.Min * 1024
 	config.Producer.Timeout = 10 * time.Second
 
 	if cli.conf.Timeout > 0 {
