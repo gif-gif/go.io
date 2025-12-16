@@ -21,6 +21,8 @@ type Config struct {
 	AutoCommit     AutoCommitOption `json:"autoCommit" yaml:"AutoCommit"`
 	ProducerFlush  ProducerFlush    `json:"producerFlush" yaml:"ProducerFlush"`
 	ConsumerConfig ConsumerConfig   `json:"consumerConfig" yaml:"ConsumerConfig"`
+
+	ChannelBufferSize int `json:"ChannelBufferSize,default=1024" yaml:"ChannelBufferSize,default=1024"`
 }
 
 type AutoCommitOption struct {
