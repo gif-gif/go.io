@@ -37,7 +37,7 @@ func (cli *GoKafka) init() (err error) {
 	config := sarama.NewConfig()
 	config.ClientID = id
 	config.ChannelBufferSize = cli.conf.ChannelBufferSize
-	
+
 	if cli.conf.Version == "" {
 		config.Version = sarama.V3_6_0_0
 	}
