@@ -14,6 +14,11 @@ import (
 
 var JSON = jsoniter.ConfigCompatibleWithStandardLibrary
 var JSONFast = jsoniter.ConfigFastest
+var JSONCloseSort = jsoniter.Config{
+	EscapeHTML:             true,
+	SortMapKeys:            false,
+	ValidateJsonRawMessage: true,
+}.Froze()
 
 func Pretty(strJson string) string {
 	var out bytes.Buffer
