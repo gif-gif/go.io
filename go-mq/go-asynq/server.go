@@ -2,19 +2,21 @@ package goasynq
 
 import (
 	"context"
+	"time"
+
 	goredisc "github.com/gif-gif/go.io/go-db/go-redis/go-redisc"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/hibiken/asynq"
 	"github.com/samber/lo"
-	"time"
 )
 
 type ServerConfig struct {
-	Name        string          `yaml:"Name" json:"name,optional"`
-	Config      goredisc.Config `yaml:"Config" json:"config,optional"`
-	Concurrency int             `yaml:"Concurrency" json:"concurrency,optional"` //default 10 指定要使用的并发工作线程数量
-	Queues      map[string]int  `yaml:"Queues" json:"queues,optional"`
+	Name           string               `yaml:"Name" json:"name,optional"`
+	Config         goredisc.Config      `yaml:"Config" json:"config,optional"`
+	Concurrency    int                  `yaml:"Concurrency" json:"concurrency,optional"` //default 10 指定要使用的并发工作线程数量
+	Queues         map[string]int       `yaml:"Queues" json:"queues,optional"`
+	RetryDelayFunc asynq.RetryDelayFunc `yaml:"RetryDelayFunc" json:"retry_delay_func,optional"`
 }
 
 type GoAsynqServer struct {
@@ -72,6 +74,7 @@ func RunServer(config ServerConfig) *GoAsynqServer {
 			// Optionally specify multiple queues with different priority.
 			Queues: config.Queues,
 			// See the godoc for other configuration options
+			RetryDelayFunc: config.RetryDelayFunc,
 		},
 	)
 
