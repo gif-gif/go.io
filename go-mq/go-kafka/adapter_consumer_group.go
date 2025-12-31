@@ -3,10 +3,11 @@ package gokafka
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/IBM/sarama"
 	gocontext "github.com/gif-gif/go.io/go-context"
 	goutils "github.com/gif-gif/go.io/go-utils"
-	"time"
 )
 
 // 分组
@@ -72,8 +73,8 @@ func (g group) doHandler(msg *sarama.ConsumerMessage, session sarama.ConsumerGro
 		}
 	}
 
-	// 定义上下文
-	ctx := gocontext.WithLog()
+	// 定义上下文，关联到 session context 以便能够取消
+	ctx := gocontext.WithParent(session.Context()).WithLog()
 	ctx.Log.WithTag("gokafka-consumer-group", g.id).WithField("msg", m)
 
 	if g.redis == nil {

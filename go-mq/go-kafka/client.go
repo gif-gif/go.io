@@ -37,7 +37,7 @@ func (cli *GoKafka) init() (err error) {
 	config := sarama.NewConfig()
 	config.ClientID = id
 	config.ChannelBufferSize = cli.conf.ChannelBufferSize
-	
+
 	if cli.conf.Version == "" {
 		config.Version = sarama.V3_6_0_0
 	}
@@ -213,6 +213,21 @@ func (cli *GoKafka) Producer(opts ...Option) IProducer {
 		}
 	}
 	return &producer{GoKafka: cli, focus: focus}
+}
+
+// 生产者异步
+func (cli *GoKafka) ProducerFast(opts ...Option) IProducer {
+	var focus bool
+	for _, opt := range opts {
+		switch opt.Name {
+		case FocusName:
+			focus = opt.Value.(bool)
+		}
+	}
+	producerObj := &producerFast{GoKafka: cli, focus: focus}
+	// 生成一个独立消费的异步生产者
+	producerObj.initAsyncEngine()
+	return producerObj
 }
 
 func (c *GoKafka) GetKey(topic, msg string) string {

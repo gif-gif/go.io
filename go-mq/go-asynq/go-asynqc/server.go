@@ -2,12 +2,13 @@ package goasynqc
 
 import (
 	"context"
+	"time"
+
 	goredisc "github.com/gif-gif/go.io/go-db/go-redis/go-redisc"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/hibiken/asynq"
 	"github.com/samber/lo"
-	"time"
 )
 
 type GoAsynqServer struct {
@@ -16,10 +17,11 @@ type GoAsynqServer struct {
 }
 
 type ClusterServerConfig struct {
-	Name        string          `yaml:"Name" json:"name,optional"`
-	Config      goredisc.Config `yaml:"Config" json:"config,optional"`
-	Concurrency int             `yaml:"Concurrency" json:"concurrency,optional"` //default 10 指定要使用的并发工作线程数量
-	Queues      map[string]int  `yaml:"Queues" json:"queues,optional"`
+	Name           string               `yaml:"Name" json:"name,optional"`
+	Config         goredisc.Config      `yaml:"Config" json:"config,optional"`
+	Concurrency    int                  `yaml:"Concurrency" json:"concurrency,optional"` //default 10 指定要使用的并发工作线程数量
+	Queues         map[string]int       `yaml:"Queues" json:"queues,optional"`
+	RetryDelayFunc asynq.RetryDelayFunc `yaml:"RetryDelayFunc" json:"retry_delay_func,optional"`
 }
 
 func ClusterRunServer(conf ClusterServerConfig) *GoAsynqServer {
@@ -76,6 +78,7 @@ func RunServer(conf ClusterServerConfig) *asynq.Server {
 			// Optionally specify multiple queues with different priority.
 			Queues: conf.Queues,
 			// See the godoc for other configuration options
+			RetryDelayFunc: conf.RetryDelayFunc,
 		},
 	)
 
@@ -115,6 +118,7 @@ func RunServerByNode(config ClusterServerConfig) *asynq.Server {
 			// Optionally specify multiple queues with different priority.
 			Queues: config.Queues,
 			// See the godoc for other configuration options
+			RetryDelayFunc: config.RetryDelayFunc,
 		},
 	)
 
