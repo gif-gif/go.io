@@ -1,4 +1,4 @@
-package gocrypto
+package gotls
 
 import (
 	"crypto/rand"
