@@ -63,3 +63,19 @@ func testSyncLock() {
 }
 
 ```
+### 分布式锁
+- RedisLock 用 https://github.com/go-redsync/redsync
+- EtcdLock 官方
+```go
+import "go.etcd.io/etcd/client/v3/concurrency"
+
+// 官方推荐用法
+session, _ := concurrency.NewSession(cli, concurrency.WithTTL(5))
+defer session.Close()
+
+mutex := concurrency.NewMutex(session, "/my-lock/")
+if err := mutex.Lock(context.TODO()); err == nil {
+    // 业务代码...
+    mutex.Unlock(context.TODO())
+}
+```

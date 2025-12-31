@@ -2,10 +2,14 @@ package gocrypto
 
 import (
 	"encoding/binary"
+
 	goerror "github.com/gif-gif/go.io/go-error"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/gif-gif/go.io/go-utils/gozip"
+	"github.com/gogf/gf/util/gconv"
+
+	"math"
 	"time"
 )
 
@@ -166,4 +170,17 @@ func GoDataAesCTRTransform(data []byte, aesKey []byte, aesIv []byte, compressMet
 		compressBytes = body
 	}
 	return compressBytes, nil
+}
+
+// 常用签名验证, sign md5 小写
+func CheckSign(secret string, linkSignTimeout int64, ts int64, sign string) bool {
+	if linkSignTimeout == 0 {
+		linkSignTimeout = 20
+	}
+	tsStep := time.Now().Unix() - ts
+	if math.Abs(gconv.Float64(tsStep)) > gconv.Float64(linkSignTimeout) { //连接失效
+		return false
+	}
+	serverSign := Md5([]byte(gconv.String(ts) + secret))
+	return serverSign == sign
 }

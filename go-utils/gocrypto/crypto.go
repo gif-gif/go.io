@@ -17,16 +17,14 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/gogf/gf/util/gconv"
-	"golang.org/x/crypto/bcrypt"
 	"hash"
 	"io"
-	"math"
 	"math/big"
 	"net/url"
 	"os"
 	"strings"
-	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 //md5
@@ -531,17 +529,4 @@ func BcryptHash(password string) string {
 func BcryptCheck(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
-}
-
-// 常用签名验证, sign md5 小写
-func CheckSign(secret string, linkSignTimeout int64, ts int64, sign string) bool {
-	if linkSignTimeout == 0 {
-		linkSignTimeout = 20
-	}
-	tsStep := time.Now().Unix() - ts
-	if math.Abs(gconv.Float64(tsStep)) > gconv.Float64(linkSignTimeout) { //连接失效
-		return false
-	}
-	serverSign := Md5([]byte(gconv.String(ts) + secret))
-	return serverSign == sign
 }
