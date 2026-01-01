@@ -40,15 +40,15 @@ type CertConfig struct {
 // DefaultConfig 返回默认配置
 func DefaultConfig() *CertConfig {
 	return &CertConfig{
-		Hosts:        []string{""},
-		IPs:          []net.IP{net.ParseIP("")},
+		Hosts:        []string{},
+		IPs:          []net.IP{},
 		Organization: "My Company",
 		CommonName:   "localhost",
 		Country:      "SG",
 		Province:     "Singapore",
 		Locality:     "Singapore",
 		ValidDays:    3650,
-		RSABits:      4096,
+		RSABits:      2048,
 		IsCA:         false,
 	}
 }
