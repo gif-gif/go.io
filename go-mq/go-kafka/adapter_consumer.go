@@ -3,11 +3,12 @@ package gokafka
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/IBM/sarama"
 	gocontext "github.com/gif-gif/go.io/go-context"
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
-	"time"
 )
 
 type consumer struct {
@@ -78,9 +79,11 @@ func (c *consumer) Consume(topic string, handler ConsumerHandler) {
 		}
 	}()
 
+	ctx := gocontext.WithCancel()
+
 	for {
 		select {
-		case <-gocontext.WithCancel().Done():
+		case <-ctx.Done():
 			log.Debug("Context被取消,停止消费")
 			return
 
@@ -95,10 +98,11 @@ func (c *consumer) Consume(topic string, handler ConsumerHandler) {
 				return
 			}
 
-			ctx := gocontext.WithLog()
-			ctx.Log.WithTag("gokafka-consumer").WithField("msg", msg)
+			onceCtx, cancel := context.WithCancel(ctx.Context)
+			handlerCtx := gocontext.WithParent(onceCtx).WithLog()
+			handlerCtx.Log.WithTag("gokafka-consumer").WithField("msg", msg)
 
-			if err = handler(ctx, &ConsumerMessage{ConsumerMessage: msg}, nil); err != nil {
+			if err = handler(handlerCtx, &ConsumerMessage{ConsumerMessage: msg}, nil); err != nil {
 				log.Error(err)
 			}
 
@@ -107,6 +111,8 @@ func (c *consumer) Consume(topic string, handler ConsumerHandler) {
 			if c.redis != nil {
 				c.redis.Del(key)
 			}
+
+			cancel()
 		}
 	}
 }
