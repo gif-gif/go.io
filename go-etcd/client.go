@@ -246,8 +246,7 @@ func (cli *GoEtcdClient) RegisterService(serviceName, addr string) (err error) {
 	return
 }
 
-// watch the key
-func (cli *GoEtcdClient) Watch(key string) <-chan []string {
+func (cli *GoEtcdClient) WatchEx(ctx context.Context, key string) <-chan []string {
 	var (
 		mu   sync.Mutex
 		ch   = make(chan []string, runtime.NumCPU()*2)
@@ -263,10 +262,10 @@ func (cli *GoEtcdClient) Watch(key string) <-chan []string {
 			}
 		}()
 
-		wc := cli.Client.Watch(cli.ctx, key, clientv3.WithPrefix())
+		wc := cli.Client.Watch(ctx, key, clientv3.WithPrefix())
 		for {
 			select {
-			case <-cli.ctx.Done():
+			case <-ctx.Done():
 				return
 
 			case w := <-wc:
@@ -293,6 +292,11 @@ func (cli *GoEtcdClient) Watch(key string) <-chan []string {
 	}()
 
 	return ch
+}
+
+// watch the key
+func (cli *GoEtcdClient) Watch(key string) <-chan []string {
+	return cli.WatchEx(cli.ctx, key)
 }
 
 func (cli *GoEtcdClient) map2array(data map[string]string) []string {
