@@ -1,6 +1,7 @@
 package goetcd
 
 import (
+	"context"
 	"errors"
 
 	golog "github.com/gif-gif/go.io/go-log"
@@ -123,4 +124,8 @@ func RegisterService(key, val string) (err error) {
 
 func Watch(key string) <-chan []string {
 	return Default().Watch(key)
+}
+
+func WatchWithContext(ctx context.Context, key string) <-chan []string {
+	return Default().WatchWithContext(ctx, key)
 }
