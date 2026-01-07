@@ -126,6 +126,6 @@ func Watch(key string) <-chan []string {
 	return Default().Watch(key)
 }
 
-func WatchWithContext(ctx context.Context, key string) <-chan []string {
-	return Default().WatchWithContext(ctx, key)
+func WatchWithContext(ctx context.Context, key string, withPrefix bool) <-chan []string {
+	return Default().WatchWithContext(ctx, key, withPrefix)
 }

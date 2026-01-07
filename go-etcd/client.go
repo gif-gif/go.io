@@ -247,7 +247,7 @@ func (cli *GoEtcdClient) RegisterService(serviceName, addr string) (err error) {
 	return
 }
 
-func (cli *GoEtcdClient) WatchWithContext(ctx context.Context, key string) <-chan []string {
+func (cli *GoEtcdClient) WatchWithContext(ctx context.Context, key string, withPrefix bool) <-chan []string {
 	ch := make(chan []string, runtime.NumCPU()*2)
 
 	go func() {
@@ -260,7 +260,7 @@ func (cli *GoEtcdClient) WatchWithContext(ctx context.Context, key string) <-cha
 			default:
 			}
 
-			err := cli.runWatchSession(ctx, key, ch)
+			err := cli.runWatchSession(ctx, key, withPrefix, ch)
 
 			if err != nil {
 				if ctx.Err() != nil {
@@ -278,8 +278,13 @@ func (cli *GoEtcdClient) WatchWithContext(ctx context.Context, key string) <-cha
 	return ch
 }
 
-func (cli *GoEtcdClient) runWatchSession(ctx context.Context, key string, ch chan<- []string) error {
-	resp, err := cli.Client.Get(ctx, key, clientv3.WithPrefix())
+func (cli *GoEtcdClient) runWatchSession(ctx context.Context, key string, withPrefix bool, ch chan<- []string) error {
+	var baseOpts []clientv3.OpOption
+	if withPrefix {
+		baseOpts = append(baseOpts, clientv3.WithPrefix())
+	}
+
+	resp, err := cli.Client.Get(ctx, key, baseOpts...)
 	if err != nil {
 		return err
 	}
@@ -296,7 +301,8 @@ func (cli *GoEtcdClient) runWatchSession(ctx context.Context, key string, ch cha
 	}
 
 	watchStartRevision := resp.Header.Revision + 1
-	wc := cli.Client.Watch(ctx, key, clientv3.WithPrefix(), clientv3.WithRev(watchStartRevision), clientv3.WithProgressNotify())
+	watchOpts := append(baseOpts, clientv3.WithRev(watchStartRevision), clientv3.WithProgressNotify())
+	wc := cli.Client.Watch(ctx, key, watchOpts...)
 
 	for {
 		select {
@@ -348,7 +354,7 @@ func (cli *GoEtcdClient) runWatchSession(ctx context.Context, key string, ch cha
 
 // watch the key
 func (cli *GoEtcdClient) Watch(key string) <-chan []string {
-	return cli.WatchWithContext(cli.ctx, key)
+	return cli.WatchWithContext(cli.ctx, key, true)
 }
 
 func (cli *GoEtcdClient) map2array(data map[string]string) []string {
