@@ -4,8 +4,9 @@ import (
 	"context"
 	"crypto/tls"
 	"runtime"
+	"slices"
 	"strconv"
-	"sync"
+	"strings"
 	"time"
 
 	golog "github.com/gif-gif/go.io/go-log"
@@ -247,51 +248,102 @@ func (cli *GoEtcdClient) RegisterService(serviceName, addr string) (err error) {
 }
 
 func (cli *GoEtcdClient) WatchWithContext(ctx context.Context, key string) <-chan []string {
-	var (
-		mu   sync.Mutex
-		ch   = make(chan []string, runtime.NumCPU()*2)
-		data = cli.GetMap(key)
-	)
-
-	ch <- cli.map2array(data)
+	ch := make(chan []string, runtime.NumCPU()*2)
 
 	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				golog.WithTag("go-etcd").WithField("key", key).Error(r)
-			}
-		}()
+		defer close(ch)
 
-		wc := cli.Client.Watch(ctx, key, clientv3.WithPrefix())
 		for {
 			select {
 			case <-ctx.Done():
 				return
+			default:
+			}
 
-			case w := <-wc:
-				mu.Lock()
+			err := cli.runWatchSession(ctx, key, ch)
 
-				for _, ev := range w.Events {
-					k := string(ev.Kv.Key)
-					v := string(ev.Kv.Value)
-
-					switch ev.Type {
-					case clientv3.EventTypePut:
-						data[k] = v
-
-					case clientv3.EventTypeDelete:
-						delete(data, k)
-					}
+			if err != nil {
+				if ctx.Err() != nil {
+					return
 				}
-
-				ch <- cli.map2array(data)
-
-				mu.Unlock()
+				golog.WithTag("go-etcd").ErrorF("Etcd watch session failed: %v, retrying in 1s...", err)
+				time.Sleep(1 * time.Second)
+			} else {
+				golog.WithTag("go-etcd").Info("Etcd watch session finished normally, reconnecting...")
+				time.Sleep(200 * time.Millisecond)
 			}
 		}
 	}()
 
 	return ch
+}
+
+func (cli *GoEtcdClient) runWatchSession(ctx context.Context, key string, ch chan<- []string) error {
+	resp, err := cli.Client.Get(ctx, key, clientv3.WithPrefix())
+	if err != nil {
+		return err
+	}
+
+	data := make(map[string]string)
+	for _, kv := range resp.Kvs {
+		data[string(kv.Key)] = string(kv.Value)
+	}
+
+	select {
+	case ch <- cli.map2array(data):
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+
+	watchStartRevision := resp.Header.Revision + 1
+	wc := cli.Client.Watch(ctx, key, clientv3.WithPrefix(), clientv3.WithRev(watchStartRevision), clientv3.WithProgressNotify())
+
+	for {
+		select {
+		case resp, ok := <-wc:
+			if !ok {
+				return nil
+			}
+
+			if resp.Err() != nil {
+				return resp.Err()
+			}
+
+			if len(resp.Events) == 0 {
+				continue
+			}
+
+			dirty := false
+			for _, ev := range resp.Events {
+				k := string(ev.Kv.Key)
+				v := string(ev.Kv.Value)
+
+				switch ev.Type {
+				case clientv3.EventTypePut:
+					if oldV, exists := data[k]; !exists || oldV != v {
+						data[k] = v
+						dirty = true
+					}
+				case clientv3.EventTypeDelete:
+					if _, exists := data[k]; exists {
+						delete(data, k)
+						dirty = true
+					}
+				}
+			}
+
+			if dirty {
+				select {
+				case ch <- cli.map2array(data):
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+			}
+
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
 }
 
 // watch the key
@@ -301,8 +353,15 @@ func (cli *GoEtcdClient) Watch(key string) <-chan []string {
 
 func (cli *GoEtcdClient) map2array(data map[string]string) []string {
 	var arrData []string
-	for _, v := range data {
-		arrData = append(arrData, v)
+	keys := make([]string, 0, len(data))
+	for k := range data {
+		keys = append(keys, k)
+	}
+	slices.SortStableFunc(keys, func(a, b string) int {
+		return strings.Compare(a, b)
+	})
+	for _, k := range keys {
+		arrData = append(arrData, data[k])
 	}
 	return arrData
 }
