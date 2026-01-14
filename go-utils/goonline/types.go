@@ -12,6 +12,7 @@ type Config struct {
 	EntityType   string `yaml:"entityType" json:"entityType,optional"`     // 实体类型（users/servers/devices等）
 	LeaseTTL     int64  `yaml:"leaseTTL" json:"leaseTTL,optional"`         // 租约过期时间（秒）,默认10分钟
 	OnlinePrefix string `yaml:"onlinePrefix" json:"onlinePrefix,optional"` // 在线数据键前缀, 默认"/online/"
+	LogEnable    bool   `yaml:"logEnable" json:"logEnable,optional"`       // 是否开启日志
 }
 
 // OnlineData 存储在 etcd 中的通用在线数据结构

@@ -19,6 +19,7 @@ type GoOnline struct {
 	ctx        context.Context
 	cancel     context.CancelFunc
 	Config     Config
+	LogEnable  bool
 }
 
 // New 创建在线管理器
@@ -43,6 +44,7 @@ func New(client *clientv3.Client, cfg *Config) (*GoOnline, error) {
 		ctx:        ctx,
 		cancel:     cancel,
 		Config:     *cfg,
+		LogEnable:  cfg.LogEnable,
 	}, nil
 }
 
@@ -82,7 +84,10 @@ func (m *GoOnline) SetOnline(entityID string, leaseTTL int64, data any) error {
 		leaseID := clientv3.LeaseID(existingData.LeaseID)
 		_, err = m.client.KeepAliveOnce(m.ctx, leaseID)
 		if err != nil {
-			logx.Infof("⚠ [%s]续租失败，租约可能已过期，将创建新租约: %v", entityID, err)
+			// 日志
+			if m.LogEnable {
+				logx.Infof("⚠ [%s]续租失败，租约可能已过期，将创建新租约: %v", entityID, err)
+			}
 			return m.createNewLease(entityID, leaseTTL, data)
 		}
 
@@ -101,7 +106,10 @@ func (m *GoOnline) SetOnline(entityID string, leaseTTL int64, data any) error {
 			return fmt.Errorf("更新数据失败: %v", err)
 		}
 
-		logx.Infof("🔄 [%s] %s 续租成功，租约ID: %d", m.entityType, entityID, leaseID)
+		// 日志
+		if m.LogEnable {
+			logx.Infof("🔄 [%s] %s 续租成功，租约ID: %d", m.entityType, entityID, leaseID)
+		}
 		return nil
 	}
 
@@ -143,7 +151,10 @@ func (m *GoOnline) createNewLease(entityID string, leaseTTL int64, data any) err
 		return fmt.Errorf("注册失败: %v", err)
 	}
 
-	logx.Infof("✓ [%s] %s 上线成功，租约ID: %d，过期时间: %d秒", m.entityType, entityID, lease.ID, leaseTTL)
+	// 日志
+	if m.LogEnable {
+		logx.Infof("✓ [%s] %s 上线成功，租约ID: %d，过期时间: %d秒", m.entityType, entityID, lease.ID, leaseTTL)
+	}
 	return nil
 }
 
@@ -179,7 +190,10 @@ func (m *GoOnline) SetOffline(entityID string) error {
 		return fmt.Errorf("撤销租约失败: %v", err)
 	}
 
-	logx.Infof("✓ [%s] %s 下线成功", m.entityType, entityID)
+	// 日志
+	if m.LogEnable {
+		logx.Infof("✓ [%s] %s 下线成功", m.entityType, entityID)
+	}
 	return nil
 }
 
@@ -196,7 +210,10 @@ func (m *GoOnline) GetOnlineList() ([]OnlineData, error) {
 		var data OnlineData
 		err := gojson.Unmarshal(kv.Value, &data)
 		if err != nil {
-			logx.Infof("解析数据失败: %v", err)
+			// 日志
+			if m.LogEnable {
+				logx.Infof("解析数据失败: %v", err)
+			}
 			continue
 		}
 		list = append(list, data)
@@ -291,7 +308,10 @@ func (w *OnlineWatcher) GetOnlineList() ([]OnlineData, error) {
 		var data OnlineData
 		err := gojson.Unmarshal(kv.Value, &data)
 		if err != nil {
-			logx.Errorf("解析数据失败: %v", err)
+			// 日志
+			if w.Config.LogEnable {
+				logx.Errorf("解析数据失败: %v", err)
+			}
 			continue
 		}
 		list = append(list, data)
@@ -302,18 +322,27 @@ func (w *OnlineWatcher) GetOnlineList() ([]OnlineData, error) {
 
 // Watch 监听在线状态变化 for test
 func (w *OnlineWatcher) Watch() {
-	logx.Infof("📡 开始监听 [%s] 在线状态变化...", w.entityType)
+	// 日志
+	if w.Config.LogEnable {
+		logx.Infof("📡 开始监听 [%s] 在线状态变化...", w.entityType)
+	}
 
 	// 先获取当前在线列表
 	list, err := w.GetOnlineList()
 	if err != nil {
-		logx.Errorf("获取初始在线列表失败: %v", err)
+		// 日志
+		if w.Config.LogEnable {
+			logx.Errorf("获取初始在线列表失败: %v", err)
+		}
 		return
 	}
 
-	logx.Infof("📊 当前 [%s] 在线数: %d", w.entityType, len(list))
-	for _, item := range list {
-		logx.Infof("  👤 %s: %v", item.ID, item.Data)
+	// 日志
+	if w.Config.LogEnable {
+		logx.Infof("📊 当前 [%s] 在线数: %d", w.entityType, len(list))
+		for _, item := range list {
+			logx.Infof("  👤 %s: %v", item.ID, item.Data)
+		}
 	}
 
 	// 监听后续变化
@@ -325,13 +354,19 @@ func (w *OnlineWatcher) Watch() {
 			var data OnlineData
 			if event.Type == clientv3.EventTypePut {
 				gojson.Unmarshal(event.Kv.Value, &data)
-				logx.Infof("🟢 [%s] [上线/更新] %s: %v", w.entityType, data.ID, data.Data)
+				// 日志
+				if w.Config.LogEnable {
+					logx.Infof("🟢 [%s] [上线/更新] %s: %v", w.entityType, data.ID, data.Data)
+				}
 			} else if event.Type == clientv3.EventTypeDelete {
 				// 从 key 中提取 ID
 				key := string(event.Kv.Key)
 				prefix := w.getPrefix()
 				entityID := key[len(prefix):]
-				logx.Infof("🔴 [%s] [下线] %s", w.entityType, entityID)
+				// 日志
+				if w.Config.LogEnable {
+					logx.Infof("🔴 [%s] [下线] %s", w.entityType, entityID)
+				}
 			}
 		}
 	}
