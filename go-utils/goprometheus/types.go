@@ -35,6 +35,11 @@ type Traffic struct {
 type MemberLevelUserCount struct {
 	Level int64 `json:"level,optional"` // 会员等级
 	Count int64 `json:"count,optional"` // 用户数
+} // 会员等级用户数
+
+type UserLevelUserCount struct {
+	Level int64 `json:"level,optional"` // 会员等级
+	Count int64 `json:"count,optional"` // 用户数
 }
 
 type IpUserCount struct {

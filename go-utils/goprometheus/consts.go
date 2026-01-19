@@ -14,7 +14,9 @@ var (
 	MetricTotalBandwidthIn         = "total_bandwidth_in"
 	MetricTotalBandwidthOut        = "total_bandwidth_out"
 	MetricMemberLevelUserCount     = "member_level_user_count"
+	MetricUserLevelUserCount       = "user_level_user_count"
 	MetricRealMemberLevelUserCount = "real_member_level_user_count"
+	MetricRealUserLevelUserCount   = "real_user_level_user_count"
 	MetricIpTcpConnectionsIn       = "ip_tcp_connections_in"
 	MetricIpTcpConnectionsOut      = "ip_tcp_connections_out"
 	MetricIpUdpConnectionsIn       = "ip_udp_connections_in"
@@ -124,6 +126,7 @@ var (
 	MetricLabelExportedInstanceId = model.LabelName("exported_instance_id")
 	MetricLabelInstance           = model.LabelName("instance")
 	MetricLabelMemberLevel        = model.LabelName("member_level")
+	MetricLabelUserLevel          = model.LabelName("user_level")
 	MetricLabelIp                 = model.LabelName("ip")
 	MetricLabelProtocol           = model.LabelName("protocol")
 	MetricLabelPort               = model.LabelName("port")
