@@ -2,7 +2,8 @@ package goserver
 
 import (
 	"encoding/hex"
-	goutils "github.com/gif-gif/go.io/go-utils"
+
+	"github.com/gif-gif/go.io/go-utils/gocrypto"
 
 	"strings"
 )
@@ -17,7 +18,7 @@ func (enc *Encryption) Encode(b []byte) (str string, err error) {
 		return
 	}
 	var bts []byte
-	bts, err = goutils.AESCBCEncrypt(b, []byte(enc.Key), []byte(enc.Secret))
+	bts, err = gocrypto.AESCBCEncrypt(b, []byte(enc.Key), []byte(enc.Secret))
 	if err != nil {
 		return
 	}
@@ -35,6 +36,6 @@ func (enc *Encryption) Decode(str string) (b []byte, err error) {
 	if err != nil {
 		return
 	}
-	b, err = goutils.AESCBCDecrypt(bts, []byte(enc.Key), []byte(enc.Secret))
+	b, err = gocrypto.AESCBCDecrypt(bts, []byte(enc.Key), []byte(enc.Secret))
 	return
 }

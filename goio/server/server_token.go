@@ -3,8 +3,11 @@ package goserver
 import (
 	"encoding/json"
 	"errors"
+
 	golog "github.com/gif-gif/go.io/go-log"
 	goutils "github.com/gif-gif/go.io/go-utils"
+	"github.com/gif-gif/go.io/go-utils/gocrypto"
+
 	"time"
 )
 
@@ -33,12 +36,12 @@ func CreateToken(appId string, openid int64) (tokenStr string, err error) {
 	}
 
 	var (
-		key    = goutils.MD5([]byte(appId))
+		key    = gocrypto.MD5([]byte(appId))
 		iv     = key[8:24]
 		encBuf []byte
 	)
 
-	encBuf, err = goutils.AESCBCEncrypt(token.Bytes(), []byte(key), []byte(iv))
+	encBuf, err = gocrypto.AESCBCEncrypt(token.Bytes(), []byte(key), []byte(iv))
 	if err != nil {
 		golog.Error(err.Error())
 		return
@@ -56,7 +59,7 @@ func ParseToken(tokenStr, appId string) (token *Token, err error) {
 		b        []byte
 	)
 
-	b, err = goutils.AESCBCDecrypt(tokenBuf, []byte(key), []byte(iv))
+	b, err = gocrypto.AESCBCDecrypt(tokenBuf, []byte(key), []byte(iv))
 	if err != nil {
 		golog.Error(err.Error())
 		return
