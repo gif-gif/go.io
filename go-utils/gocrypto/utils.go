@@ -106,6 +106,66 @@ func GoDataDecrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, e
 	return body, nil
 }
 
+// GoDataDecryptStrict严格模式 解密并检查时间是否过期
+// serverTimeExpire 服务器时间过期时间，单位秒，默认10秒
+// clientTimestampTs 客户端时间戳，单位秒
+func GoDataDecryptStrict(data []byte, AesKey []byte, compressMethod string, clientTimestampTs, serverTimeExpire uint64) ([]byte, error) {
+	defer goutils.Recovery(func(err any) {
+		golog.Warn(err)
+	})
+	AesIvLength := 16
+	if len(data) < AesIvLength { //非法数据
+		return nil, goerror.NewParamErrMsg("非法数据")
+	}
+
+	first16BytesIv := data[:AesIvLength]
+	// 获取剩余的字节解密
+	timeAndDataEncryptBytes := data[AesIvLength:]
+	timeAndZipBody, err := AESCBCDecrypt(timeAndDataEncryptBytes, AesKey, first16BytesIv)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(timeAndZipBody) < 8 { //非法数据
+		return nil, goerror.NewParamErrMsg("非法数据")
+	}
+
+	timestampBytes := timeAndZipBody[:8]
+	clientTimestamp := binary.BigEndian.Uint64(timestampBytes) //客户端时间戳
+	if clientTimestampTs == 0 || clientTimestampTs != clientTimestamp {
+		return nil, goerror.NewParamErrMsg("clientTimestampTs is not equal")
+	}
+	body := timeAndZipBody[8:]
+
+	if serverTimeExpire < 0 { // 服务器时间过期时间，默认10秒
+		serverTimeExpire = 10
+	}
+	// 检查时间是否过期
+	serverTimestamp := uint64(time.Now().Unix())
+	timeDiff := serverTimestamp - clientTimestamp // 时间差
+
+	if timeDiff > serverTimeExpire { // 超过允许的时间差
+		return nil, goerror.NewParamErrMsg("Time Expire")
+	}
+
+	// 还应该检查时钟倒退（防止重放攻击）
+	if serverTimestamp < clientTimestamp {
+		maxFutureTime := uint64(300) // 允许5分钟的时钟误差
+		if clientTimestamp-serverTimestamp > maxFutureTime {
+			return nil, goerror.NewParamErrMsg("Client time too far in future")
+		}
+	}
+
+	if compressMethod != "" && compressMethod != gozip.NOZIP {
+		_, body, err = gozip.Compress(body, compressMethod, gozip.UnGoZipType)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return body, nil
+}
+
 // 加密和解密AesCtr(zip(data))
 //
 // compressMethod 空时不会压缩和解压
