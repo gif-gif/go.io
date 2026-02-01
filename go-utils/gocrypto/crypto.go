@@ -85,7 +85,7 @@ func CreateHash(data []byte, hashingAlgorithm string, encoding string) (string, 
 }
 
 func GenerateByteKey(len int64) ([]byte, error) {
-	// 生成32字节（256位）的密钥
+	// 生成len字节（256位）的密钥
 	key := make([]byte, len)
 	_, err := rand.Read(key)
 	if err != nil {
@@ -106,7 +106,7 @@ func GenerateKey(len int64) (string, error) {
 }
 
 // 生成 AES 密钥
-func GenerateAESKey() (string, error) {
+func GenerateAESKey256() (string, error) {
 	// 生成32字节（256位）的密钥
 	key, err := GenerateKey(32)
 	if err != nil {
@@ -115,7 +115,7 @@ func GenerateAESKey() (string, error) {
 	return key, nil
 }
 
-func GenerateAESIv() (string, error) {
+func GenerateAESIv16() (string, error) {
 	// 生成 16 字节（128 位）的 IV
 	key, err := GenerateKey(16)
 	if err != nil {
@@ -125,7 +125,24 @@ func GenerateAESIv() (string, error) {
 }
 
 // 生成 AES 密钥和 IV 返回string 格式(hex.EncodeToString)
-func GenerateAESKeyAndIV() (string, string, error) {
+func GenerateAESKeyAndIV128() (string, string, error) {
+	// 生成32字节（256位）的密钥
+	key, err := GenerateKey(16)
+	if err != nil {
+		return "", "", err
+	}
+
+	// 生成 16 字节（128 位）的 IV
+	iv, err := GenerateKey(16)
+	if err != nil {
+		return "", "", err
+	}
+
+	return key, iv, nil
+}
+
+// 生成 AES 密钥和 IV 返回string 格式(hex.EncodeToString)
+func GenerateAESKeyAndIV256And128() (string, string, error) {
 	// 生成32字节（256位）的密钥
 	key, err := GenerateKey(32)
 	if err != nil {
@@ -141,8 +158,8 @@ func GenerateAESKeyAndIV() (string, string, error) {
 	return key, iv, nil
 }
 
-// 生成 AES 密钥和 IV 返回string 格式(hex.EncodeToString)
-func GenerateAESKeyAndIVBase64() (string, string, error) {
+// 生成 AES 密钥和 IV 返回string 格式(base64)
+func GenerateAESKeyAndIVBase64256And128() (string, string, error) {
 	// 生成32字节（256位）的密钥
 	key, err := GenerateByteKey(32)
 	if err != nil {

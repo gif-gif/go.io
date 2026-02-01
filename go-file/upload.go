@@ -3,14 +3,15 @@ package gofile
 import (
 	"context"
 	"fmt"
-	"github.com/gif-gif/go.io/go-http"
-	goutils "github.com/gif-gif/go.io/go-utils"
-	"github.com/gogf/gf/util/gconv"
 	"io"
 	"mime/multipart"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/gif-gif/go.io/go-http"
+	"github.com/gif-gif/go.io/go-utils/gocrypto"
+	"github.com/gogf/gf/util/gconv"
 )
 
 // 服务器接受file文件到assetsDir目录下，assetsDir 目录不存在则自动创建,返回存储位置
@@ -122,7 +123,7 @@ func MergeFileForChunks(filePath string, fileName string, fileMd5 string, totalC
 		}
 	}
 
-	finalFileMd5, err := goutils.CalculateFileMD5(finalFilePath)
+	finalFileMd5, err := gocrypto.CalculateFileMD5(finalFilePath)
 	if err != nil {
 		return nil, err
 	}

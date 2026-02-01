@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+// 注意：aesKey和aesIv 必须是16字节(128位)，否则会报错，格式(hex.EncodeToString), 用gocrypto.GenerateAESKeyAndIV128()生成
+//
 // AesIv 动态生成 (aes(time+zip(data)))
 //
 // 1. 先时间戳 time
@@ -21,7 +23,7 @@ import (
 //
 // 3. 压缩data(如果有压缩) zip(data)
 //
-// 4. 加密data： aes(time+zip(data))
+// 4. encryptData ： aes(time+zip(data))
 //
 // 5. 拼接iv+encryptData
 func GoDataEncrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, error) {
@@ -56,6 +58,8 @@ func GoDataEncrypt(data []byte, AesKey []byte, compressMethod string) ([]byte, e
 	return resDataEncrypt, nil
 }
 
+// 注意：aesKey和aesIv 必须是16字节(128位)，否则会报错，格式(hex.EncodeToString), 用gocrypto.GenerateAESKeyAndIV128()生成
+//
 // 解密：
 //
 // 1. 先取前16个字节，作为AES的IV
