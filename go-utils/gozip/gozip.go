@@ -3,7 +3,10 @@ package gozip
 import (
 	"bytes"
 	"compress/gzip"
+
 	"github.com/andybalholm/brotli"
+	"github.com/klauspost/compress/zstd"
+
 	"io"
 	"os"
 )
@@ -14,6 +17,7 @@ const (
 	NOZIP              = "nozip"                 //不压缩
 	GZIP               = "gzip"
 	BR                 = "br"
+	ZSTD               = "zstd"
 	GoZipNoType        = "__nozip__" //默认Header 压缩标识
 	GoZipType          = "__zip__"   //默认Header 压缩标识
 	UnGoZipType        = "__unzip__" //默认Header 压缩标识
@@ -195,4 +199,29 @@ func UnBrZipFile(src, dst string) error {
 	// 从brotli reader复制到目标文件
 	_, err = io.Copy(destFile, brReader)
 	return err
+}
+
+func ZstdCompress(inData []byte) ([]byte, error) {
+	encoder, err := zstd.NewWriter(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer encoder.Close()
+
+	outData := encoder.EncodeAll(inData, nil)
+	return outData, nil
+}
+
+func ZstdDecompress(inData []byte) ([]byte, error) {
+	decoder, err := zstd.NewReader(nil)
+	if err != nil {
+		return nil, err
+	}
+	defer decoder.Close()
+
+	outData, err := decoder.DecodeAll(inData, nil)
+	if err != nil {
+		return nil, err
+	}
+	return outData, nil
 }

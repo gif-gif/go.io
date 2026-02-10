@@ -44,6 +44,18 @@ func Compress(body []byte, compressMethod string, compressType string) (bool, []
 				return false, nil, goerror.NewParamErrMsg("UnBrZip error ")
 			}
 		}
+	} else if compressMethod == ZSTD {
+		if compressType == GoZipType { //压缩和解压
+			data, err = ZstdCompress(body)
+			if err != nil {
+				return false, nil, goerror.NewParamErrMsg("ZstdCompress error ")
+			}
+		} else {
+			data, err = ZstdDecompress(body)
+			if err != nil {
+				return false, nil, goerror.NewParamErrMsg("ZstdDecompress error ")
+			}
+		}
 	} else { //不 压缩和解压
 		data = body
 	}
