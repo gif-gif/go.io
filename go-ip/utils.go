@@ -9,7 +9,7 @@ import (
 )
 
 // 只返回A记录IPS
-func LookupIP(domain string, dnsServer string) ([]string, error) {
+func LookupIPList(domain string, dnsServer string) ([]string, error) {
 	c := new(dns.Client)
 	c.Timeout = 5 * time.Second
 
