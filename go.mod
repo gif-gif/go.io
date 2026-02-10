@@ -25,6 +25,7 @@ require (
 	github.com/hibiken/asynq v0.25.1
 	github.com/ip2location/ip2location-go/v9 v9.7.0
 	github.com/json-iterator/go v1.1.12
+	github.com/miekg/dns v1.1.43
 	github.com/minio/minio-go/v7 v7.0.70
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mojocn/base64Captcha v1.3.6
@@ -41,6 +42,7 @@ require (
 	github.com/shopspring/decimal v1.4.0
 	github.com/silenceper/wechat/v2 v2.1.6
 	github.com/stretchr/testify v1.10.0
+	github.com/tjfoc/gmsm v1.4.1
 	github.com/xuri/excelize/v2 v2.9.1
 	github.com/zeromicro/go-zero v1.8.4
 	go.etcd.io/etcd/client/pkg/v3 v3.5.16
