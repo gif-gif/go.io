@@ -143,7 +143,19 @@ func (ins *instance) run(attachProc *os.Process) {
 				}
 
 				if err := attachProc.Signal(syscall.Signal(0)); err != nil {
-					log.Infof("[%s] attached process PID:%d exited: %v, starting new...", ins.opts.Name, attachProc.Pid, err)
+					ins.mutex.Lock()
+					killed := ins.isKilled
+					ins.mutex.Unlock()
+
+					if killed {
+						// 是主动 kill 触发的，不重启
+						log.Infof("[%s] attached process PID:%d killed, not restarting",
+							ins.opts.Name, attachProc.Pid)
+						return
+					}
+
+					log.Infof("[%s] attached process PID:%d exited: %v, starting new...",
+						ins.opts.Name, attachProc.Pid, err)
 					removePidFile(ins.opts.PidFile)
 					ins.mutex.Lock()
 					ins.cmd = nil
@@ -162,7 +174,8 @@ func (ins *instance) run(attachProc *os.Process) {
 			default:
 			}
 
-			log.Infof("[%s] running instance: %v cmd: %s %v", ins.opts.Name, ins.instanceId, ins.opts.ExecPath, ins.opts.Args)
+			log.Infof("[%s] running instance: %v cmd: %s %v",
+				ins.opts.Name, ins.instanceId, ins.opts.ExecPath, ins.opts.Args)
 
 			ins.cmd = exec.CommandContext(ins.ctx, ins.opts.ExecPath, ins.opts.Args...)
 			ins.cmd.Stdout = os.Stdout
@@ -199,9 +212,11 @@ func (ins *instance) run(attachProc *os.Process) {
 			}
 
 			if waitErr != nil {
-				log.Warnf("[%s] exited with error: %v instance: %v, restarting...", ins.opts.Name, waitErr, ins.instanceId)
+				log.Warnf("[%s] exited with error: %v instance: %v, restarting...",
+					ins.opts.Name, waitErr, ins.instanceId)
 			} else {
-				log.Infof("[%s] exited normally instance: %v, restarting...", ins.opts.Name, ins.instanceId)
+				log.Infof("[%s] exited normally instance: %v, restarting...",
+					ins.opts.Name, ins.instanceId)
 			}
 
 			time.Sleep(ins.opts.RestartDelay)
@@ -266,6 +281,36 @@ func (r *Runner) UpdateOptions(fn func(opts *Options)) {
 	r.opts.setDefaults()
 }
 
+// Run 统一入口：自动检测 PID 文件，有存活进程则接管，否则直接启动
+// 若已有实例在运行，先 kill 再执行
+func (r *Runner) Run() {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	if r.instance != nil {
+		r.instance.kill()
+	}
+
+	// 尝试从 PID 文件找到遗留进程
+	var attachProc *os.Process
+	if r.opts.PidFile != "" {
+		if pid, err := readPidFile(r.opts.PidFile); err == nil {
+			if proc := findLivingProcess(pid); proc != nil {
+				attachProc = proc
+			} else {
+				log.Infof("[%s] previous process PID:%d not found, starting new",
+					r.opts.Name, pid)
+				removePidFile(r.opts.PidFile)
+			}
+		}
+	}
+
+	ins := newInstance(r.opts, r.instanceIdx)
+	r.instanceIdx++
+	r.instance = ins
+	ins.run(attachProc)
+}
+
 // ReRun 重启当前进程，waitOldExit 为 true 时等待旧进程完全退出再启动
 func (r *Runner) ReRun(waitOldExit bool) {
 	log.Infof("[%s] restarting...", r.opts.Name)
@@ -290,35 +335,6 @@ func (r *Runner) ReRun(waitOldExit bool) {
 	}
 
 	r.Run()
-}
-
-// Run 统一入口：自动检测 PID 文件，有存活进程则接管，否则直接启动
-// 若已有实例在运行，先 kill 再执行
-func (r *Runner) Run() {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
-	if r.instance != nil {
-		r.instance.kill()
-	}
-
-	// 尝试从 PID 文件找到遗留进程
-	var attachProc *os.Process
-	if r.opts.PidFile != "" {
-		if pid, err := readPidFile(r.opts.PidFile); err == nil {
-			if proc := findLivingProcess(pid); proc != nil {
-				attachProc = proc
-			} else {
-				log.Infof("[%s] previous process PID:%d not found, starting new", r.opts.Name, pid)
-				removePidFile(r.opts.PidFile)
-			}
-		}
-	}
-
-	ins := newInstance(r.opts, r.instanceIdx)
-	r.instanceIdx++
-	r.instance = ins
-	ins.run(attachProc)
 }
 
 // Kill 终止当前进程
