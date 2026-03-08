@@ -266,6 +266,32 @@ func (r *Runner) UpdateOptions(fn func(opts *Options)) {
 	r.opts.setDefaults()
 }
 
+// ReRun 重启当前进程，waitOldExit 为 true 时等待旧进程完全退出再启动
+func (r *Runner) ReRun(waitOldExit bool) {
+	log.Infof("[%s] restarting...", r.opts.Name)
+
+	r.mutex.Lock()
+	old := r.instance
+	r.mutex.Unlock()
+
+	r.Kill()
+
+	if waitOldExit && old != nil {
+		for {
+			old.mutex.Lock()
+			exited := old.isExited
+			old.mutex.Unlock()
+			if exited {
+				break
+			}
+			time.Sleep(r.opts.KillCheckInterval)
+		}
+		log.Infof("[%s] old instance exited, starting new...", r.opts.Name)
+	}
+
+	r.Run()
+}
+
 // Run 统一入口：自动检测 PID 文件，有存活进程则接管，否则直接启动
 // 若已有实例在运行，先 kill 再执行
 func (r *Runner) Run() {
