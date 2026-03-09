@@ -7,7 +7,7 @@ const (
 )
 
 // “每分钟最多执行 250 次查询”
-const limitMax = 500 //返回的行数。限制：同步请求的数量上限为 2,000。
+const limitMax = 1000 //返回的行数。限制：同步请求的数量上限为 2,000。
 
 // 常用纬度 group by 数据
 // breakdowns  breakdowns=['breakdown_1', 'breakdown_2',...]
