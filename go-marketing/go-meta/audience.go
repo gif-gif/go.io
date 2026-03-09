@@ -3,12 +3,16 @@ package gometa
 import (
 	"context"
 	"fmt"
-	gohttp "github.com/gif-gif/go.io/go-http"
-	goutils "github.com/gif-gif/go.io/go-utils"
-	"github.com/gogf/gf/util/gconv"
-	"github.com/google/go-querystring/query"
+	"io/ioutil"
+	"net/http"
 	"strings"
 	"time"
+
+	gohttp "github.com/gif-gif/go.io/go-http"
+	goutils "github.com/gif-gif/go.io/go-utils"
+	"github.com/gif-gif/go.io/go-utils/gojson"
+	"github.com/gogf/gf/util/gconv"
+	"github.com/google/go-querystring/query"
 )
 
 type AudienceResponseItem struct {
@@ -28,6 +32,8 @@ type AudienceResponseItem struct {
 	MatchedRequests int64   `json:"matched_requests"`
 	MatchRate       float64 `json:"match_rate"`
 	ShowRate        float64 `json:"show_rate"`
+	NoBid           int64   `json:"no_bid"`
+	NoFill          int64   `json:"no_fill"`
 }
 
 type AudienceReportResponse struct {
@@ -43,6 +49,14 @@ func (m *GoMeta) GetMetaAudienceReport(req *AudienceDataRequest, ID string) (*Au
 	api := m.Config.currentVersionBaseApi + ApiAdNetworkAnalytics
 	api = fmt.Sprintf(api, ID)
 	params, _ := query.Values(req)
+	filters, _ := gojson.MarshalToString(req.Filter)
+	params.Set("filters", filters)
+	metrics, _ := gojson.MarshalToString(req.Metrics)
+	params.Set("metrics", metrics)
+	breakdowns, _ := gojson.MarshalToString(req.Breakdowns)
+	params.Set("breakdowns", breakdowns)
+	params.Set("limit", gconv.String(req.Limit))
+	params.Set("access_token", m.Config.AccessToken)
 	request := &gohttp.Request{
 		Url:          api,
 		ParamsValues: params,
@@ -67,7 +81,7 @@ func (m *GoMeta) GetAudienceReport(req *AudienceDataRequest, ID string) (*Audien
 		for _, result := range item.Results {
 			key := result.Time
 			for _, breakdown := range result.Breakdowns {
-				key += "-" + breakdown.Key + ":" + breakdown.Value + ""
+				key += "##" + breakdown.Key + ":" + breakdown.Value + ""
 			}
 
 			rowData := make(map[string]string)
@@ -84,7 +98,7 @@ func (m *GoMeta) GetAudienceReport(req *AudienceDataRequest, ID string) (*Audien
 
 	for rowsKey, value := range rowsData {
 		vo := AudienceResponseItem{}
-		keys := strings.Split(rowsKey, "-")
+		keys := strings.Split(rowsKey, "##")
 		for i, key := range keys {
 			if i == 0 {
 				tt, err := goutils.ConvertToGMTTime(key)
@@ -143,6 +157,10 @@ func (m *GoMeta) GetAudienceReport(req *AudienceDataRequest, ID string) (*Audien
 			case Metrics_AD_NETWORK_FILLED_REQUEST:
 				vo.MatchedRequests = gconv.Int64(v)
 				break
+			case Metrics_AD_NETWORK_NO_BID:
+				vo.NoBid = gconv.Int64(v)
+			case Metrics_AD_NETWORK_NO_FILL:
+				vo.NoFill = gconv.Int64(v)
 			}
 		}
 		res.Items = append(res.Items, &vo)
@@ -151,4 +169,18 @@ func (m *GoMeta) GetAudienceReport(req *AudienceDataRequest, ID string) (*Audien
 	res.NextPageToken = rst.Paging.Cursors.After
 
 	return &res, nil
+}
+
+func (m *GoMeta) GetAdUnits(ID string) (*AudienceReportResponse, error) {
+	api := m.Config.currentVersionBaseApi + "/" + ID
+	//api = fmt.Sprintf(api, ID)
+	// 使用 GET 请求获取列表
+	resp, _ := http.Get(api + "?access_token=" + m.Config.AccessToken + "&fields=id,name,format")
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("Placements List:", string(body))
+
+	return nil, nil
+
 }

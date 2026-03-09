@@ -2,8 +2,9 @@ package gometa
 
 import (
 	"context"
+
 	gohttp "github.com/gif-gif/go.io/go-http"
-	goutils "github.com/gif-gif/go.io/go-utils"
+	"github.com/gif-gif/go.io/go-utils/gocrypto"
 	"github.com/google/go-querystring/query"
 )
 
@@ -56,7 +57,7 @@ func New(config Config) *GoMeta {
 		Config: config,
 	}
 	if mm.Config.ApiVersion == "" {
-		mm.Config.ApiVersion = "v21.0"
+		mm.Config.ApiVersion = "v22.0"
 	}
 	if mm.Config.baseApi == "" {
 		mm.Config.baseApi = "https://graph.facebook.com"
@@ -121,5 +122,5 @@ func (c *GoMeta) Exchange(authorizationCode string) (*TokenResponse, error) {
 //
 // DOC: https://developers.facebook.com/docs/marketing-api/overview/authorization
 func (c *GoMeta) AuthUrl(scope string) string {
-	return c.Config.currentVersionBaseApi + "/dialog/oauth?client_id=" + c.Config.ClientId + "&redirect_uri=" + goutils.UrlEncode(c.Config.RedirectUri) + "&scope=" + goutils.UrlEncode(scope)
+	return c.Config.currentVersionBaseApi + "/dialog/oauth?client_id=" + c.Config.ClientId + "&redirect_uri=" + gocrypto.UrlEncode(c.Config.RedirectUri) + "&scope=" + gocrypto.UrlEncode(scope)
 }

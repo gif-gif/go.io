@@ -2,7 +2,8 @@ package gometa
 
 // API
 const (
-	ApiAdNetworkAnalytics = "/%s/adnetworkanalytics" // 变现广告网络分析
+	ApiAdNetworkAnalytics = "/%s/adnetworkanalytics"   // 变现广告网络分析
+	GetAllPlacementList   = "/%s/adnetwork_properties" // 所有广告位列表
 )
 
 // “每分钟最多执行 250 次查询”
@@ -10,6 +11,7 @@ const limitMax = 500 //返回的行数。限制：同步请求的数量上限为
 
 // 常用纬度 group by 数据
 // breakdowns  breakdowns=['breakdown_1', 'breakdown_2',...]
+// must be one of {AGE, APP, COUNTRY, DELIVERY_METHOD, DISPLAY_FORMAT, DEAL, DEAL_AD, DEAL_PAGE, GENDER, PLACEMENT, PLACEMENT_NAME, AD_SPACE, PLATFORM, PROPERTY, CLICKED_VIEW_TAG, FAIL_REASON, SDK_VERSION, INSTANT_ARTICLE_PAGE_ID, INSTANT_ARTICLE_ID, AD_SERVER_CAMPAIGN_ID, IS_DEAL_BACKFILL}
 const (
 	BREAKDOWN_AD_SPACE        = "ad_space"        //按广告专区细分
 	BREAKDOWN_COUNTRY         = "country"         //按国家/地区细分
@@ -117,6 +119,8 @@ type AudienceDataRequest struct {
 	OrderingColumn string           `url:"ordering_column"` //time|value,默认值为 time。
 	OrderingType   string           `url:"ordering_type"`   //ascending|descending ,默认值为 descending。升序或降序。
 	After          string           `url:"after"`           //下一页游标。
+
+	AccessToken string `url:"access_token"`
 }
 
 type AudienceDataResponse struct {
