@@ -149,13 +149,11 @@ func (ins *instance) run(attachProc *os.Process) {
 
 					if killed {
 						// 是主动 kill 触发的，不重启
-						log.Infof("[%s] attached process PID:%d killed, not restarting",
-							ins.opts.Name, attachProc.Pid)
+						log.Infof("[%s] attached process PID:%d killed, not restarting", ins.opts.Name, attachProc.Pid)
 						return
 					}
 
-					log.Infof("[%s] attached process PID:%d exited: %v, starting new...",
-						ins.opts.Name, attachProc.Pid, err)
+					log.Infof("[%s] attached process PID:%d exited: %v, starting new...", ins.opts.Name, attachProc.Pid, err)
 					removePidFile(ins.opts.PidFile)
 					ins.mutex.Lock()
 					ins.cmd = nil
@@ -182,8 +180,7 @@ func (ins *instance) run(attachProc *os.Process) {
 			ins.cmd.Stderr = os.Stderr
 
 			if err := ins.cmd.Start(); err != nil {
-				log.Warnf("[%s] failed to start instance: %v error: %v",
-					ins.opts.Name, ins.instanceId, err)
+				log.Warnf("[%s] failed to start instance: %v error: %v", ins.opts.Name, ins.instanceId, err)
 				time.Sleep(ins.opts.StartRetryDelay)
 				continue
 			}
@@ -212,11 +209,9 @@ func (ins *instance) run(attachProc *os.Process) {
 			}
 
 			if waitErr != nil {
-				log.Warnf("[%s] exited with error: %v instance: %v, restarting...",
-					ins.opts.Name, waitErr, ins.instanceId)
+				log.Warnf("[%s] exited with error: %v instance: %v, restarting...", ins.opts.Name, waitErr, ins.instanceId)
 			} else {
-				log.Infof("[%s] exited normally instance: %v, restarting...",
-					ins.opts.Name, ins.instanceId)
+				log.Infof("[%s] exited normally instance: %v, restarting...", ins.opts.Name, ins.instanceId)
 			}
 
 			time.Sleep(ins.opts.RestartDelay)
@@ -237,23 +232,21 @@ func (ins *instance) kill() {
 		return
 	}
 
-	go func() {
-		for {
-			if err := proc.Kill(); err != nil {
-				log.Warnf("[%s] kill failed: %v instance: %v",
-					ins.opts.Name, err, ins.instanceId)
-				return
-			}
-			time.Sleep(ins.opts.KillCheckInterval)
-
-			ins.mutex.Lock()
-			exited := ins.isExited
-			ins.mutex.Unlock()
-			if exited {
-				return
-			}
+	// 同步轮询，确保主程序 defer 调用时也能可靠 kill
+	for {
+		if err := proc.Kill(); err != nil {
+			log.Warnf("[%s] kill failed: %v instance: %v", ins.opts.Name, err, ins.instanceId)
+			return
 		}
-	}()
+		time.Sleep(ins.opts.KillCheckInterval)
+
+		ins.mutex.Lock()
+		exited := ins.isExited
+		ins.mutex.Unlock()
+		if exited {
+			return
+		}
+	}
 }
 
 // ---- Runner ----
@@ -298,8 +291,7 @@ func (r *Runner) Run() {
 			if proc := findLivingProcess(pid); proc != nil {
 				attachProc = proc
 			} else {
-				log.Infof("[%s] previous process PID:%d not found, starting new",
-					r.opts.Name, pid)
+				log.Infof("[%s] previous process PID:%d not found, starting new", r.opts.Name, pid)
 				removePidFile(r.opts.PidFile)
 			}
 		}
