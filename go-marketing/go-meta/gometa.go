@@ -53,18 +53,20 @@ type GoMeta struct {
 }
 
 func New(config Config) *GoMeta {
-	mm := &GoMeta{
-		Config: config,
-	}
-	if mm.Config.ApiVersion == "" {
-		mm.Config.ApiVersion = "v22.0"
-	}
-	if mm.Config.baseApi == "" {
-		mm.Config.baseApi = "https://graph.facebook.com"
-	}
-
-	mm.Config.currentVersionBaseApi = mm.Config.baseApi + "/" + mm.Config.ApiVersion
+	mm := &GoMeta{}
+	mm.UpdateConfig(config)
 	return mm
+}
+
+func (m *GoMeta) UpdateConfig(config Config) {
+	if config.ApiVersion == "" {
+		config.ApiVersion = "v22.0"
+	}
+	if config.baseApi == "" {
+		config.baseApi = "https://graph.facebook.com"
+	}
+	config.currentVersionBaseApi = config.baseApi + "/" + config.ApiVersion
+	m.Config = config
 }
 
 // 刷新token接口

@@ -3,6 +3,8 @@ package goadmob
 import (
 	"context"
 	"errors"
+	"time"
+
 	gohttp "github.com/gif-gif/go.io/go-http"
 	golog "github.com/gif-gif/go.io/go-log"
 	gooauth "github.com/gif-gif/go.io/go-sso/go-oauth"
@@ -10,7 +12,6 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/admob/v1"
 	"google.golang.org/api/option"
-	"time"
 )
 
 const (
@@ -99,6 +100,20 @@ type GoAdmob struct {
 
 // 每次调用时都需要调用这个方法
 func New(ctx context.Context, config Config) (*GoAdmob, error) {
+	err := gooauth.Init(config.AuthConfig)
+	if err != nil {
+		return nil, err
+	}
+	o := &GoAdmob{
+		ctx:    ctx,
+		GoAuth: gooauth.GetClient(config.AuthConfig.Name),
+	}
+
+	o.UpdateConfig(config)
+	return o, nil
+}
+
+func (o *GoAdmob) UpdateConfig(config Config) {
 	if len(config.AuthConfig.Scopes) <= 0 {
 		config.AuthConfig.Scopes = []string{"https://www.googleapis.com/auth/admob.readonly", "https://www.googleapis.com/auth/admob.report"}
 	}
@@ -111,18 +126,7 @@ func New(ctx context.Context, config Config) (*GoAdmob, error) {
 			AuthStyle:     google.Endpoint.AuthStyle,
 		}
 	}
-
-	err := gooauth.Init(config.AuthConfig)
-	if err != nil {
-		return nil, err
-	}
-	o := &GoAdmob{
-		ctx:    ctx,
-		Config: config,
-		GoAuth: gooauth.GetClient(config.AuthConfig.Name),
-	}
-
-	return o, nil
+	o.Config = config
 }
 
 // RefreshToken and AdmobService admon token 有效期为60分钟，所有每次请求数据刷新下token
