@@ -23,6 +23,11 @@ var (
 	}
 )
 
+func ToBeijingTime(t time.Time) time.Time {
+	beijing := time.FixedZone("CST", 8*60*60)
+	return t.In(beijing)
+}
+
 // GetTimeNow 获取当前时间GetTimeNow()，用于测试时的时间修改
 func GetTimeNow() time.Time {
 	//redisConf := redis.RedisKeyConf{

@@ -72,6 +72,7 @@ var DefaultAudienceMetrics = []string{
 	Metrics_AD_NETWORK_BIDDING_BID_RATE,
 	Metrics_AD_NETWORK_NO_FILL,
 	Metrics_AD_NETWORK_NO_BID,
+	Metrics_AD_NETWORK_FILLED_REQUEST,
 }
 
 // ResponseData 数据
