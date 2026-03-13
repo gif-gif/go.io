@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	gofile "github.com/gif-gif/go.io/go-file"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -172,9 +173,12 @@ func (ins *instance) run(attachProc *os.Process) {
 			default:
 			}
 
-			log.Infof("[%s] running instance: %v cmd: %s %v",
-				ins.opts.Name, ins.instanceId, ins.opts.ExecPath, ins.opts.Args)
-
+			if !gofile.Exists(ins.opts.ExecPath) {
+				//log.Warnf("[%s] exec path not exists: %s", ins.opts.Name, ins.opts.ExecPath)
+				time.Sleep(ins.opts.StartRetryDelay)
+				continue
+			}
+			log.Infof("[%s] running instance: %v cmd: %s %v", ins.opts.Name, ins.instanceId, ins.opts.ExecPath, ins.opts.Args)
 			ins.cmd = exec.CommandContext(ins.ctx, ins.opts.ExecPath, ins.opts.Args...)
 			ins.cmd.Stdout = os.Stdout
 			ins.cmd.Stderr = os.Stderr
