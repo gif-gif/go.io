@@ -3,13 +3,13 @@ package goserver
 import (
 	"encoding/json"
 	"fmt"
+
+	"strings"
+
 	goerror "github.com/gif-gif/go.io/go-error"
 	goutils "github.com/gif-gif/go.io/go-utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/gogf/gf/util/gconv"
-	"github.com/samber/lo"
-
-	"strings"
 )
 
 type Response struct {
@@ -93,11 +93,15 @@ func SuccessResponse(data any) *Response {
 
 // 便捷方法: 快速创建错误响应
 func ErrorResponseX(errorCode string, errorMessage string, showType ...uint32) *Response {
+	_showType := uint32(0)
+	if len(showType) > 0 {
+		_showType = showType[0]
+	}
 	return NewResponseBuilder().
 		WithSuccess(false).
 		WithErrorCode(errorCode).
 		WithErrorMessage(errorMessage).
-		WithShowType(lo.If[uint32](len(showType) == 0, 0).Else(showType[0])).
+		WithShowType(_showType).
 		Build()
 }
 
