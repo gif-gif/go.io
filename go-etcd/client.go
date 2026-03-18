@@ -3,6 +3,8 @@ package goetcd
 import (
 	"context"
 	"crypto/tls"
+	"errors"
+	"fmt"
 	"runtime"
 	"slices"
 	"strconv"
@@ -11,6 +13,7 @@ import (
 
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gif-gif/go.io/goio"
+	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	"go.etcd.io/etcd/client/pkg/v3/transport"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/naming/endpoints"
@@ -56,7 +59,7 @@ func New(conf Config) (cli *GoEtcdClient, err error) {
 		var clientConfig *tls.Config
 		clientConfig, err = tlsInfo.ClientConfig()
 		if err != nil {
-			golog.WithTag("go-etcd").WithField("config", conf).Error(err.Error())
+			golog.WithTag("goetcd").WithField("config", conf).Error(err.Error())
 			return
 		}
 		cfg.TLS = clientConfig
@@ -64,7 +67,7 @@ func New(conf Config) (cli *GoEtcdClient, err error) {
 
 	cli.Client, err = clientv3.New(cfg)
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("config", conf).Error(err.Error())
+		golog.WithTag("goetcd").WithField("config", conf).Error(err.Error())
 	}
 
 	return
@@ -74,7 +77,7 @@ func New(conf Config) (cli *GoEtcdClient, err error) {
 func (cli *GoEtcdClient) Set(key, val string, opts ...clientv3.OpOption) (resp *clientv3.PutResponse, err error) {
 	resp, err = cli.Client.Put(cli.ctx, key, val, opts...)
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("key", key).WithField("val", val).Error(err)
+		golog.WithTag("goetcd").WithField("key", key).WithField("val", val).Error(err)
 	}
 	return
 }
@@ -94,13 +97,13 @@ func (cli *GoEtcdClient) SetTTL(key, val string, ttl int64, opts ...clientv3.OpO
 
 	lease, err = cli.Client.Grant(cli.ctx, ttl)
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("key", key).WithField("val", val).WithField("ttl", ttl).Error(err)
+		golog.WithTag("goetcd").WithField("key", key).WithField("val", val).WithField("ttl", ttl).Error(err)
 		return
 	}
 
 	_, err = cli.Client.Put(cli.ctx, key, val, clientv3.WithLease(lease.ID))
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("key", key).WithField("val", val).WithField("ttl", ttl).Error(err)
+		golog.WithTag("goetcd").WithField("key", key).WithField("val", val).WithField("ttl", ttl).Error(err)
 		return
 	}
 
@@ -116,7 +119,7 @@ func (cli *GoEtcdClient) SetTTLWithPrevKV(key, val string, ttl int64) (resp *cli
 func (cli *GoEtcdClient) Get(key string, opts ...clientv3.OpOption) (resp *clientv3.GetResponse, err error) {
 	resp, err = cli.Client.Get(cli.ctx, key, opts...)
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("key", key).Error(err)
+		golog.WithTag("goetcd").WithField("key", key).Error(err)
 	}
 	return
 }
@@ -139,7 +142,7 @@ func (cli *GoEtcdClient) GetArray(key string) (data []string) {
 
 	resp, err := cli.Get(key, clientv3.WithPrefix())
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("key", key).Error(err)
+		golog.WithTag("goetcd").WithField("key", key).Error(err)
 		return
 	}
 
@@ -156,7 +159,7 @@ func (cli *GoEtcdClient) GetMap(key string) (data map[string]string) {
 
 	resp, err := cli.Get(key, clientv3.WithPrefix())
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("key", key).Error(err)
+		golog.WithTag("goetcd").WithField("key", key).Error(err)
 		return
 	}
 
@@ -173,7 +176,7 @@ func (cli *GoEtcdClient) Del(key string, opts ...clientv3.OpOption) (resp *clien
 	opts = append(opts, clientv3.WithPrevKV())
 	resp, err = cli.Client.Delete(cli.ctx, key, opts...)
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("key", key).Error(err)
+		golog.WithTag("goetcd").WithField("key", key).Error(err)
 	}
 	return
 }
@@ -201,42 +204,42 @@ func (cli *GoEtcdClient) RegisterService(serviceName, addr string) (err error) {
 
 	lease, err = cli.Client.Grant(cli.ctx, ttl)
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("serviceName", serviceName).WithField("addr", addr).Error(err)
+		golog.WithTag("goetcd").WithField("serviceName", serviceName).WithField("addr", addr).Error(err)
 		return
 	}
 
 	em, err = endpoints.NewManager(cli.Client, serviceName)
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("serviceName", serviceName).WithField("addr", addr).Error(err)
+		golog.WithTag("goetcd").WithField("serviceName", serviceName).WithField("addr", addr).Error(err)
 		return
 	}
 
 	serviceKey := serviceName + "/" + strconv.Itoa(int(lease.ID))
 	err = em.AddEndpoint(cli.ctx, serviceKey, endpoints.Endpoint{Addr: addr}, clientv3.WithLease(lease.ID))
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("serviceName", serviceName).WithField("addr", addr).Error(err)
+		golog.WithTag("goetcd").WithField("serviceName", serviceName).WithField("addr", addr).Error(err)
 		return
 	}
 
 	ch, err = cli.Client.KeepAlive(cli.ctx, lease.ID)
 	if err != nil {
-		golog.WithTag("go-etcd").WithField("serviceName", serviceName).WithField("addr", addr).Error(err)
+		golog.WithTag("goetcd").WithField("serviceName", serviceName).WithField("addr", addr).Error(err)
 		return
 	}
 
-	golog.WithTag("go-etcd").WithField("serviceName", serviceName).WithField("addr", addr).Debug("服务注册成功")
+	golog.WithTag("goetcd").WithField("serviceName", serviceName).WithField("addr", addr).Debug("服务注册成功")
 
 	go func() {
 		for {
 			select {
 			case <-cli.ctx.Done():
-				golog.WithTag("go-etcd").WithField("serviceName", serviceName).WithField("addr", addr).Warn("服务退出,收回注册信息")
+				golog.WithTag("goetcd").WithField("serviceName", serviceName).WithField("addr", addr).Warn("服务退出,收回注册信息")
 				cli.Client.Revoke(cli.ctx, lease.ID)
 				return
 
 			case rsp := <-ch:
 				if rsp == nil {
-					golog.WithTag("go-etcd").WithField("serviceName", serviceName).WithField("addr", addr).Error("服务注册续租失效")
+					golog.WithTag("goetcd").WithField("serviceName", serviceName).WithField("addr", addr).Error("服务注册续租失效")
 					cli.RegisterService(serviceName, addr)
 					return
 				}
@@ -261,15 +264,17 @@ func (cli *GoEtcdClient) WatchWithContext(ctx context.Context, key string, withP
 			}
 
 			err := cli.runWatchSession(ctx, key, withPrefix, ch)
-
+			if errors.Is(err, rpctypes.ErrCompacted) { //说明 watchStartRevision 已经被 etcd compact 压缩掉了
+				// 重新走一次 runWatchSession？？？？
+			}
 			if err != nil {
 				if ctx.Err() != nil {
 					return
 				}
-				golog.WithTag("go-etcd").ErrorF("Etcd watch session failed: %v, retrying in 1s...", err)
+				golog.WithTag("goetcd").ErrorF("Etcd watch session failed: %v, retrying in 1s...", err)
 				time.Sleep(1 * time.Second)
 			} else {
-				golog.WithTag("go-etcd").Info("Etcd watch session finished normally, reconnecting...")
+				golog.WithTag("goetcd").Info("Etcd watch session finished normally, reconnecting...")
 				time.Sleep(200 * time.Millisecond)
 			}
 		}
@@ -308,7 +313,8 @@ func (cli *GoEtcdClient) runWatchSession(ctx context.Context, key string, withPr
 		select {
 		case resp, ok := <-wc:
 			if !ok {
-				return nil
+				return fmt.Errorf("watch channel closed unexpectedly")
+				//return nil
 			}
 
 			if resp.Err() != nil {
@@ -372,7 +378,7 @@ func (cli *GoEtcdClient) map2array(data map[string]string) []string {
 	return arrData
 }
 
-// 检测 rpc服务是否启动
+// 检测 rpc服务是否在etcd中注册
 func (cli *GoEtcdClient) CheckRpcServices(rpcServices []string) bool {
 	rpcStarted := true
 	for _, service := range rpcServices {
