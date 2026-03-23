@@ -23,23 +23,38 @@ func New(channelSize ...int) *GoEvent {
 	}
 }
 
+// safeSend 安全发送消息到 channel，channel 已关闭时返回 false 而不是 panic
+func safeSend(ch MessageChan, msg Message) (ok bool) {
+	defer func() {
+		if r := recover(); r != nil {
+			ok = false
+		}
+	}()
+	ch <- msg
+	return true
+}
+
 // 发布 执行当前topic 对应的所有订阅者, async=true 则异步执行(并发执行无序)，否则同步执行保证channel发送顺序
 func (ev *GoEvent) Publish(topic string, data interface{}, async ...bool) {
 	ev.mu.RLock()
-	defer ev.mu.RUnlock()
+	chs, ok := ev.subscribes[topic]
+	if !ok {
+		ev.mu.RUnlock()
+		return
+	}
+	channels := append([]MessageChan{}, chs...)
+	ev.mu.RUnlock()
 
-	if chs, ok := ev.subscribes[topic]; ok {
-		channels := append([]MessageChan{}, chs...)
-		if len(async) > 0 && async[0] { //并发执行
-			goutils.AsyncFunc(func() {
-				for _, ch := range channels {
-					ch <- Message{Topic: topic, Data: data}
-				}
-			})
-		} else {
+	msg := Message{Topic: topic, Data: data}
+	if len(async) > 0 && async[0] { //并发执行
+		goutils.AsyncFunc(func() {
 			for _, ch := range channels {
-				ch <- Message{Topic: topic, Data: data}
+				safeSend(ch, msg)
 			}
+		})
+	} else {
+		for _, ch := range channels {
+			safeSend(ch, msg)
 		}
 	}
 }
@@ -71,14 +86,10 @@ func (ev *GoEvent) Subscribe(topic string, fn SubscribeFunc, async ...bool) {
 					fn(msg)
 				})
 			}
-			//v, ok := <-ch
-			//fmt.Println(v, ok)
 		} else {
 			for msg := range ch {
 				fn(msg)
 			}
-			//v, ok := <-ch
-			//fmt.Println(v, ok)
 		}
 	})
 }
@@ -89,13 +100,9 @@ func (ev *GoEvent) UnSubscribe(topic string) {
 	defer ev.mu.Unlock()
 
 	if chs, ok := ev.subscribes[topic]; ok {
-		channels := append([]MessageChan{}, chs...)
-		for _, ch := range channels {
-			goutils.AsyncFunc(func() {
-				close(ch)
-			})
+		for _, ch := range chs {
+			close(ch)
 		}
-
 		delete(ev.subscribes, topic)
 	}
 }
@@ -104,13 +111,21 @@ func (ev *GoEvent) UnSubscribeDefault() {
 	ev.mu.Lock()
 	defer ev.mu.Unlock()
 	if chs, ok := ev.subscribes[ev.DefaultTopic]; ok {
-		channels := append([]MessageChan{}, chs...)
-		for _, ch := range channels {
-			goutils.AsyncFunc(func() {
-				close(ch)
-			})
+		for _, ch := range chs {
+			close(ch)
 		}
-
 		delete(ev.subscribes, ev.DefaultTopic)
+	}
+}
+
+// Close 关闭所有订阅，释放所有 subscriber goroutine
+func (ev *GoEvent) Close() {
+	ev.mu.Lock()
+	defer ev.mu.Unlock()
+	for topic, chs := range ev.subscribes {
+		for _, ch := range chs {
+			close(ch)
+		}
+		delete(ev.subscribes, topic)
 	}
 }

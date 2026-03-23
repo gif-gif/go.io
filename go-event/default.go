@@ -8,6 +8,9 @@ var (
 )
 
 func Default() *GoEvent {
+	__once.Do(func() {
+		__event = New()
+	})
 	return __event
 }
 
