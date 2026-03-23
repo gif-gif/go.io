@@ -241,6 +241,7 @@ func (ins *instance) kill() {
 		if err := proc.Kill(); err != nil {
 			// 进程已退出，目的达到，不算错误， 如：Ctrl+C 发出 SIGINT 信号时主程序和子程序都会收到，但是子程序被kill时主程序会尝试重启子程序
 			if strings.Contains(err.Error(), "process already finished") {
+				log.Warnf("[%s] kill success: %v instance: %v", ins.opts.Name, err, ins.instanceId)
 				return
 			}
 			log.Warnf("[%s] kill failed: %v instance: %v", ins.opts.Name, err, ins.instanceId)

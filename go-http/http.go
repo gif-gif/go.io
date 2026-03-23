@@ -76,15 +76,15 @@ func (g *GoHttp[T]) doHttpRequest(context context.Context, req *Request) (*T, er
 		restyClient.SetProxy(req.proxyURL)
 	}
 
-	if req.Headers == nil {
-		req.Headers = make(map[string]string)
-		req.Headers["Accept"] = CONTENT_TYPE_JSON
-	} else {
-		req.Headers["Accept"] = CONTENT_TYPE_JSON
+	// 构建独立的 headers 副本，避免修改原始 req.Headers 造成并发问题
+	headers := make(map[string]string)
+	for k, v := range req.Headers {
+		headers[k] = v
 	}
+	headers["Accept"] = CONTENT_TYPE_JSON
 
 	for k, v := range g.GetGlobalHeaders() {
-		req.Headers[k] = v
+		headers[k] = v
 	}
 
 	var t T
@@ -93,10 +93,10 @@ func (g *GoHttp[T]) doHttpRequest(context context.Context, req *Request) (*T, er
 	request := restyClient.R()
 	request.SetContext(context)
 	if !req.BinaryResponse {
-		request.SetResult(t)
+		request.SetResult(&t)
 	}
 
-	request.SetHeaders(req.Headers)
+	request.SetHeaders(headers)
 	if req.QueryParams != nil {
 		request.SetQueryParams(req.QueryParams)
 	}
@@ -212,6 +212,7 @@ func (g *GoHttp[T]) HttpConcurrencyRequest() (*T, error) {
 	}
 
 	var rst *T
+	var mu sync.Mutex
 	errs := errors.New("Concurrency error")
 	var one sync.Once
 	ctx, cancel := context.WithCancel(context.Background())
@@ -220,6 +221,11 @@ func (g *GoHttp[T]) HttpConcurrencyRequest() (*T, error) {
 	for _, url := range g.Request.Urls {
 		reqNew := *g.Request
 		reqNew.Url = url
+		// 深拷贝 Headers map，避免并发写同一个 map
+		reqNew.Headers = make(map[string]string)
+		for k, v := range g.Request.Headers {
+			reqNew.Headers[k] = v
+		}
 		fns = append(fns, func() {
 			if goutils.IsContextDone(ctx) {
 				return
@@ -227,7 +233,9 @@ func (g *GoHttp[T]) HttpConcurrencyRequest() (*T, error) {
 
 			t, err := g.doHttpRequest(ctx, &reqNew)
 			if err != nil {
+				mu.Lock()
 				errs = errors.Join(errs, err)
+				mu.Unlock()
 			} else { //请求成功了应该直接返回，剩下的请求结果忽略
 				one.Do(func() { //只保留最快成功的
 					rst = t
