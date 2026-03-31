@@ -10,27 +10,18 @@ import (
 )
 
 func main() {
-	// 创建客户端，可按需覆盖默认值
-	client := gohttpc.New(
-		gohttpc.WithMaxConcurrency(100), // 最多 100 个请求同时在飞
-		gohttpc.WithMaxConnsPerHost(50), // 每个 host 最多 50 个 TCP 连接
-		gohttpc.WithMaxIdleConnsPerHost(30),
-		gohttpc.WithRequestTimeout(10*time.Second),
-		gohttpc.WithMaxRetries(2),
-	)
-
 	ctx := context.Background()
 
-	// --- 示例 1: 简单 GET ---
-	resp, err := client.Get(ctx, "https://httpbin.org/get")
+	// --- 示例 1: 直接用包级函数，零配置 ---
+	resp, err := gohttpc.Get(ctx, "https://httpbin.org/get")
 	if err != nil {
 		fmt.Println("GET error:", err)
 	} else {
 		fmt.Println("GET status:", resp.StatusCode)
 	}
 
-	// --- 示例 2: POST JSON ---
-	resp, err = client.Post(ctx, "https://httpbin.org/post", map[string]string{
+	// --- 示例 2: 包级 POST ---
+	resp, err = gohttpc.Post(ctx, "https://httpbin.org/post", map[string]string{
 		"hello": "world",
 	})
 	if err != nil {
@@ -39,8 +30,8 @@ func main() {
 		fmt.Println("POST status:", resp.StatusCode)
 	}
 
-	// --- 示例 3: 自定义请求（带 Header） ---
-	resp, err = client.Do(ctx, func(r *req.Request) (*req.Response, error) {
+	// --- 示例 3: 包级 Do 自定义请求 ---
+	resp, err = gohttpc.Do(ctx, func(r *req.Request) (*req.Response, error) {
 		return r.
 			SetHeader("X-Custom", "value").
 			SetQueryParam("page", "1").
@@ -52,7 +43,14 @@ func main() {
 		fmt.Println("Do status:", resp.StatusCode)
 	}
 
-	// --- 示例 4: 批量并发请求 ---
+	// --- 示例 4: 需要自定义配置时才 New ---
+	client := gohttpc.New(
+		gohttpc.WithMaxConcurrency(100),
+		gohttpc.WithMaxConnsPerHost(50),
+		gohttpc.WithRequestTimeout(10*time.Second),
+		gohttpc.WithMaxRetries(2),
+	)
+
 	urls := []string{
 		"https://httpbin.org/delay/1",
 		"https://httpbin.org/delay/1",
@@ -63,7 +61,6 @@ func main() {
 
 	tasks := make([]gohttpc.Task, len(urls))
 	for i, u := range urls {
-		u := u
 		tasks[i] = gohttpc.Task{
 			Name: fmt.Sprintf("req-%d", i),
 			Fn: func(ctx context.Context, c *gohttpc.Client) (*req.Response, error) {

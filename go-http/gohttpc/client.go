@@ -48,11 +48,11 @@ func DefaultConfig() *Config {
 
 		DialTimeout:         5 * time.Second,
 		TLSHandshakeTimeout: 5 * time.Second,
-		RequestTimeout:      30 * time.Second,
+		RequestTimeout:      10 * time.Second,
 
 		MaxConcurrency: 256,
 
-		MaxRetries:    3,
+		MaxRetries:    0,
 		RetryInterval: 500 * time.Millisecond,
 
 		UserAgent: "HighConcurrencyClient/1.0",
@@ -84,6 +84,36 @@ type Client struct {
 	client *req.Client
 	sem    chan struct{} // 并发信号量
 	cfg    *Config
+}
+
+// defaultClient 使用默认配置的全局客户端，通过包级函数直接使用
+var defaultClient = New()
+
+// Default 返回默认全局客户端实例
+func Default() *Client {
+	return defaultClient
+}
+
+// --- 包级快捷函数，直接使用默认客户端 ---
+
+// Get 使用默认客户端发起 GET 请求
+func Get(ctx context.Context, url string) (*req.Response, error) {
+	return defaultClient.Get(ctx, url)
+}
+
+// Post 使用默认客户端发起 POST 请求
+func Post(ctx context.Context, url string, body any) (*req.Response, error) {
+	return defaultClient.Post(ctx, url, body)
+}
+
+// Do 使用默认客户端发起自定义请求
+func Do(ctx context.Context, fn func(r *req.Request) (*req.Response, error)) (*req.Response, error) {
+	return defaultClient.Do(ctx, fn)
+}
+
+// BatchDo 使用默认客户端并发执行一批任务
+func BatchDo(ctx context.Context, tasks []Task) []Result {
+	return defaultClient.BatchDo(ctx, tasks)
 }
 
 // New 创建高并发客户端
@@ -154,7 +184,7 @@ func (c *Client) Get(ctx context.Context, url string) (*req.Response, error) {
 }
 
 // Post 发起 POST 请求（受并发控制）
-func (c *Client) Post(ctx context.Context, url string, body interface{}) (*req.Response, error) {
+func (c *Client) Post(ctx context.Context, url string, body any) (*req.Response, error) {
 	if err := c.acquire(ctx); err != nil {
 		return nil, err
 	}
