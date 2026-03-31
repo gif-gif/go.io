@@ -1,5 +1,5 @@
 # Http 请求封装
-
+- 注意：GoHttp 每次请求都会 restyClient = resty.New()，高并发请求建议用 gohttpc 包
 ```go
 package main
 

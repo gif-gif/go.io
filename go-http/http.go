@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	goutils "github.com/gif-gif/go.io/go-utils"
-	"github.com/go-resty/resty/v2"
-	"github.com/gogf/gf/util/gconv"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	goutils "github.com/gif-gif/go.io/go-utils"
+	"github.com/go-resty/resty/v2"
+	"github.com/gogf/gf/util/gconv"
 )
 
 type GoHttp[T any] struct {
