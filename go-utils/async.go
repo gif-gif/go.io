@@ -2,11 +2,13 @@ package goutils
 
 import (
 	"context"
+	"fmt"
+	"sync"
+	"time"
+
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/sync/errgroup"
-	"sync"
-	"time"
 )
 
 type ErrorGroup struct {
@@ -124,4 +126,61 @@ func IsContextDone(ctx context.Context) bool {
 	default:
 	}
 	return false
+}
+
+// --- Safe Goroutine ---
+
+// CatchErrorAndThrow recovers from panics (use with defer).
+func CatchErrorAndThrow() {
+	if r := recover(); r != nil {
+		panic(r)
+	}
+}
+
+// Go runs fn in a goroutine with panic recovery.
+func Go(fn func()) {
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Printf("Safe Goroutine.Go() panic: %v\n", r)
+			}
+		}()
+		fn()
+	}()
+}
+
+// Go1 runs fn(t1) in a goroutine with panic recovery.
+func Go1[T1 any](fn func(T1), t1 T1) {
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Printf("Safe Goroutine.Go1() panic: %v\n", r)
+			}
+		}()
+		fn(t1)
+	}()
+}
+
+// Go2 runs fn(t1, t2) in a goroutine with panic recovery.
+func Go2[T1, T2 any](fn func(T1, T2), t1 T1, t2 T2) {
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Printf("Safe Goroutine.Go2() panic: %v\n", r)
+			}
+		}()
+		fn(t1, t2)
+	}()
+}
+
+// Go3 runs fn(t1, t2, t3) in a goroutine with panic recovery.
+func Go3[T1, T2, T3 any](fn func(T1, T2, T3), t1 T1, t2 T2, t3 T3) {
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Printf("Safe Goroutine.Go3() panic: %v\n", r)
+			}
+		}()
+		fn(t1, t2, t3)
+	}()
 }
