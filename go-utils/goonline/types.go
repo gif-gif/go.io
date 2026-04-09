@@ -3,6 +3,7 @@ package goonline
 const (
 	DefaultLeaseTTL     = 600        // 租约过期时间：10分钟
 	DefaultOnlinePrefix = "/online/" // 在线数据键前缀
+	DefaultTimeout      = 5          // 默认etcd操作超时时间（秒）
 )
 
 // Config 配置项
@@ -12,6 +13,7 @@ type Config struct {
 	EntityType   string `yaml:"entityType" json:"entityType,optional"`     // 实体类型（users/servers/devices等）
 	LeaseTTL     int64  `yaml:"leaseTTL" json:"leaseTTL,optional"`         // 租约过期时间（秒）,默认10分钟
 	OnlinePrefix string `yaml:"onlinePrefix" json:"onlinePrefix,optional"` // 在线数据键前缀, 默认"/online/"
+	Timeout      int64  `yaml:"timeout" json:"timeout,optional"`           // etcd操作超时时间（秒），默认5秒
 	LogEnable    bool   `yaml:"logEnable" json:"logEnable,optional"`       // 是否开启日志
 }
 

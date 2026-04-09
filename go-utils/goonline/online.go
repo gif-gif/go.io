@@ -35,6 +35,10 @@ func New(client *clientv3.Client, cfg *Config) (*GoOnline, error) {
 	if cfg.LeaseTTL <= 0 {
 		cfg.LeaseTTL = DefaultLeaseTTL
 	}
+	// 设置默认超时时间
+	if cfg.Timeout <= 0 {
+		cfg.Timeout = DefaultTimeout
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -58,6 +62,11 @@ func (m *GoOnline) getPrefix() string {
 	return fmt.Sprintf("%s%s/", m.Config.OnlinePrefix, m.entityType)
 }
 
+// timeoutCtx 创建带超时的 context，避免 etcd 调用无限期阻塞
+func (m *GoOnline) timeoutCtx() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(m.ctx, time.Duration(m.Config.Timeout)*time.Second)
+}
+
 // SetOnline 设置实体上线或续租
 // 如果实体已在线，则续租现有租约；如果不在线，则创建新租约
 func (m *GoOnline) SetOnline(entityID string, leaseTTL int64, data any) error {
@@ -67,7 +76,9 @@ func (m *GoOnline) SetOnline(entityID string, leaseTTL int64, data any) error {
 	key := m.getKey(entityID)
 
 	// 1. 检查实体是否已在线
-	resp, err := m.client.Get(m.ctx, key)
+	ctx, cancel := m.timeoutCtx()
+	defer cancel()
+	resp, err := m.client.Get(ctx, key)
 	if err != nil {
 		return fmt.Errorf("查询实体状态失败: %v", err)
 	}
@@ -82,7 +93,9 @@ func (m *GoOnline) SetOnline(entityID string, leaseTTL int64, data any) error {
 
 		// 续租现有租约
 		leaseID := clientv3.LeaseID(existingData.LeaseID)
-		_, err = m.client.KeepAliveOnce(m.ctx, leaseID)
+		kaCtx, kaCancel := m.timeoutCtx()
+		defer kaCancel()
+		_, err = m.client.KeepAliveOnce(kaCtx, leaseID)
 		if err != nil {
 			// 日志
 			if m.LogEnable {
@@ -101,7 +114,9 @@ func (m *GoOnline) SetOnline(entityID string, leaseTTL int64, data any) error {
 		}
 
 		// 更新 etcd
-		_, err = m.client.Put(m.ctx, key, string(dataJSON), clientv3.WithLease(leaseID))
+		putCtx, putCancel := m.timeoutCtx()
+		defer putCancel()
+		_, err = m.client.Put(putCtx, key, string(dataJSON), clientv3.WithLease(leaseID))
 		if err != nil {
 			return fmt.Errorf("更新数据失败: %v", err)
 		}
@@ -123,7 +138,9 @@ func (m *GoOnline) createNewLease(entityID string, leaseTTL int64, data any) err
 	if leaseTTL == 0 {
 		leaseTTL = m.Config.LeaseTTL
 	}
-	lease, err := m.client.Grant(m.ctx, leaseTTL)
+	grantCtx, grantCancel := m.timeoutCtx()
+	defer grantCancel()
+	lease, err := m.client.Grant(grantCtx, leaseTTL)
 	if err != nil {
 		return fmt.Errorf("创建租约失败: %v", err)
 	}
@@ -146,7 +163,9 @@ func (m *GoOnline) createNewLease(entityID string, leaseTTL int64, data any) err
 
 	// 3. 存储到 etcd
 	key := m.getKey(entityID)
-	_, err = m.client.Put(m.ctx, key, string(dataJSON), clientv3.WithLease(lease.ID))
+	putCtx, putCancel := m.timeoutCtx()
+	defer putCancel()
+	_, err = m.client.Put(putCtx, key, string(dataJSON), clientv3.WithLease(lease.ID))
 	if err != nil {
 		return fmt.Errorf("注册失败: %v", err)
 	}
@@ -166,7 +185,9 @@ func (m *GoOnline) SetOffline(entityID string) error {
 	key := m.getKey(entityID)
 
 	// 获取实体信息
-	resp, err := m.client.Get(m.ctx, key)
+	getCtx, getCancel := m.timeoutCtx()
+	defer getCancel()
+	resp, err := m.client.Get(getCtx, key)
 	if err != nil {
 		return fmt.Errorf("查询失败: %v", err)
 	}
@@ -183,9 +204,9 @@ func (m *GoOnline) SetOffline(entityID string) error {
 	}
 
 	// 撤销租约
-	ctx, cancel := context.WithTimeout(m.ctx, 3*time.Second)
-	defer cancel()
-	_, err = m.client.Revoke(ctx, clientv3.LeaseID(onlineData.LeaseID))
+	revokeCtx, revokeCancel := m.timeoutCtx()
+	defer revokeCancel()
+	_, err = m.client.Revoke(revokeCtx, clientv3.LeaseID(onlineData.LeaseID))
 	if err != nil {
 		return fmt.Errorf("撤销租约失败: %v", err)
 	}
@@ -200,7 +221,9 @@ func (m *GoOnline) SetOffline(entityID string) error {
 // GetOnlineList 获取所有在线实体列表
 func (m *GoOnline) GetOnlineList() ([]OnlineData, error) {
 	prefix := m.getPrefix()
-	resp, err := m.client.Get(m.ctx, prefix, clientv3.WithPrefix())
+	ctx, cancel := m.timeoutCtx()
+	defer cancel()
+	resp, err := m.client.Get(ctx, prefix, clientv3.WithPrefix())
 	if err != nil {
 		return nil, fmt.Errorf("获取在线列表失败: %v", err)
 	}
@@ -225,7 +248,9 @@ func (m *GoOnline) GetOnlineList() ([]OnlineData, error) {
 // Get 获取指定实体信息
 func (m *GoOnline) Get(entityID string) (*OnlineData, error) {
 	key := m.getKey(entityID)
-	resp, err := m.client.Get(m.ctx, key)
+	ctx, cancel := m.timeoutCtx()
+	defer cancel()
+	resp, err := m.client.Get(ctx, key)
 	if err != nil {
 		return nil, fmt.Errorf("查询失败: %v", err)
 	}
@@ -246,7 +271,9 @@ func (m *GoOnline) Get(entityID string) (*OnlineData, error) {
 // GetOnlineCount 获取在线数量
 func (m *GoOnline) GetOnlineCount() (int, error) {
 	prefix := m.getPrefix()
-	resp, err := m.client.Get(m.ctx, prefix, clientv3.WithPrefix(), clientv3.WithCountOnly())
+	ctx, cancel := m.timeoutCtx()
+	defer cancel()
+	resp, err := m.client.Get(ctx, prefix, clientv3.WithPrefix(), clientv3.WithCountOnly())
 	if err != nil {
 		return 0, fmt.Errorf("获取在线数量失败: %v", err)
 	}
@@ -256,7 +283,9 @@ func (m *GoOnline) GetOnlineCount() (int, error) {
 // IsOnline 检查是否在线
 func (m *GoOnline) IsOnline(entityID string) (bool, error) {
 	key := m.getKey(entityID)
-	resp, err := m.client.Get(m.ctx, key, clientv3.WithCountOnly())
+	ctx, cancel := m.timeoutCtx()
+	defer cancel()
+	resp, err := m.client.Get(ctx, key, clientv3.WithCountOnly())
 	if err != nil {
 		return false, err
 	}
@@ -295,10 +324,21 @@ func (w *OnlineWatcher) getPrefix() string {
 	return fmt.Sprintf("%s%s/", w.Config.OnlinePrefix, w.entityType)
 }
 
+// timeoutCtx 创建带超时的 context
+func (w *OnlineWatcher) timeoutCtx() (context.Context, context.CancelFunc) {
+	timeout := w.Config.Timeout
+	if timeout <= 0 {
+		timeout = DefaultTimeout
+	}
+	return context.WithTimeout(w.ctx, time.Duration(timeout)*time.Second)
+}
+
 // GetOnlineList 获取当前在线列表
 func (w *OnlineWatcher) GetOnlineList() ([]OnlineData, error) {
 	prefix := w.getPrefix()
-	resp, err := w.client.Get(w.ctx, prefix, clientv3.WithPrefix())
+	ctx, cancel := w.timeoutCtx()
+	defer cancel()
+	resp, err := w.client.Get(ctx, prefix, clientv3.WithPrefix())
 	if err != nil {
 		return nil, fmt.Errorf("获取在线列表失败: %v", err)
 	}

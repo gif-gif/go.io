@@ -29,6 +29,7 @@ func TestOnlineManager(t *testing.T) {
 	// 2. 创建服务器在线管理器
 	serverConfigs := &Config{
 		EntityType: "server",
+		Timeout:    1,
 	}
 	serverManager, err := New(client, serverConfigs)
 	if err != nil {
