@@ -1,5 +1,5 @@
 # gohttpx 模块
-- 快捷使用http 请求，大量高并发请求建议用 gohttpc 包
+- 快捷使用http 请求，高并发请求建议用 gohttpc 包
 ```go
 resp, err := gohttpx.PostJson(Email.Api, data)
 if err != nil {
