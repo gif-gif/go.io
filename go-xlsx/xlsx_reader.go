@@ -44,6 +44,33 @@ func (r *XlsxRead) ReadBySheet(sheet string, fn func(n int, row []string) error)
 	return nil
 }
 
+func (r *XlsxRead) ReadBySheetIndex(sheetIndex int, fn func(n int, row []string) error) error {
+	xlsx, err := excelize.OpenFile(r.FilePath)
+	if err != nil {
+		return err
+	}
+	defer xlsx.Close()
+
+	sheet := xlsx.GetSheetName(sheetIndex)
+
+	rows, err := xlsx.Rows(sheet)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var n int
+	for rows.Next() {
+		n++
+		row, _ := rows.Columns()
+		if err = fn(n, row); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (r *XlsxRead) Read(fn func(n int, row []string) error) error {
 	return r.ReadBySheet("", fn)
 }
