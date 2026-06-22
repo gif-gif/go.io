@@ -5,9 +5,11 @@ go 1.24.1
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.30.0
 	github.com/IBM/sarama v1.43.3
+	github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/andybalholm/brotli v1.2.0
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
+	github.com/creack/pty v1.1.18
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
@@ -39,7 +41,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.22.0
 	github.com/prometheus/common v0.62.0
-	github.com/redis/go-redis/v9 v9.10.0
+	github.com/redis/go-redis/v9 v9.21.0
 	github.com/samber/lo v1.47.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/silenceper/wechat/v2 v2.1.6
@@ -55,6 +57,7 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.46.0
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
+	golang.org/x/net v0.48.0
 	golang.org/x/oauth2 v0.24.0
 	golang.org/x/sync v0.19.0
 	golang.org/x/text v0.32.0
@@ -154,7 +157,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
@@ -220,7 +223,6 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/image v0.25.0 // indirect
-	golang.org/x/net v0.48.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/term v0.38.0 // indirect
 	golang.org/x/time v0.12.0 // indirect

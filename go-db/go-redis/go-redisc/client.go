@@ -2,12 +2,13 @@ package goredisc
 
 import (
 	"context"
+	"time"
+
 	gojob "github.com/gif-gif/go.io/go-job"
 	golog "github.com/gif-gif/go.io/go-log"
 	"github.com/gogf/gf/container/garray"
 	"github.com/redis/go-redis/v9"
 	"github.com/samber/lo"
-	"time"
 )
 
 type GoRedisC struct {
@@ -27,12 +28,20 @@ func New(conf Config) (cli *GoRedisC, err error) {
 	}
 
 	//兼容集群模式和单点连接
-	clusterSlots := func(ctx context.Context) ([]redis.ClusterSlot, error) {
-		// 自定义集群槽位获取逻辑，通常使用默认值即可
-		return nil, nil
-	}
-	if conf.Type != "node" {
-		clusterSlots = nil
+	// 单点模式(node)下，目标 Redis 不是真正的集群，不会响应 CLUSTER SLOTS。
+	// 手动把全部槽位(0-16383)映射到配置地址，让 ClusterClient 当作单分片集群使用。
+	// 注意：不能返回 nil，否则新版 go-redis 会因为没有节点而报 "cluster has no nodes"。
+	var clusterSlots func(ctx context.Context) ([]redis.ClusterSlot, error)
+	if conf.Type == "node" {
+		clusterSlots = func(ctx context.Context) ([]redis.ClusterSlot, error) {
+			nodes := make([]redis.ClusterNode, 0, len(conf.Addrs))
+			for _, addr := range conf.Addrs {
+				nodes = append(nodes, redis.ClusterNode{Addr: addr})
+			}
+			return []redis.ClusterSlot{
+				{Start: 0, End: 16383, Nodes: nodes},
+			}, nil
+		}
 	}
 
 	cli.Redis = redis.NewClusterClient(&redis.ClusterOptions{
